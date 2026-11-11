@@ -281,10 +281,10 @@ Notice that Route 101 (departed 07:15) was matched with the 06:00 observation (D
 
 Review the following five curated documentation guides and technical specifications before beginning your applied lab:
 
-1. **[DuckDB Official Documentation: ASOF JOIN Query Syntax](https://duckdb.org/docs/sql/query_syntax/asof_join)**
+1. **[DuckDB Official Documentation: ASOF JOIN Query Syntax](https://duckdb.org/docs/guides/sql_features/asof_join)**
    *Understand the formal syntax specifications, inequality operators, equality constraints, and NULL match behaviors for DuckDB's native point-in-time join engine.*
 
-2. **[DuckDB Engineering Blog: Fuzzy Temporal Lookups](https://duckdb.org/2023/09/15/asof-join-fuzzy-temporal-lookups.html)**
+2. **[DuckDB Engineering Blog: Fuzzy Temporal Lookups](https://duckdb.org/2023/09/15/asof-joins-fuzzy-temporal-lookups.html)**
    *Study the architectural internals of how DuckDB plans and executes ASOF joins using parallelized merge pipelines instead of expensive Cartesian products.*
 
 3. **[Apache Arrow In-Memory Columnar Format](https://arrow.apache.org/overview/)**
@@ -302,29 +302,29 @@ Review the following five curated documentation guides and technical specificati
 
 Watch each of the following video chapters to observe columnar data engines and temporal joins executed in live engineering environments:
 
-### DuckDB in 100 Seconds <span style="font-size: 0.9em; color: #64748b;">(Full Video - 2:12)</span>
+### DuckDB in 100 Seconds <span style="font-size: 0.9em; color: #64748b;">(Fireship - 2:12)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
   <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="DuckDB in 100 Seconds" src="https://www.youtube.com/embed/uHm6FEb2Re4" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=uHm6FEb2Re4" target="_blank" rel="noopener">Open video segment in new tab (2:12)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=uHm6FEb2Re4" target="_blank" rel="noopener">Open video in new tab (2:12)</a></p>
 
-### Row vs. Column Storage Models & Compression <span style="font-size: 0.9em; color: #64748b;">(Starts at 15:20)</span>
+### Row vs. Column Storage Models: Why Columnar Databases Are Faster <span style="font-size: 0.9em; color: #64748b;">(Better Stack - 7:45)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
-  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Row vs Column Storage Models - CMU Database Group" src="https://www.youtube.com/embed/5gXn5fLkbM0?start=920" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Row vs Columnar Databases" src="https://www.youtube.com/embed/VGdMembUCC0" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=5gXn5fLkbM0&amp;t=920s" target="_blank" rel="noopener">Open video segment in new tab (15:20)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=VGdMembUCC0" target="_blank" rel="noopener">Open video in new tab (7:45)</a></p>
 
-### SQL ASOF Join Tutorial in DuckDB & Snowflake <span style="font-size: 0.9em; color: #64748b;">(Full Walkthrough - 8:45)</span>
+### SQL ASOF Join Tutorial in DuckDB & Snowflake <span style="font-size: 0.9em; color: #64748b;">(Bill Wallis - Full Walkthrough)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
-  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="SQL ASOF Join Tutorial" src="https://www.youtube.com/embed/zy89zKipsQg" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="SQL ASOF Join Tutorial" src="https://www.youtube.com/embed/zWY36adlP_c" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=zy89zKipsQg" target="_blank" rel="noopener">Open video segment in new tab (8:45)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=zWY36adlP_c" target="_blank" rel="noopener">Open video in new tab</a></p>
 
-### Feature Engineering: Point-in-Time Correctness & Avoiding Data Leakage <span style="font-size: 0.9em; color: #64748b;">(Full Video - 11:30)</span>
+### Feature Engineering: Point-in-Time Correctness & Avoiding Data Leakage <span style="font-size: 0.9em; color: #64748b;">(CodeEmporium - Core Concepts)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
-  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Feature Engineering and Point in Time Correctness" src="https://www.youtube.com/embed/T1dJfh1KlYA" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="What is Data Leakage in Machine Learning" src="https://www.youtube.com/embed/cApPa55X2JU" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=T1dJfh1KlYA" target="_blank" rel="noopener">Open video segment in new tab (11:30)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=cApPa55X2JU" target="_blank" rel="noopener">Open video in new tab</a></p>
 
 ---
 

@@ -197,7 +197,7 @@ Review the following five curated documentation guides and technical specificati
 1. **[Polars User Guide: Streaming Lazy API](https://docs.pola.rs/user-guide/concepts/streaming/)**
    *Learn how Polars processes datasets larger than available RAM by streaming data in chunks through multithreaded pipelines.*
 
-2. **[Polars User Guide: Expressions & Vectorization](https://docs.pola.rs/user-guide/concepts/expressions/)**
+2. **[Polars User Guide: Expressions & Vectorization](https://docs.pola.rs/user-guide/concepts/expressions-and-contexts/)**
    *Understand how Polars writes declarative columnar transformations executed concurrently across CPU cores without Python overhead.*
 
 3. **[Scikit-Learn User Guide: Novelty and Outlier Detection](https://scikit-learn.org/stable/modules/outlier_detection.html)**
@@ -215,23 +215,23 @@ Review the following five curated documentation guides and technical specificati
 
 Watch each of the following video chapters to observe high-performance DataFrames and outlier detection algorithms in practice:
 
-### Polars: The Next Big Python Data Science Library <span style="font-size: 0.9em; color: #64748b;">(Full Walkthrough - 12:45)</span>
+### Polars: The Next Big Python Data Science Library <span style="font-size: 0.9em; color: #64748b;">(Rob Mulla - Full Walkthrough)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
   <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Polars Python Tutorial" src="https://www.youtube.com/embed/VHqn7ufiilE" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=VHqn7ufiilE" target="_blank" rel="noopener">Open video segment in new tab (12:45)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=VHqn7ufiilE" target="_blank" rel="noopener">Open video in new tab</a></p>
 
-### Apache Arrow: Zero-Copy In-Memory Analytics <span style="font-size: 0.9em; color: #64748b;">(Architecture Overview - 9:30)</span>
+### Apache Arrow: Zero-Copy In-Memory Columnar Analytics <span style="font-size: 0.9em; color: #64748b;">(Airbyte - Architecture Overview)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
-  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Apache Arrow Architecture" src="https://www.youtube.com/embed/5gXn5fLkbM0?start=180" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Apache Arrow Architecture" src="https://www.youtube.com/embed/e8Ti5Z4t1E8" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=5gXn5fLkbM0&amp;t=180s" target="_blank" rel="noopener">Open video segment in new tab (3:00)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=e8Ti5Z4t1E8" target="_blank" rel="noopener">Open video in new tab</a></p>
 
-### DuckDB & Polars: Modern Data Stack Synergy <span style="font-size: 0.9em; color: #64748b;">(Full Video - 10:15)</span>
+### DuckDB & Polars: Modern Data Stack Synergy in Python <span style="font-size: 0.9em; color: #64748b;">(FlowForge Lab - Code & Benchmarks)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
-  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Modern Data Stack with Polars" src="https://www.youtube.com/embed/uHm6FEb2Re4" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="DuckDB and Polars Together in Python" src="https://www.youtube.com/embed/7TINvL43Oko" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=uHm6FEb2Re4" target="_blank" rel="noopener">Open video segment in new tab (2:12)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=7TINvL43Oko" target="_blank" rel="noopener">Open video in new tab</a></p>
 
 ---
 

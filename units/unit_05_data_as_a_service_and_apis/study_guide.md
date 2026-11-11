@@ -209,10 +209,10 @@ Review the following five curated documentation guides and technical specificati
 2. **[Pydantic v2 Documentation: Models & Rust Validation Engine](https://docs.pydantic.dev/latest/)**
    *Understand model declaration, custom validators (`@field_validator`), strict mode, and high-speed serialization.*
 
-3. **[Starlette ASGI Framework: Architecture & Performance](https://www.starlette.io/)**
+3. **[Starlette ASGI Framework: Architecture & Performance](https://starlette.dev/)**
    *Explore the underlying asynchronous toolkit that powers FastAPI's high-concurrency HTTP request handling.*
 
-4. **[Uvicorn ASGI Web Server: Configuration Reference](https://www.uvicorn.org/)**
+4. **[Uvicorn ASGI Web Server: Configuration Reference](https://uvicorn.dev/)**
    *Master running production Python services with worker processes, hot-reloading, and socket binding.*
 
 5. **[Designing Data-Intensive Applications: Service-Oriented Architecture (OER Notes)](https://github.com/ept/ddia-references)**
@@ -224,23 +224,23 @@ Review the following five curated documentation guides and technical specificati
 
 Watch each of the following video chapters to observe RESTful APIs and schema contracts in action:
 
-### RESTful APIs in 100 Seconds <span style="font-size: 0.9em; color: #64748b;">(Full Video - 2:10)</span>
+### RESTful APIs in 100 Seconds <span style="font-size: 0.9em; color: #64748b;">(Fireship - 2:10)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
   <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="RESTful APIs in 100 Seconds" src="https://www.youtube.com/embed/-MTSQjw5DrM" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=-MTSQjw5DrM" target="_blank" rel="noopener">Open video segment in new tab (2:10)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=-MTSQjw5DrM" target="_blank" rel="noopener">Open video in new tab (2:10)</a></p>
 
-### FastAPI Tutorial: Building Modern Asynchronous Python Endpoints <span style="font-size: 0.9em; color: #64748b;">(Core Concepts - 15:00)</span>
+### FastAPI Tutorial: Building Modern Asynchronous Python Endpoints <span style="font-size: 0.9em; color: #64748b;">(pixegami - 15-Minute Walkthrough)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
-  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="FastAPI Tutorial" src="https://www.youtube.com/embed/qw--VYLpxG4?start=4348" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="FastAPI Tutorial in Python" src="https://www.youtube.com/embed/iWS9ogMPOI0" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=qw--VYLpxG4&amp;t=4348s" target="_blank" rel="noopener">Open video segment in new tab (72:28)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=iWS9ogMPOI0" target="_blank" rel="noopener">Open video in new tab</a></p>
 
-### Pydantic v2: Fast Data Validation for Production Python <span style="font-size: 0.9em; color: #64748b;">(Full Video - 10:30)</span>
+### Pydantic v2: Fast Data Validation for Production Python <span style="font-size: 0.9em; color: #64748b;">(pixegami - Core Walkthrough)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
-  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Pydantic v2 Validation" src="https://www.youtube.com/embed/T1dJfh1KlYA" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Pydantic v2 Data Validation" src="https://www.youtube.com/embed/XIdQ6gO3Anc" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=T1dJfh1KlYA" target="_blank" rel="noopener">Open video segment in new tab (11:30)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=XIdQ6gO3Anc" target="_blank" rel="noopener">Open video in new tab</a></p>
 
 ---
 

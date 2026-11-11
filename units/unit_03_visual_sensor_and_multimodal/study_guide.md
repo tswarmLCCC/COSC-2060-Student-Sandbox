@@ -183,7 +183,7 @@ print(f"Applied Scale: {scale:.4f}, Padding X: {px}, Padding Y: {py}")
 
 Review the following five curated documentation guides and technical specifications before beginning your applied lab:
 
-1. **[OpenCV Official Documentation: Geometric Image Transformations](https://docs.opencv.org/4.x/d2/d96/tutorial_py_table_of_contents_imgproc.html)**
+1. **[OpenCV Official Documentation: Geometric Image Transformations](https://github.com/opencv/opencv-python)**
    *Understand resizing interpolation algorithms (linear, cubic, area), color space conversions, and image affine transformations.*
 
 2. **[Ultralytics YOLO: Dataset Format & Manifest Standards](https://docs.ultralytics.com/datasets/)**
@@ -192,7 +192,7 @@ Review the following five curated documentation guides and technical specificati
 3. **[PyTorch Vision: Transforms & Data Augmentation](https://pytorch.org/vision/stable/transforms.html)**
    *Learn how modern deep learning frameworks handle batch image normalization, tensor conversions, and spatial augmentations.*
 
-4. **[Roboflow Engineering: Image Letterboxing vs. Resizing](https://blog.roboflow.com/letterbox/)**
+4. **[Roboflow Engineering: Image Letterboxing vs. Resizing](https://blog.roboflow.com/you-might-be-resizing-your-images-incorrectly/)**
    *A deep dive with visual benchmarks explaining why non-square aspect ratio distortion ruins object detection precision.*
 
 5. **[Albumentations: Fast Computer Vision Preprocessing Library](https://albumentations.ai/docs/)**
@@ -204,23 +204,23 @@ Review the following five curated documentation guides and technical specificati
 
 Watch each of the following video chapters to observe computer vision data engineering and coordinate systems in action:
 
-### PyTorch in 100 Seconds <span style="font-size: 0.9em; color: #64748b;">(Full Video - 2:15)</span>
+### PyTorch in 100 Seconds <span style="font-size: 0.9em; color: #64748b;">(Fireship - 2:15)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
   <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="PyTorch in 100 Seconds" src="https://www.youtube.com/embed/ORMx45xqWkA" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=ORMx45xqWkA" target="_blank" rel="noopener">Open video segment in new tab (2:15)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=ORMx45xqWkA" target="_blank" rel="noopener">Open video in new tab (2:15)</a></p>
 
-### OpenCV Python: Image Preprocessing & Tensor Layouts <span style="font-size: 0.9em; color: #64748b;">(Core Concepts - 10:45)</span>
+### OpenCV Python: Image Processing & Tensor Manipulation <span style="font-size: 0.9em; color: #64748b;">(Rob Mulla - Core Walkthrough)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
-  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="OpenCV Image Manipulation" src="https://www.youtube.com/embed/qw--VYLpxG4?start=317" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Image Processing with OpenCV and Python" src="https://www.youtube.com/embed/kSqxn6zGE0c" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=qw--VYLpxG4&amp;t=317s" target="_blank" rel="noopener">Open video segment in new tab (5:17)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=kSqxn6zGE0c" target="_blank" rel="noopener">Open video in new tab</a></p>
 
-### YOLO Object Detection: Bounding Box Coordinate Standards <span style="font-size: 0.9em; color: #64748b;">(Full Video - 8:30)</span>
+### What is Image Preprocessing? Aspect Ratios & Bounding Boxes <span style="font-size: 0.9em; color: #64748b;">(Roboflow - Computer Vision Fundamentals)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
-  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="YOLO Annotation Formats" src="https://www.youtube.com/embed/T1dJfh1KlYA" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="What is Image Preprocessing" src="https://www.youtube.com/embed/VMeDbP8gX80" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=T1dJfh1KlYA" target="_blank" rel="noopener">Open video segment in new tab (11:30)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=VMeDbP8gX80" target="_blank" rel="noopener">Open video in new tab</a></p>
 
 ---
 

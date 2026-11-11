@@ -211,7 +211,7 @@ Review the following five curated documentation guides and technical specificati
 1. **[Hugging Face Sentence-Transformers Official Documentation](https://sbert.net/)**
    *Learn how sentence embedding architectures encode natural language into dense metric spaces for semantic search and clustering.*
 
-2. **[ChromaDB Official Documentation: Collections & Vector Operations](https://docs.trychroma.com/getting-started)**
+2. **[ChromaDB Official Documentation: Collections & Vector Operations](https://docs.trychroma.com/docs/overview/getting-started)**
    *Understand vector collection initialization, cosine vs. L2 distance spaces, metadata filtering, and embedding functions.*
 
 3. **[Pinecone Learning Center: Vector Similarity Explained](https://www.pinecone.io/learn/vector-similarity/)**
@@ -229,23 +229,23 @@ Review the following five curated documentation guides and technical specificati
 
 Watch each of the following video chapters to observe vector embeddings and RAG pipelines in practice:
 
-### Vector Databases in 100 Seconds <span style="font-size: 0.9em; color: #64748b;">(Full Video - 2:20)</span>
+### Vector Databases in 100 Seconds <span style="font-size: 0.9em; color: #64748b;">(Fireship - 2:20)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
   <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Vector Databases in 100 Seconds" src="https://www.youtube.com/embed/klTvEwg3oJ4" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=klTvEwg3oJ4" target="_blank" rel="noopener">Open video segment in new tab (2:20)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=klTvEwg3oJ4" target="_blank" rel="noopener">Open video in new tab (2:20)</a></p>
 
-### How Sentence Transformers Work: Dense Embeddings & Vector Math <span style="font-size: 0.9em; color: #64748b;">(Core Concepts - 12:15)</span>
+### How Sentence Transformers Work: Dense Embeddings & Vector Math <span style="font-size: 0.9em; color: #64748b;">(CodeEmporium - Core Concepts)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
-  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Sentence Transformers and Vector Embeddings" src="https://www.youtube.com/embed/qw--VYLpxG4?start=550" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Sentence Transformers Explained" src="https://www.youtube.com/embed/O3xbVmpdJwU" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=qw--VYLpxG4&amp;t=550s" target="_blank" rel="noopener">Open video segment in new tab (9:10)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=O3xbVmpdJwU" target="_blank" rel="noopener">Open video in new tab</a></p>
 
-### Building a Local RAG Pipeline with ChromaDB & Python <span style="font-size: 0.9em; color: #64748b;">(Full Walkthrough - 14:30)</span>
+### Building a Local RAG Pipeline with ChromaDB & Python <span style="font-size: 0.9em; color: #64748b;">(Practical AI - Full Walkthrough)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
-  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="ChromaDB RAG Pipeline" src="https://www.youtube.com/embed/T1dJfh1KlYA" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="ChromaDB RAG Pipeline in Python" src="https://www.youtube.com/embed/InlB5-3-nR4" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=T1dJfh1KlYA" target="_blank" rel="noopener">Open video segment in new tab (11:30)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=InlB5-3-nR4" target="_blank" rel="noopener">Open video in new tab</a></p>
 
 ---
 

@@ -240,7 +240,7 @@ Review the following five curated documentation guides and technical specificati
 3. **[AWS Architecture Center: Making Retries Safe with Idempotent APIs](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/)**
    *Study the definitive architectural standard for idempotency tokens, distributed state consistency, and retry safety.*
 
-4. **[Dagster Guide: Why Dagster Replaced Legacy Task Schedulers](https://docs.dagster.io/about/why-dagster)**
+4. **[Dagster Guide: Why Dagster Replaced Legacy Task Schedulers](https://dagster.io/docs)**
    *Explore the operational differences between cron scripts, Airflow imperative operators, and asset-based engineering.*
 
 5. **[The DataOps Manifesto: Agile Principles for Data Pipelines](https://dataopsmanifesto.org/en/)**
@@ -252,23 +252,23 @@ Review the following five curated documentation guides and technical specificati
 
 Watch each of the following video chapters to observe asset-based data orchestrators and fault-tolerant DAGs in action:
 
-### What is Data Orchestration? Asset DAGs Explained <span style="font-size: 0.9em; color: #64748b;">(Full Video - 10:15)</span>
+### What is Data Orchestration? Asset DAGs Explained (Dagster 101) <span style="font-size: 0.9em; color: #64748b;">(Timnology - Core Concepts)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
-  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Data Orchestration Overview" src="https://www.youtube.com/embed/5gXn5fLkbM0?start=920" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Dagster 101 Core Concepts" src="https://www.youtube.com/embed/k-iQNrtKhjo" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=5gXn5fLkbM0&amp;t=920s" target="_blank" rel="noopener">Open video segment in new tab (15:20)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=k-iQNrtKhjo" target="_blank" rel="noopener">Open video in new tab</a></p>
 
-### Dagster Tutorial: Software-Defined Assets & Data Lineage <span style="font-size: 0.9em; color: #64748b;">(Core Walkthrough - 12:45)</span>
+### Dagster Tutorial: Software-Defined Assets & Data Lineage <span style="font-size: 0.9em; color: #64748b;">(Dagster - 10-Minute Walkthrough)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
-  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Dagster Tutorial" src="https://www.youtube.com/embed/qw--VYLpxG4?start=4518" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Dagster Data Orchestration Walkthrough" src="https://www.youtube.com/embed/L5kTxCM-tOk" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=qw--VYLpxG4&amp;t=4518s" target="_blank" rel="noopener">Open video segment in new tab (75:18)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=L5kTxCM-tOk" target="_blank" rel="noopener">Open video in new tab</a></p>
 
-### Building Resilient Pipelines: Retries, Timeouts & Dead-Letter Queues <span style="font-size: 0.9em; color: #64748b;">(Full Video - 11:20)</span>
+### Automated Data Pipelines: Scheduling Python Scripts with GitHub Actions <span style="font-size: 0.9em; color: #64748b;">(Patrick Loeber - Full Tutorial)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
-  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Resilient Data Pipelines" src="https://www.youtube.com/embed/T1dJfh1KlYA" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Schedule Python Scripts with GitHub Actions" src="https://www.youtube.com/embed/PaGp7Vi5gfM" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=T1dJfh1KlYA" target="_blank" rel="noopener">Open video segment in new tab (11:30)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=PaGp7Vi5gfM" target="_blank" rel="noopener">Open video in new tab</a></p>
 
 ---
 

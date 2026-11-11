@@ -55,7 +55,7 @@ The client scheduled a high-stakes final evaluation with the Chief Technology Of
 The team arrived at corporate headquarters. The client provided a fresh, clean cloud staging server running Ubuntu 22.04 LTS and instructed the team to deploy their system:
 
 ```bash
-git clone https://github.com/client-org/logistics-pipeline.git
+git clone https://github.com/tswarmLCCC/COSC-2060-Student-Sandbox.git
 python3 main.py
 ```
 
@@ -202,7 +202,7 @@ Review the following five curated documentation guides and technical specificati
 2. **[Docker Documentation: Multi-Stage Builds](https://docs.docker.com/build/building/multi-stage/)**
    *Understand how separating build tools from runtime environments reduces container attack surface and shrinks image sizes by 80%.*
 
-3. **[OWASP Container Security Verification Standard](https://owasp.org/www-project-container-security-verification-standard/)**
+3. **[OWASP Container Security Verification Standard](https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html)**
    *Review the gold standard for container hardening: non-root users, read-only root filesystems, and dropped Linux capabilities.*
 
 4. **[The Twelve-Factor App: Cloud-Native Architecture Principles](https://12factor.net/)**
@@ -217,23 +217,23 @@ Review the following five curated documentation guides and technical specificati
 
 Watch each of the following video chapters to observe containerization and production hardening in action:
 
-### Docker in 100 Seconds <span style="font-size: 0.9em; color: #64748b;">(Full Video - 2:15)</span>
+### Docker in 100 Seconds <span style="font-size: 0.9em; color: #64748b;">(Fireship - 2:15)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
   <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Docker in 100 Seconds" src="https://www.youtube.com/embed/Gjnup-PuquQ" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=Gjnup-PuquQ" target="_blank" rel="noopener">Open video segment in new tab (2:15)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=Gjnup-PuquQ" target="_blank" rel="noopener">Open video in new tab (2:15)</a></p>
 
-### Docker for Data Engineers: Multi-Stage Builds & Minimal Images <span style="font-size: 0.9em; color: #64748b;">(Core Concepts - 14:20)</span>
+### Docker for Data Engineers: Containerizing Python Applications <span style="font-size: 0.9em; color: #64748b;">(Patrick Loeber - Core Walkthrough)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
-  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Multi-Stage Docker Builds" src="https://www.youtube.com/embed/qw--VYLpxG4?start=4793" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Docker Tutorial for Python Applications" src="https://www.youtube.com/embed/bi0cKgmRuiA" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=qw--VYLpxG4&amp;t=4793s" target="_blank" rel="noopener">Open video segment in new tab (79:53)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=bi0cKgmRuiA" target="_blank" rel="noopener">Open video in new tab</a></p>
 
-### Container Security & Production Healthchecks <span style="font-size: 0.9em; color: #64748b;">(Full Video - 11:30)</span>
+### Top 8 Docker Best Practices for Production & Security <span style="font-size: 0.9em; color: #64748b;">(TechWorld with Nana - Multi-Stage & Non-Root)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
-  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Container Healthchecks and Hardening" src="https://www.youtube.com/embed/T1dJfh1KlYA" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+  <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: 0px none currentcolor;" title="Docker Best Practices for Production" src="https://www.youtube.com/embed/8vXoMqWgbQQ" loading="lazy" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
 </div>
-<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=T1dJfh1KlYA" target="_blank" rel="noopener">Open video segment in new tab (11:30)</a></p>
+<p style="font-size: 0.85em; color: #64748b; margin-top: 0.25rem;"><a href="https://www.youtube.com/watch?v=8vXoMqWgbQQ" target="_blank" rel="noopener">Open video in new tab</a></p>
 
 ---
 
