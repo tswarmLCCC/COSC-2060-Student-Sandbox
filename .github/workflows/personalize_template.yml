@@ -1,0 +1,33 @@
+name: Personalize Student Template README
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  personalize-readme:
+    # Only run in student repositories created from the template (never in the upstream instructor template)
+    if: github.repository != 'tswarmLCCC/COSC-2060-Student-Sandbox'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout student repository
+        uses: actions/checkout@v4
+
+      - name: Rewrite Codespaces badge to point to student repository
+        run: |
+          if grep -q "tswarmLCCC/COSC-2060-Student-Sandbox" README.md; then
+            sed -i "s|https://codespaces.new/tswarmLCCC/COSC-2060-Student-Sandbox?quickstart=1|https://codespaces.new/${GITHUB_REPOSITORY}?quickstart=1|g" README.md
+            sed -i "s|<!-- TEMPLATE_STATUS_BANNER -->|✅ **Personal Sandbox Initialized for \`${GITHUB_REPOSITORY}\`!** Click the **Open in GitHub Codespaces** badge in Step 2 below to launch or resume your personal cloud environment.|g" README.md
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add README.md
+            git commit -m "chore: personalize Codespaces launch badge for ${GITHUB_REPOSITORY} [skip ci]"
+            git push
+          else
+            echo "README.md is already personalized for ${GITHUB_REPOSITORY}."
+          fi
+

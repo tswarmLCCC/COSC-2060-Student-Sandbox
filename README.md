@@ -2,15 +2,36 @@
 
 Welcome to the hands-on student repository for **COSC 2060: Modern Data Engineering & AI Infrastructure**. This sandbox is pre-configured with **Python 3.11**, **DuckDB**, **Polars**, **Scikit-Learn**, **OpenCV**, **Sentence-Transformers**, **FastAPI**, **Pydantic v2**, and **Docker-in-Docker** so you can build leak-free feature matrices, anomaly pipelines, computer vision manifests, RAG ingestion engines, DaaS microservices, and MCP tool bridges directly in your web browser.
 
+<!-- TEMPLATE_STATUS_BANNER -->
+
 ---
 
-## 🚀 1-Click Quick Start (GitHub Codespaces)
+## 🚀 Getting Started: 2-Step Sandbox Setup
 
-Click the button below to launch your personal, cloud-hosted Data Engineering & AI development environment:
+Because this repository is a **GitHub Template**, you must first create your own personal copy before launching your Codespace. **(Do NOT launch a Codespace directly on the instructor's `tswarmLCCC` template repository!)**
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/tswarmLCCC/COSC-2060-Student-Sandbox?quickstart=1)
+### Step 1: Create Your Personal Sandbox Repository (One-Time Setup)
+1. Click the button below (or click the green **"Use this template" $\rightarrow$ "Create a new repository"** button in the top-right corner of this GitHub page):
 
-*Wait ~90 seconds for your container to spin up. Once the terminal displays `>>> COSC 2060 Sandbox Ready!`, all Python engines and your 1,000,000-row Apex Logistics datasets are live and pre-seeded!*
+   [![Use This Template](https://img.shields.io/badge/Step_1-Create_Your_Personal_Sandbox_Repo-2ea44f?style=for-the-badge&logo=github)](https://github.com/new?template_owner=tswarmLCCC&template_name=COSC-2060-Student-Sandbox&owner=%40me&name=COSC-2060-Student-Sandbox&description=My+COSC+2060+Data+Engineering+Sandbox&visibility=private)
+
+2. Name your new repository **`COSC-2060-Student-Sandbox`**, set visibility to **Private** (or Public), and click **Create repository**.
+3. Wait ~15 seconds after your repository is created—an automated GitHub Action (`.github/workflows/personalize_template.yml`) will automatically update the Codespaces badge in Step 2 below so it points to **your personal repository**! *(Refresh your browser page once to see the updated badge).*
+
+### Step 2: Launch Your Personal GitHub Codespace
+Once you are inside **your own repository** (`<your-username>/COSC-2060-Student-Sandbox`), launch your cloud environment using either method below:
+
+* **Option A — Via the GitHub UI Button (Always Works Immediately)**:
+  1. Click the green **`<> Code`** button near the top-right of your repository page.
+  2. Click the **`Codespaces`** tab.
+  3. Click **`Create codespace on main`** (or click your existing Codespace name to resume it).
+
+* **Option B — Via Your Personalized 1-Click Badge**:
+  *(Note: Only click this badge from inside **your own** `<your-username>/COSC-2060-Student-Sandbox` repository after completing Step 1!)*
+
+  [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/tswarmLCCC/COSC-2060-Student-Sandbox?quickstart=1)
+
+*Wait ~90 seconds for your container to spin up on first launch. Once the terminal displays `>>> COSC 2060 Sandbox Ready!`, all Python engines and your 1,000,000-row Apex Logistics datasets are live and pre-seeded!*
 
 ---
 
@@ -53,6 +74,7 @@ If an experimental pipeline overwrites your DuckDB tables, corrupts a Parquet fi
 ```text
 .
 ├── .devcontainer/             # Automated Python 3.11 + Docker-in-Docker configuration
+├── .github/workflows/         # Auto-personalizes README Codespaces badge for student repos
 ├── .vscode/                   # Pre-configured Python, Jupyter, Ruff, & Parquet Viewer settings
 ├── datasets/                  # Master dataset generators (DuckDB, 1M Parquet, Vision, Logs)
 ├── requirements.txt           # CPU-optimized PyTorch, Headless OpenCV, DuckDB, Polars, FastAPI
@@ -101,11 +123,4 @@ Inside **each unit folder**, you will find:
 3. Open `lab{N}_starter.py` and implement your pipeline logic under each `# TODO` challenge section.
 4. **Verify your pipeline:** Run your script in the terminal (`python lab1_starter.py`) and confirm all built-in `assert` verification checks print `PASS`.
 5. Save a copy of your completed file as `lab{N}_{yourlastname}.py` (e.g., `lab1_smith.py`).
-6. Download/export your `lab{N}_{yourlastname}.py` file from VS Code (Right-click file $\rightarrow$ **Download...**) and upload it to the corresponding **Applied Lab Assignment in Canvas**.
-
-cd "c:\dev\Course-Content-Agentic-Template\courses\cosc-2060-data-engineering\student_sandbox_template"
-git init -b main
-git add .
-git commit -m "Initial release: COSC 2060 Student Lab Sandbox"
-git remote add origin https://github.com/tswarmLCCC/COSC-2060-Student-Sandbox.git
-git push -u origin main
+6. You can both commit/push to your personal GitHub repo (`git add . && git commit -m "Complete Lab 1" && git push`) AND download your `lab{N}_{yourlastname}.py` file from VS Code (Right-click file $\rightarrow$ **Download...**) to upload it to the **Applied Lab Assignment in Canvas**.
