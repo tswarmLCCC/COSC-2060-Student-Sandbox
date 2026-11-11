@@ -1,5 +1,4 @@
 {
-  "python.defaultInterpreterPath": "/usr/local/python/current/bin/python",
   "python.testing.pytestEnabled": true,
   "python.testing.unittestEnabled": false,
   "jupyter.askForKernelRestart": false,
