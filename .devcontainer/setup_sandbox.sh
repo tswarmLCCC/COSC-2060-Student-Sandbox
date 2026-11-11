@@ -5,29 +5,20 @@ echo "======================================================================"
 echo "  COSC 2060: Initializing Modern Data Engineering & AI Sandbox..."
 echo "======================================================================"
 
-echo ">>> [1/5] Installing pip on system Python (/usr/bin/python) & devcontainer Python..."
-sudo apt-get update -qq && sudo apt-get install -y -qq python3-pip python3-venv libgl1
-sudo rm -f /usr/lib/python3*/EXTERNALLY-MANAGED || true
-export PIP_BREAK_SYSTEM_PACKAGES=1
-
-echo ">>> [2/5] Configuring Git directory trust & line endings..."
+echo ">>> [1/4] Configuring Git directory trust & line endings..."
 git config --global --add safe.directory '*'
 git config --global core.autocrlf input
 
-echo ">>> [3/5] Installing core Data Engineering stack & registering Jupyter Kernel..."
-/usr/bin/python3 -m pip install --upgrade pip ipykernel jupyter duckdb pyarrow polars pandas numpy scikit-learn opencv-python-headless Pillow fastapi "uvicorn[standard]" "pydantic>=2.6.0" httpx pytest ruff
-/usr/bin/python3 -m ipykernel install --user --name python3 --display-name "Python 3 (COSC 2060 Sandbox)"
+echo ">>> [2/4] Installing Python Data Engineering & AI stack (pip)..."
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python -m ipykernel install --user --name python3 --display-name "Python 3.11 (COSC 2060 Sandbox)"
 
-if [ -x "/usr/local/bin/python" ] && [ "/usr/local/bin/python" != "/usr/bin/python3" ]; then
-    /usr/local/bin/python -m pip install --upgrade pip ipykernel jupyter duckdb pyarrow polars pandas numpy scikit-learn opencv-python-headless Pillow fastapi "uvicorn[standard]" "pydantic>=2.6.0" httpx pytest ruff
-fi
+echo ">>> [3/4] Seeding Apex Logistics multimodal datasets (DuckDB, 1M Parquet, Vision, Logs)..."
+python datasets/seed_all_datasets.py
 
-echo ">>> [4/5] Seeding Apex Logistics multimodal datasets (DuckDB, 1M Parquet, Vision, Logs)..."
-/usr/bin/python3 datasets/seed_all_datasets.py
-
-echo ">>> [5/5] Installing CPU-only PyTorch & Sentence-Transformers (Unit 4 RAG)..."
-/usr/bin/python3 -m pip install -r requirements.txt
-/usr/bin/python3 -c "
+echo ">>> [4/4] Pre-warming local Sentence-Transformers model cache (all-MiniLM-L6-v2)..."
+python -c "
 try:
     from sentence_transformers import SentenceTransformer
     SentenceTransformer('all-MiniLM-L6-v2')
