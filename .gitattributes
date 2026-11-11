@@ -1,0 +1,9 @@
+# Enforce LF line endings on shell scripts and Dockerfiles so Linux containers never fail on Windows checkouts
+* text=auto eol=lf
+*.sh text eol=lf
+*.py text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.ipynb text eol=lf
+Dockerfile text eol=lf
+

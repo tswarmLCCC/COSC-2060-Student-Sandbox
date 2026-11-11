@@ -1,0 +1,29 @@
+# Python bytecode & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+.ruff_cache/
+
+# Generated datasets & pipeline outputs (regenerated via ./reset_sandbox.sh)
+datasets/*.parquet
+datasets/*.duckdb
+datasets/*.duckdb.wal
+datasets/raw_fleet_images/
+data/
+output/
+test_raw_images/
+units/**/output/
+units/**/data/
+units/**/test_raw_images/
+units/**/*.parquet
+units/**/*.duckdb
+
+# OS & Editor metadata
+.DS_Store
+Thumbs.db
+.ipynb_checkpoints/
+
