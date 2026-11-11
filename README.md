@@ -10,7 +10,7 @@ Welcome to the hands-on student repository for **COSC 2060: Modern Data Engineer
 
 Because this repository is a **GitHub Template**, you must first create your own personal copy before launching your Codespace. **(Do NOT launch a Codespace directly on the instructor's `tswarmLCCC` template repository!)**
 
-### Step 1: Create Your Personal Sandbox Repository (One-Time Setup)
+### Step 1: Create Your Personal Sandbox Repository (One-Time Setup) 
 1. Click the button below (or click the green **"Use this template" $\rightarrow$ "Create a new repository"** button in the top-right corner of this GitHub page):
 
    [![Use This Template](https://img.shields.io/badge/Step_1-Create_Your_Personal_Sandbox_Repo-2ea44f?style=for-the-badge&logo=github)](https://github.com/new?template_owner=tswarmLCCC&template_name=COSC-2060-Student-Sandbox&owner=%40me&name=COSC-2060-Student-Sandbox&description=My+COSC+2060+Data+Engineering+Sandbox&visibility=private)
