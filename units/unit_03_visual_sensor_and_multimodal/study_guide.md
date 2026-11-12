@@ -3,7 +3,7 @@
 Welcome to the core instructional lecture and study hub for **Unit 3: The Visual Sensor Layer & Computer Vision Targets**. This page organizes all weekly learning materials into five structured sections:
 
 1. **Unit Overview & Objectives:** Review the architectural context and measurable learning objectives for this unit.
-2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2f):** Master the target YOLO manifest and 3D tensor shapes, visual camera source systems, 3D NumPy array layouts (Height, Width, Channels), OpenCV BGR vs. RGB conventions, the "Stretched Photograph" mental model, aspect-ratio preserving letterboxing, and the Bounding Box Rosetta Stone (VOC, COCO, YOLO).
+2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2h):** Master the target YOLO manifest and 3D tensor shapes, visual camera source systems, bottom-up 3D NumPy tensor & coordinate mechanics, how object detection models use images and bounding boxes, the "Stretched Photograph" mental model, aspect-ratio preserving letterboxing, and the Bounding Box Rosetta Stone (VOC, COCO, YOLO).
 3. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from OpenCV, Ultralytics YOLO, PyTorch Vision, and Albumentations.
 4. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe image tensor manipulations and coordinate transforms in live Python environments.
 5. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
@@ -62,9 +62,93 @@ For every valid inspection photo, our pipeline produces a distortion-free 3D pix
 | **tire_002.jpg** | 720 &times; 1280 | 640 &times; 640 | 0.5000 | 0 | 140 | `1` (Bulge) | **0.3125** | **0.4688** | **0.0938** | **0.1250** |
 | **tire_003.jpg** | 1000 &times; 800 | 640 &times; 640 | 0.6400 | 64 | 0 | `0` (Crack) | **0.4500** | **0.6000** | **0.0800** | **0.1600** |
 
+> **Companion Reference:** To see how 3D image tensors and normalized YOLO manifests compare with flat tabular matrices and RAG chunks, open **The Shapes of AI Data: A Companion Guide** in the *Getting Started - Course Orientation* module.
+
 ---
 
-## 2b. The $1.2M Tire Blowout Catastrophe (Why Naive Resizing Fails)
+## 2b. Working with 3D Image Tensors & Pixel Coordinates from the Ground Up
+
+Before we dive into computer vision failure cases or bounding box math, let's start at the beginning: **How does Python represent a digital photograph in memory, and how do pixel coordinates work?**
+
+In Units 1 and 2, every dataset was a **2D table** `(Rows, Columns)`. When you load a digital photograph into Python using **OpenCV** (`cv2`) and **NumPy** (`np`), there are no SQL columns or text headers. Instead, an image is stored as a **three-dimensional grid of numbers** called a **3D Tensor** (or 3D NumPy `ndarray`).
+
+Let's walk through the four foundational building blocks of image data engineering from the ground up.
+
+### 1. The Shape of an Image: `(Height, Width, Channels)`
+Every pixel on a computer screen is made by mixing three primary light colors (`0` = completely off/black, `255` = full brightness). Therefore, a color image with a height of `1080` pixels and a width of `1920` pixels is stored in NumPy with `.shape == (1080, 1920, 3)`:
+* **Axis 0 (`Height` / Rows):** Number of vertical pixel rows from top to bottom (`1080`).
+* **Axis 1 (`Width` / Columns):** Number of horizontal pixel columns from left to right (`1920`).
+* **Axis 2 (`Channels` / Depth):** `3` numbers per pixel representing the color intensities (`Blue`, `Green`, `Red` in OpenCV's default `BGR` order, or `Red`, `Green`, `Blue` in `RGB` order), stored as 8-bit unsigned integers (`dtype=np.uint8`, values `0` to `255`).
+
+```python
+import numpy as np
+
+# Create a synthetic 720p color image filled with neutral gray (114)
+canvas = np.full((720, 1280, 3), 114, dtype=np.uint8)
+h, w, c = canvas.shape
+print(f"Height (rows): {h}, Width (cols): {w}, Color Channels: {c}")
+```
+
+### 2. How Image Pixel Coordinates Work (`(0, 0)` Is the Top-Left Corner!)
+In high school algebra, the origin `(0, 0)` is at the bottom-left and `y` goes *up*. In computer graphics and image processing, **the origin `(0, 0)` is always the top-left corner of the image**:
+* **`x` (Horizontal / Width):** Starts at `0` on the left edge and increases to the **right** up to `Width`.
+* **`y` (Vertical / Height):** Starts at `0` on the top edge and increases **downward** up to `Height`.
+
+```
+IMAGE PIXEL COORDINATE GRID (1920 Wide x 1080 Tall):
+(x=0, y=0) Top-Left ──────────────────────────> +x (Width = 1920)
+    │
+    │      (x_min, y_min) ┌──────────────┐
+    │                     │ Tire Defect  │
+    │                     │ Bounding Box │
+    │                     └──────────────┘ (x_max, y_max)
+    ▼
+   +y (Height = 1080)
+```
+
+### 3. Pasting an Image onto a Padded Canvas Using NumPy Slice Assignment
+Because an image is just a NumPy array indexed as `image[y_row, x_col]`, we can place a resized image (`new_h` tall by `new_w` wide) dead-center onto a square `640 x 640` gray canvas in a single line of NumPy slice assignment:
+
+```python
+# Create a 640x640 neutral gray canvas
+canvas = np.full((640, 640, 3), 114, dtype=np.uint8)
+
+# Suppose our resized wide image is 360 pixels tall (new_h=360) and 640 pixels wide (new_w=640)
+# Top/bottom border padding: pad_y = (640 - 360) // 2 = 140 pixels
+# Left/right border padding: pad_x = (640 - 640) // 2 = 0 pixels
+canvas[140 : 140 + 360, 0 : 0 + 640] = resized_img
+```
+
+### 4. Auditing Image Health Before Training (`Brightness` & `Resolution`)
+In physical inspection lanes, outdoor camera hardware fails regularly: strobe flashes burn out at night (producing pitch-black images where every pixel is near `0`), or network drops truncate a file. Before allowing an image into our training manifest, a data engineer checks its array shape and mean pixel brightness (`np.mean(img)`):
+
+```python
+mean_brightness = float(np.mean(img))
+if img.shape[0] == 0 or img.shape[1] == 0 or mean_brightness < 5.0:
+    print("Quarantine frame: corrupted dimensions or pitch-black night exposure!")
+```
+
+---
+
+## 2c. How Computer Vision Object Detectors Use Images and Bounding Boxes
+
+You do not need prior computer vision coursework to understand how an object detection model like **YOLO (You Only Look Once)** uses the images and manifest files we build in this unit.
+
+In computer vision, there are two very different tasks:
+1. **Image Classification:** Assigns one label to an entire photo (e.g., *"This photo contains a truck tire"*).
+2. **Object Detection (Our Goal in Unit 3):** Finds specific physical defects inside a photo and outputs **both** a **Class ID** (`0` = Sidewall Crack, `1` = Tread Bulge) and a **Bounding Box** (`[x_center, y_center, width, height]`) tightly framing each defect.
+
+### How Training and Live Gate Inference Work
+1. **During Training:** We feed thousands of letterboxed `640 x 640` images alongside their ground-truth YOLO bounding box labels (`[class_id, x_center_norm, y_center_norm, width_norm, height_norm]`). The neural network scans the pixel grid and adjusts its internal weights until its predicted boxes line up with the human inspector's ground-truth boxes.
+2. **During Live Terminal Gate Inspection:** When a semi-truck rolls through the inspection lane at 5 mph, our data pipeline grabs the raw camera frame, runs the exact same `letterbox_image()` function to produce a distortion-free `640 x 640` tensor, and hands it to the trained YOLO model. In 8 milliseconds, the model outputs the coordinates and confidence scores of any tire cracks it spots.
+
+This two-stage workflow establishes the core engineering law of Unit 3:
+
+> **The Spatial Synchronization Rule:** An image tensor and its bounding box coordinates are two halves of the same physical measurement. Whenever your pipeline scales an image by ratio <i>r</i> and shifts it by border padding `(pad_x, pad_y)`, you must apply that exact same scale <i>r</i> and shift `(pad_x, pad_y)` to every bounding box coordinate before normalizing to `[0.0, 1.0]`.
+
+---
+
+## 2d. Why the $1.2M Tire Blowout Model Failed (Why Naive Resizing Fails)
 
 Consider an authentic operational failure in freight transportation.
 
@@ -112,7 +196,7 @@ Because the naive data pipeline forced a wide 16:9 rectangular photo into a squa
 
 ---
 
-## 2c. "The Stretched Photograph" & Letterbox Padding
+## 2e. "The Stretched Photograph" & Letterbox Padding
 
 To prevent geometric distortion, modern computer vision pipelines use **Letterboxing** (the same technique film directors use to show widescreen movies on a standard TV).
 
@@ -143,7 +227,7 @@ Final Dimension: 640 x 640 (Zero Distortion!)
 
 ---
 
-## 2d. The Coordinate System Rosetta Stone — VOC vs. COCO vs. YOLO
+## 2f. Defensive Vision Evolution — Coordinate Schemas (VOC, COCO, YOLO) & Label Synchronization
 
 When preprocessing object detection datasets, you will encounter three competing bounding box coordinate schemas:
 
@@ -169,9 +253,32 @@ When you **letterbox** the image by scale factor <i>r</i> and add border padding
 2. `new_y_min = (y_min * r) + pad_y` and `new_y_max = (y_max * r) + pad_y`
 3. Compute `x_center`, `y_center`, `width`, and `height` from those shifted coordinates and divide by the target canvas size (`640.0`).
 
+### Tracing the 3-Step Engineering Evolution
+Let's trace the three stages of computer vision preprocessing to see how production pipelines avoid both geometric distortion and label drift:
+
+#### Step 1: Naive Non-Uniform Squash (Broken Geometry)
+```python
+# DANGEROUS: Warps aspect ratio of non-square images (e.g., 1920x1080 -> 640x640)
+resized = cv2.resize(img, (640, 640))
+```
+
+#### Step 2: Letterbox Image Without Updating Bounding Boxes (Broken Labels)
+```python
+# DANGEROUS: Image is letterboxed with 140px top padding, but labels still use unpadded ratios!
+canvas, r, pad_x, pad_y = letterbox_image(img, (640, 640))
+wrong_y_center = ((y_min + y_max) / 2.0) / orig_h  # Points to the wrong vertical location on the 640x640 canvas!
+```
+
+#### Step 3: Production Synchronized Letterboxing + Normalized YOLO Manifest
+```python
+# PRODUCTION: Uniformly scales and pads BOTH the image tensor AND the bounding box coordinates
+canvas, r, pad_x, pad_y = letterbox_image(img, (640, 640))
+x_c, y_c, w_n, h_n = voc_to_yolo_letterboxed(x_min, y_min, x_max, y_max, r, pad_x, pad_y, 640, 640)
+```
+
 ---
 
-## 2e. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (NumPy + OpenCV)
+## 2g. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (NumPy + OpenCV)
 
 If you have never manipulated 3D arrays in NumPy or called OpenCV (`cv2`) before, let's build every piece from the ground up, and then run the complete letterboxing and coordinate transformation walkthrough.
 
@@ -282,9 +389,19 @@ yolo_box = voc_to_yolo_letterboxed(540, 260, 740, 460, ratio=scale, pad_x=px, pa
 print("Normalized YOLO (x_center, y_center, width, height):", yolo_box)
 ```
 
+**Verification Output:**
+```
+Original shape: (720, 1280, 3)
+Processed shape: (640, 640, 3)
+Applied Scale: 0.5000, Padding X: 0, Padding Y: 140
+Normalized YOLO (x_center, y_center, width, height): (0.5, 0.5, 0.15625, 0.15625)
+```
+
+Notice why `x_center` and `y_center` are both `0.5` and `width` and `height` are both `0.15625` (`100 / 640`): the `200 x 200` pixel circle in the center of the `1280 x 720` image was scaled by `0.5` to a `100 x 100` pixel circle and shifted down by `140` pixels of top padding so it sits dead-center (`320, 320`) on the `640 x 640` canvas!
+
 ---
 
-## 2f. Practice Exercises & Formative Self-Check FAQ
+## 2h. Practice Exercises & Formative Self-Check FAQ
 
 Try these three exercises in your GitHub Codespaces sandbox (`units/unit_03_visual_sensor_and_multimodal_layer/`) before starting the graded lab:
 
@@ -302,6 +419,9 @@ Try these three exercises in your GitHub Codespaces sandbox (`units/unit_03_visu
 
 * **Question 3: Why do we pad with neutral gray `(114, 114, 114)` instead of black `(0, 0, 0)` or white `(255, 255, 255)`?**  
   *Answer:* Before neural networks process an image, they subtract the average dataset pixel intensity (roughly `114` out of `255`). Filling the padded borders with `(114, 114, 114)` means those borders become near `0.0` after normalization, preventing artificial high-contrast edges at the border boundary.
+
+* **Question 4: Why does `np.zeros((720, 1280, 3))` put `720` first while `cv2.resize(img, (1280, 720))` puts `1280` first?**  
+  *Answer:* NumPy follows linear algebra matrix conventions where index 0 is **rows (`Height`)** and index 1 is **columns (`Width`)**. OpenCV C++ functions follow Cartesian `(x, y)` geometry conventions where argument 0 is **horizontal width (`x`)** and argument 1 is **vertical height (`y`)**. Always double-check whether a function expects `(H, W)` or `(W, H)`!
 
 ---
 

@@ -3,7 +3,7 @@
 Welcome to the core instructional lecture and study hub for **Unit 2: The Anomaly Engine & Unsupervised Learning Targets**. This page organizes all weekly learning materials into five structured sections:
 
 1. **Unit Overview & Objectives:** Review the architectural context and measurable learning objectives for this unit.
-2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2f):** Master the target unsupervised feature matrix shape, operational fuel-card source systems, the mathematical mechanics of distance metrics, the "Ruler Distortion" mental model, Polars multithreaded Arrow memory layouts, step-by-step Polars expressions, and streaming LazyFrames for anomaly detection.
+2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2h):** Master the target unsupervised feature matrix shape, operational fuel-card source systems, bottom-up Polars feature & velocity engineering, unsupervised outlier detection mechanics, the "Ruler Distortion" mental model, Polars multithreaded Arrow memory layouts, step-by-step Polars expressions, and streaming LazyFrames for anomaly detection.
 3. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from the Polars Rust project, Scikit-Learn outlier detection guides, and Apache Arrow zero-copy memory specifications.
 4. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe high-throughput streaming DataFrames in live Python environments.
 5. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
@@ -64,9 +64,117 @@ When our Unit 2 Polars pipeline finishes scrubbing, enriching, and standardizing
 | **1004** | 42 | 125.0 | 475.0 | 48.0 | -0.710 | -0.522 | `false` | `false` |
 | **1005** | 99 | 410.0 | 1558.0 | 58.0 | +1.087 | -0.354 | `false` | `true` |
 
+> **Companion Reference:** To see how this unsupervised time-series matrix compares with the supervised table from Unit 1 and the visual, text, API, and agentic schemas in Units 3–6, open **The Shapes of AI Data: A Companion Guide** in the *Getting Started - Course Orientation* module.
+
 ---
 
-## 2b. The Ghost Fuel Card Ring ($2.4M Theft)
+## 2b. Building Columnar Features & Velocity Lags in Polars from the Ground Up
+
+Before we examine real-world fraud cases or distance math, let's start at the beginning: **How do we write columnar transformations in Polars, and how do we calculate physical features like `implied_speed_mph` from raw transaction logs?**
+
+In Unit 1, you wrote SQL statements using `SELECT`, `WHERE`, and `OVER (PARTITION BY driver_id ORDER BY dep_time)`. **Polars** brings that exact same declarative, columnar mindset directly into Python—without the memory overhead or single-threaded slowdowns of Pandas.
+
+In Polars, almost every operation revolves around **`pl.col("column_name")`** placed inside one of three methods:
+* **`.select([...])`**: Choose and return only specific columns (like a SQL `SELECT`).
+* **`.filter(...)`**: Keep only rows that satisfy a boolean condition (like a SQL `WHERE`).
+* **`.with_columns([...])`**: Keep all existing columns and attach one or more newly engineered feature columns to the right side of the table.
+
+Let's walk through the four foundational ways data engineers build anomaly features in Polars from the ground up.
+
+### 1. Scrubbing Sensor Glitches with `.filter()`
+Real Point-of-Sale (POS) fuel pump logs frequently contain hardware reset glitches: a faulty fuel meter might log `-999.0` gallons, `0.0` gallons, or a negative dollar charge when a clerk voids a receipt. Before we compute any averages or train any model, we filter to strictly valid physical transactions:
+
+```python
+import polars as pl
+
+# Keep only rows where both gallons and amount_usd are strictly positive
+clean_tx = raw_tx.filter(
+    (pl.col("gallons") > 0.0) & (pl.col("amount_usd") > 0.0)
+)
+```
+
+### 2. Creating Domain Ratios and Boolean Threshold Flags with `.with_columns()`
+Just as we used arithmetic and `CASE WHEN` in Unit 1 SQL, we can create new columns in Polars by combining `pl.col(...)` expressions and naming each new column with `.alias("column_name")`:
+
+```python
+flagged_tx = clean_tx.with_columns([
+    # 1. Compute price paid per gallon
+    (pl.col("amount_usd") / pl.col("gallons")).round(2).alias("price_per_gallon"),
+
+    # 2. Flag any single fill-up exceeding a Class 8 semi-truck's 300-gallon dual-tank capacity
+    (pl.col("gallons") > 300.0).alias("flag_tank_overflow")
+])
+```
+
+### 3. Calculating Time & Distance Lags Across Consecutive Swipes (`.shift(1).over()`)
+How do we know how fast a truck traveled between two fuel stops (`implied_speed_mph`) when a single transaction row only lists one station and one timestamp?
+
+We sort the transactions chronologically and use **`.shift(1).over("driver_id")`** (the exact Polars equivalent of SQL's `LAG(col, 1) OVER (PARTITION BY driver_id ORDER BY timestamp)`!) to pull the **previous** swipe's timestamp and mile-marker onto the current row:
+
+```python
+velocity_tx = (
+    clean_tx.sort(["driver_id", "timestamp"])
+    .with_columns([
+        # Pull the previous swipe's mile-marker and timestamp for this specific driver
+        pl.col("mile_marker").shift(1).over("driver_id").alias("prev_mile_marker"),
+        pl.col("timestamp").shift(1).over("driver_id").alias("prev_timestamp")
+    ])
+    .with_columns([
+        # Distance traveled (miles) divided by elapsed time (hours) = Implied Speed (mph)
+        (
+            (pl.col("mile_marker") - pl.col("prev_mile_marker")).abs()
+            / ((pl.col("timestamp") - pl.col("prev_timestamp")).dt.total_minutes() / 60.0)
+        ).fill_null(0.0).alias("implied_speed_mph")
+    ])
+)
+```
+
+Look at what happens on each row for Driver 42:
+* On Driver 42's **first swipe**, there is no previous swipe, so `.shift(1)` returns `null` and `.fill_null(0.0)` safely sets `implied_speed_mph` to `0.0`.
+* On Driver 42's **second swipe** (45 minutes later, 950 miles away), Polars divides `950.0 miles / 0.75 hours` and populates `implied_speed_mph = 1266.67`—instantly exposing a cloned fuel card!
+
+### 4. Standardizing Features with Vectorized Column Aggregations
+Finally, inside `.with_columns()`, Polars allows you to mix row values (`pl.col("gallons")`) and whole-column aggregations (`pl.col("gallons").mean()` and `pl.col("gallons").std()`) in a single expression to convert any raw column into a standardized Z-score:
+
+```python
+scaled_tx = velocity_tx.with_columns([
+    ((pl.col("gallons") - pl.col("gallons").mean()) / pl.col("gallons").std()).alias("z_gallons")
+])
+```
+
+---
+
+## 2c. How Unsupervised Anomaly Detection Finds Outliers Without Labels
+
+You do not need prior machine learning coursework to understand how **unsupervised anomaly detection** works or why it differs from Unit 1.
+
+In Unit 1, we built a dataset for **supervised learning**. Every historical trip had a known answer column on the far right (<b><i>y</i></b> = `target_delay_mins`), and the model learned how input features <b><i>X</i></b> predicted <b><i>y</i></b>.
+
+In fraud detection, equipment sensor monitoring, and cybersecurity, however, **we almost never have a clean column of historical <i>y</i> labels**:
+* Fraudsters constantly invent new schemes that have never been labeled before.
+* Out of 1,000,000 fuel card swipes, 99.9% are completely normal everyday fill-ups, and nobody has time to manually audit a million receipts to create a training label column.
+
+Instead, we use **unsupervised learning**: we hand the algorithm **only the feature matrix <i>X</i>** (with zero <b><i>y</i></b> target column) and ask it to find rows that are mathematically different from the rest of the fleet.
+
+### How Isolation Forests and Distance Detectors Spot Anomalies
+Two unsupervised techniques work side by side in production anomaly pipelines:
+
+1. **Statistical Z-Score & Domain Rule Audits:**
+   * **Domain Rules** enforce hard physical laws: a Class 8 truck tank cannot hold more than `300` gallons (`flag_tank_overflow`), and a governed commercial truck cannot average `185 mph` between stops (`flag_speed_impossible`).
+   * **Z-Scores** measure how many standard deviations (&sigma;) a transaction sits above or below the fleet average (&mu;). A transaction with `z_gallons = +3.5` is so far out on the tail of the bell curve that it warrants immediate inspection.
+2. **Isolation Forests (`sklearn.ensemble.IsolationForest`):**
+   * What if a transaction doesn't violate a single hard rule on its own, but has a suspicious *combination* of features (for example, pumping `285` gallons right after driving `72 mph` at 3:00 AM)?
+   * An **Isolation Forest** plots every transaction as a point in multi-dimensional space (`z_gallons`, `z_speed`, `z_amount`) and builds random decision trees that slice the space with random cuts.
+   * Normal transactions are packed tightly together in a dense cluster near `(0, 0, 0)`, so it takes **many random slices** to isolate a single normal point.
+   * Anomalous transactions sit out in empty space far from the cluster, so a random slice isolates them in **just 1 or 2 cuts**! The model assigns `-1` to isolated anomalies and `1` to normal points.
+
+This establishes our core rule for Unit 2:
+
+> **The Unsupervised Scrubbing & Scaling Rule:** Because unsupervised anomaly detectors rely entirely on geometric spread and column statistics across <b><i>X</i></b> without a target label <b><i>y</i></b> to guide them, you must (1) scrub impossible sensor error codes before computing means and standard deviations, and (2) scale every numeric feature to a common unit so wide-ranged columns do not drown out narrow-ranged columns.
+
+---
+
+## 2d. Why the $2.4M Ghost Fuel Card Ring Went Undetected (Failure Case Study)
 
 To appreciate why multi-column feature engineering, scaling, and high-throughput engines matter, consider an authentic corporate logistics fraud case.
 
@@ -104,7 +212,7 @@ This is why modern data engineering pairs **Polars** with **mathematical feature
 
 ---
 
-## 2c. Why Scaling Matters — "The Ruler Distortion"
+## 2e. Why Scaling Matters — "The Ruler Distortion"
 
 Before writing code, let's examine why unnormalized features destroy unsupervised anomaly detection algorithms.
 
@@ -158,9 +266,9 @@ In data engineering pipelines, every numerical column destined for distance-base
 
 ---
 
-## 2d. The Architectural Model — Pandas vs. Polars (Apache Arrow)
+## 2f. Defensive Pipeline Evolution — Pandas vs. Polars (Apache Arrow)
 
-Why is Polars capable of processing 1,000,000 rows in 0.4 seconds while Pandas takes 45 seconds or crashes?
+Why is Polars capable of processing 1,000,000 rows in 0.4 seconds while Pandas takes 45 seconds or crashes? And how do we evolve a fragile script into a production-grade anomaly pipeline?
 
 ```
 1. PANDAS MEMORY MODEL (Python Object Pointers & NumPy Boxed Arrays):
@@ -174,9 +282,44 @@ Why is Polars capable of processing 1,000,000 rows in 0.4 seconds while Pandas t
 - Lazy Optimization: Compiles queries into an execution DAG, pushes down projection filters, and streams chunks through CPU caches without allocating unnecessary RAM.
 ```
 
+### Tracing the 3-Step Engineering Evolution
+Let's compare three ways engineers attempt to process fuel transaction logs so you can see why the Lazy Polars pattern wins:
+
+#### Step 1: The Naive Unfiltered Scaling & Python Loop (Broken)
+```python
+# DANGEROUS: Computes mean/std BEFORE scrubbing -999.0 sensor glitches, and loops in Python
+mean_gal = df["gallons"].mean()  # Corrupted by -999.0 pump error rows!
+std_gal  = df["gallons"].std()
+for idx, row in df.iterrows():   # Single-threaded Python loop: 100x slower!
+    ...
+```
+
+#### Step 2: Eager In-Memory Operations (Better, But Allocates Duplicate RAM)
+```python
+# INTERMEDIATE: Vectorized, but pl.read_parquet() loads 100% of every column into RAM immediately
+df = pl.read_parquet("datasets/unit_02_fuel.parquet")
+df = df.filter((pl.col("gallons") > 0) & (pl.col("amount_usd") > 0))
+```
+
+#### Step 3: Production Polars `LazyFrame` Pipeline (`pl.scan_parquet`)
+```python
+# PRODUCTION: Predicate pushdown + projection pushdown + multithreaded Rust execution
+features_df = (
+    pl.scan_parquet("datasets/unit_02_fuel.parquet")
+    .filter((pl.col("gallons") > 0) & (pl.col("amount_usd") > 0))
+    .with_columns([
+        ((pl.col("gallons") - pl.col("gallons").mean()) / pl.col("gallons").std()).alias("z_gallons"),
+        (pl.col("gallons") > 300.0).alias("flag_tank_overflow"),
+        (pl.col("implied_speed_mph") > 75.0).alias("flag_speed_impossible"),
+    ])
+    .collect()
+)
+```
+* **Why Step 3 Wins:** Because we started with `pl.scan_parquet(...)`, Polars pushes the `.filter(...)` predicate down to the Parquet file reader itself—skipping invalid rows before they ever enter feature standardization, and executing all `.with_columns(...)` expressions in parallel across every CPU core when `.collect()` is called.
+
 ---
 
-## 2e. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Polars)
+## 2g. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Polars)
 
 If you have never used Polars before, you will find its design very intuitive—especially right after Unit 1 SQL. In Polars, nearly every column operation uses `pl.col("column_name")` inside a context method like `.select()`, `.filter()`, or `.with_columns()`. Let's build up the syntax from the ground up, and then run the complete outlier detection walkthrough.
 
@@ -299,9 +442,29 @@ shape: (5, 9)
 
 Notice that Transaction 1002 triggered both the physical speed impossibility flag (185 mph) and tank overflow flag (380 gallons), while Transaction 1005 was isolated as a tank overflow without speed anomalies.
 
+### Step 7: Passing Standardized Features to `IsolationForest` and Exporting Parquet
+Once our Polars DataFrame contains the standardized columns (`z_gallons`, `z_speed`), we can pass them directly to Scikit-Learn's `IsolationForest` as a NumPy matrix via `.to_numpy()` and export our finished table to Apache Parquet via `.write_parquet()`:
+
+```python
+from sklearn.ensemble import IsolationForest
+
+# Extract the 2D standardized feature matrix X
+X_scaled = engineered_features.select(["z_gallons", "z_speed"]).to_numpy()
+
+# Fit an unsupervised Isolation Forest (returns 1 for normal, -1 for anomaly)
+iso_model = IsolationForest(contamination=0.2, random_state=42)
+anomaly_labels = iso_model.fit_predict(X_scaled)
+
+# Attach the model predictions back to the Polars DataFrame and save to Parquet
+final_df = engineered_features.with_columns(
+    pl.Series(name="isolation_forest_score", values=anomaly_labels)
+)
+final_df.write_parquet("output/anomaly_features.parquet")
+```
+
 ---
 
-## 2f. Practice Exercises & Formative Self-Check FAQ
+## 2h. Practice Exercises & Formative Self-Check FAQ
 
 Try these three short exercises in your GitHub Codespaces sandbox (`units/unit_02_anomaly_detection_engines/`) before starting the graded lab:
 
@@ -319,6 +482,9 @@ Try these three short exercises in your GitHub Codespaces sandbox (`units/unit_0
 
 * **Question 3: Why can't I write `pl.col("gallons") > 0 and pl.col("amount_usd") > 0` using Python's keyword `and`?**  
   *Answer:* In Python DataFrame libraries (both Polars and Pandas), the keyword `and` attempts to evaluate an entire column expression as a single boolean truth value and raises a `TypeError`. Always wrap each condition in parentheses and join them with the bitwise `&` operator: `(pl.col("gallons") > 0) & (pl.col("amount_usd") > 0)`.
+
+* **Question 4: Why must I sort by `["driver_id", "timestamp"]` before calling `.shift(1).over("driver_id")`?**  
+  *Answer:* Just like SQL's `LAG()` window function requires `ORDER BY timestamp`, Polars' `.shift(1)` looks at the row physically above the current row within each `driver_id` group. Sorting by `["driver_id", "timestamp"]` first guarantees that "one row above" is always the driver's immediately preceding chronological swipe.
 
 ---
 

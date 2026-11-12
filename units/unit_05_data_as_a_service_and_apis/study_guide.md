@@ -3,7 +3,7 @@
 Welcome to the core instructional lecture and study hub for **Unit 5: Data as a Service (DaaS) & The API Layer**. This page organizes all weekly learning materials into five structured sections:
 
 1. **Unit Overview & Objectives:** Review the architectural context and measurable learning objectives for this unit.
-2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2f):** Master the target JSON API contract shapes, operational DaaS source systems, decoupled microservices, the "Death of the CSV" operational postmortem, HTTP REST semantics, strict Pydantic v2 data validation schemas, and asynchronous FastAPI endpoints.
+2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2h):** Master the target JSON API contract shapes, operational DaaS source systems, bottom-up Pydantic v2 & FastAPI route construction, how downstream applications consume Data as a Service, the "Death of the CSV" operational postmortem, HTTP REST semantics, and asynchronous FastAPI endpoints.
 3. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from FastAPI, Pydantic v2, Starlette, and Uvicorn.
 4. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe RESTful endpoints and real-time schema validation in live Python environments.
 5. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
@@ -97,9 +97,64 @@ When a client interacts with our API, the exchange follows these exact HTTP + JS
 }
 ```
 
+> **Companion Reference:** To see how Pydantic API contracts compare with the tabular matrices, image manifests, and RAG schemas from Units 1–4, open **The Shapes of AI Data: A Companion Guide** in the *Getting Started - Course Orientation* module.
+
 ---
 
-## 2b. The $380,000 Monday Morning Outage (The Death of the CSV)
+## 2b. Building Pydantic Data Contracts & HTTP Routes from the Ground Up
+
+Before we examine real-world API outages or microservice architectures, let's start at the beginning: **How do we enforce strict data types in Python using Pydantic, and how do we expose a Python function over HTTP using FastAPI?**
+
+In standard Python, type annotations like `gallons: float` are merely polite suggestions—Python will happily allow a caller to pass `"N/A"` or `-999.0` into a function until a math operation crashes halfway through your pipeline. Let's walk through the four foundational building blocks that turn fragile Python dictionaries into contract-guaranteed web services.
+
+### 1. Turning Python Classes into Runtime Validators with `BaseModel`
+When a Python class inherits from `pydantic.BaseModel`, Pydantic inspects every field's type annotation (`int`, `float`, `str`, `bool`) and validates incoming values the instant an object is created:
+
+```python
+from pydantic import BaseModel
+
+class DriverSummary(BaseModel):
+    driver_id: int
+    safety_score: float
+    is_active: bool
+
+# Valid inputs pass and can be converted to a plain Python dict via .model_dump()
+d = DriverSummary(driver_id=42, safety_score=0.98, is_active=True)
+print(d.model_dump())  # {'driver_id': 42, 'safety_score': 0.98, 'is_active': True}
+```
+
+### 2. Adding Physical Domain Boundaries with `Field(...)`
+Knowing that `gallons` is a `float` is not enough—a negative number like `-50.0` is still a valid `float`! Pydantic's `Field(...)` function lets us attach physical domain boundaries directly to each attribute:
+* **`gt=0.0`** (strictly **g**reater **t**han `0.0`) or **`ge=0.0`** (**g**reater than or **e**qual to `0.0`)
+* **`lt=4000.0`** (strictly **l**ess **t**han `4000.0`) or **`le=450.0`** (**l**ess than or **e**qual to `450.0`)
+* **`min_length=2, max_length=50`** (minimum and maximum character length for strings)
+
+### 3. Understanding HTTP Verbs (`GET` vs. `POST`) and Route Decorators
+In **FastAPI**, you create an application with `app = FastAPI()` and attach route decorators above regular Python functions:
+* **`@app.get("/v1/routes/{route_id}")`**: Used when a client wants to **read or look up** an existing record without sending a complex body. The `{route_id}` part of the URL is a **path parameter** passed directly into your Python function (`async def get_route(route_id: int):`).
+* **`@app.post("/v1/evaluate-anomaly")`**: Used when a client wants to **send a JSON payload** in the request body (such as a new fuel card swipe) for your server to validate, score, or process.
+
+### 4. Querying DuckDB or Polars Inside an Endpoint Handler
+Inside a FastAPI function, you can query the exact same `.parquet` files you built in Units 1–4 using DuckDB or Polars, convert the matching row to a dictionary, and return it as a validated Pydantic response object!
+
+---
+
+## 2c. How Client Applications & AI Systems Consume Data as a Service (DaaS)
+
+You do not need prior web development coursework to understand how **Data as a Service (DaaS)** connects your data engineering pipelines to the rest of an organization.
+
+In Units 1 through 4, our scripts ran in batch mode and saved files to disk (`feature_matrix.parquet`, `anomaly_features.parquet`, `rag_chunks.jsonl`). In a real company, three types of consumers need live access to those results every second:
+1. **Frontend Web Dashboards (React / Vue / Internal Portals):** A human dispatcher clicks on Route #101 in their web browser. The browser sends an HTTP `GET /v1/routes/101` request to your FastAPI service and renders the returned JSON on screen.
+2. **Mobile & Edge Devices (Driver Tablets / Gate Scanners):** When a fuel card is swiped at a travel plaza, the payment gateway sends an HTTP `POST /v1/evaluate-anomaly` JSON payload to your FastAPI service and receives an instant `{ "is_anomaly": false, "risk_score": 0.05 }` decision in 5 milliseconds.
+3. **Downstream Microservices & AI Agents:** Other backend services call your API (and inspect its auto-generated `/docs` OpenAPI schema) without ever needing to know whether your backend stores data in DuckDB, Polars, PostgreSQL, or ChromaDB.
+
+This architecture establishes our core rule for Unit 5:
+
+> **The Bilateral Contract Rule:** A production Data-as-a-Service endpoint must enforce a strict Pydantic schema on **both** the inbound request (blocking malformed or out-of-bounds inputs with HTTP `422 Unprocessable Entity` before they reach your database) and the outbound `response_model` (guaranteeing downstream clients never crash due to renamed columns or unexpected `null` types).
+
+---
+
+## 2d. Why the $380,000 Monday Morning Outage Happened (The Death of the CSV)
 
 To appreciate why production data engineering abandoned CSV handoffs, consider an authentic incident at a national freight logistics firm.
 
@@ -137,7 +192,7 @@ Why did this disaster occur?
 
 ---
 
-## 2c. "The Restaurant Waiter" & API Contracts
+## 2e. "The Restaurant Waiter" & API Contracts
 
 To understand how APIs decouple systems, consider a restaurant dining room:
 
@@ -163,7 +218,7 @@ When a client talks to your FastAPI server, the server replies with a 3-digit **
 
 ---
 
-## 2d. The Power of Pydantic v2 — Zero-Cost Rust Data Contracts
+## 2f. Defensive Service Evolution — The Power of Pydantic v2 & Contract-First APIs
 
 In Python, types are normally dynamic and unenforced. Pydantic v2 changes this by executing Python type validation in compiled **Rust**.
 
@@ -183,9 +238,35 @@ Pydantic automatically:
 3. **Generates OpenAPI Documentation:** Instantly populates interactive Swagger UI documentation at `/docs`.
 4. **Executes in Rust:** Validates 100,000 payloads per second with microsecond latency.
 
+### Tracing the 3-Step Engineering Evolution
+Let's trace the three ways teams share data across applications to see why bilateral Pydantic contracts are the industry standard:
+
+#### Step 1: Shared Network CSV Drops (No Schema, Silent Breakage)
+```python
+# DANGEROUS: Renaming 'truck_id' to 'vehicle_vin' silently crashes downstream readers on Monday morning!
+df.to_csv("/mnt/shared/predictions.csv", index=False)
+```
+
+#### Step 2: Unvalidated Dictionary Endpoint (Crashes Inside Handler with HTTP 500)
+```python
+# DANGEROUS: Accepts arbitrary dict; crashes with KeyError or TypeError if 'gallons' is "N/A" or negative
+@app.post("/v1/evaluate-unvalidated")
+async def bad_endpoint(payload: dict):
+    is_overflow = payload["gallons"] > 300.0  # TypeError if payload["gallons"] == "N/A"!
+    return {"overflow": is_overflow}
+```
+
+#### Step 3: Production FastAPI + Bilateral Pydantic v2 Contracts
+```python
+# PRODUCTION: Validates inbound FuelTransactionPayload (422 on bad input) AND outbound AnomalyEvaluationResponse
+@app.post("/v1/evaluate-anomaly", response_model=AnomalyEvaluationResponse)
+async def evaluate_transaction(payload: FuelTransactionPayload):
+    ...
+```
+
 ---
 
-## 2e. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Pydantic + FastAPI)
+## 2g. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Pydantic + FastAPI)
 
 Let's build up the Python syntax for Pydantic v2 and FastAPI step by step from the ground up, and then examine the complete production microservice and `TestClient` verification harness.
 
@@ -339,9 +420,16 @@ assert resp_bad.status_code == 422
 print("Invalid POST blocked with status code:", resp_bad.status_code)
 ```
 
+**Verification Output:**
+```
+Health check: {'status': 'healthy', 'service': 'fleet-data-api'}
+Valid POST response: {'trans_id': 1002, 'is_anomaly': True, 'risk_score': 0.95, 'rejection_reason': 'Tank overflow violation (>300 gallons pumped)'}
+Invalid POST blocked with status code: 422
+```
+
 ---
 
-## 2f. Practice Exercises & Formative Self-Check FAQ
+## 2h. Practice Exercises & Formative Self-Check FAQ
 
 Try these three exercises in your GitHub Codespaces sandbox (`units/unit_05_data_as_a_service_and_apis/`) before starting the graded lab:
 
@@ -359,6 +447,9 @@ Try these three exercises in your GitHub Codespaces sandbox (`units/unit_05_data
 
 * **Question 3: In Pydantic v2, should I use `.dict()` or `.model_dump()` to convert a model instance into a Python dictionary?**  
   *Answer:* In Pydantic v2, `.model_dump()` is the standard method (replacing `.dict()` from Pydantic v1). Similarly, `.model_validate()` is the Pydantic v2 method for validating a dictionary.
+
+* **Question 4: Why should I specify `response_model=AnomalyEvaluationResponse` in `@app.post(...)` if my function already returns an object?**  
+  *Answer:* Specifying `response_model=...` guarantees that FastAPI validates and filters the outgoing data against your contract (stripping any accidental internal fields like passwords or phone numbers) and documents the exact response schema in the interactive `/docs` OpenAPI specification.
 
 ---
 

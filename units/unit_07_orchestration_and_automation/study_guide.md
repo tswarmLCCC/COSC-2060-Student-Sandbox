@@ -3,7 +3,7 @@
 Welcome to the core instructional lecture and study hub for **Unit 7: Orchestration & Automation (The Unsleeping Pipeline)**. This page organizes all weekly learning materials into five structured sections:
 
 1. **Unit Overview & Objectives:** Review the architectural context and measurable learning objectives for this unit.
-2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2f):** Master the target pipeline heartbeat and Dead-Letter Queue (DLQ) schemas, automated orchestration source systems, Directed Acyclic Graphs (DAGs), the "Cron House of Cards" operational catastrophe, mathematical idempotency (<i>f</i>(<i>f</i>(<i>x</i>)) = <i>f</i>(<i>x</i>)), exponential backoff retries, and poison-pill isolation.
+2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2h):** Master the target pipeline heartbeat and Dead-Letter Queue (DLQ) schemas, automated orchestration source systems, bottom-up DAG dependency, retry, and DLQ mechanics, how Asset DAGs differ from fragile `cron` scripts, the "Cron House of Cards" operational catastrophe, mathematical idempotency (<i>f</i>(<i>f</i>(<i>x</i>)) = <i>f</i>(<i>x</i>)), exponential backoff retries, and poison-pill isolation.
 3. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from Dagster Software-Defined Assets, Prefect orchestration, and AWS idempotency standards.
 4. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe dependency-aware asset DAGs and automated backfills executed in live environments.
 5. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
@@ -96,9 +96,54 @@ When our Unit 7 orchestrator finishes a run, it outputs a structured **Heartbeat
 {"record_id": "REC-289", "raw_payload": {"route_id": null, "gallons": 120.0}, "error_reason": "ValidationError: route_id is required", "quarantined_at": "2026-10-24T03:00:05Z"}
 ```
 
+> **Companion Reference:** To see how orchestrated pipeline heartbeats and DLQ streams fit alongside the five core data shapes from Units 1–6, open **The Shapes of AI Data: A Companion Guide** in the *Getting Started - Course Orientation* module.
+
 ---
 
-## 2b. The 4:30 AM Stranded Drivers Disaster (The Cron Anti-Pattern)
+## 2b. Building DAG Dependencies, Retries & Quarantine Logs from the Ground Up
+
+Before we examine overnight `cron` disasters or idempotency math, let's start at the beginning: **How do we chain Python pipeline steps safely so that bad networks don't break runs and bad rows don't crash good rows?**
+
+When you run `python lab1.py` by hand in a terminal, *you* are the orchestrator: if step 1 fails with a network timeout, you notice the red error and don't run step 2. When a pipeline runs unattended at 3:00 AM, your Python code has to make those decisions automatically. Let's walk through the four foundational building blocks from the ground up.
+
+### 1. Modeling Stage Dependencies as a Directed Acyclic Graph (DAG)
+Instead of guessing clock times (*"Run script 1 at 3:00 AM, guess that it finishes by 3:30 AM, run script 2 at 3:30 AM"*), we declare explicit parent-child dependencies:
+* `raw_telemetry_scan` has `dependencies = []` (it can start immediately).
+* `cleaned_features` has `dependencies = ["raw_telemetry_scan"]` (it cannot start until `raw_telemetry_scan` succeeds!).
+* `publish_daas_service` has `dependencies = ["anomaly_model_score", "vector_rag_index"]` (it waits for *both* upstream branches).
+Because dependencies only flow forward with zero circular loops, this structure is called a **Directed Acyclic Graph (DAG)**.
+
+### 2. Separating Transient Network Glitches from Bad Data Rows
+When a pipeline fails at 3:00 AM, there are two completely different causes:
+* **Transient Infrastructure Error** (e.g., `TimeoutError`, `ConnectionError`, HTTP `503`): The remote server blinked. Waiting 1 second, then 2 seconds, then 4 seconds (**exponential backoff**) almost always succeeds.
+* **Permanent Data Error / "Poison Pill"** (e.g., a row with `gallons: -45.0` or `route_id: null`): Retrying 100 times will never turn `-45.0` into a valid number. We catch the error per row, append it to a **Dead-Letter Queue (`dlq_quarantine.jsonl`)**, and let the remaining valid rows finish.
+
+### 3. Making Database Writes Repeatable (`INSERT OR REPLACE INTO`)
+If a pipeline crashes halfway through and you restart it, a naive `INSERT INTO` will duplicate the first half of the batch. Using `PRIMARY KEY` constraints with `INSERT OR REPLACE INTO` (or `DELETE` + `INSERT` on a date partition) guarantees that running the pipeline 1 time or 10 times produces the exact same table.
+
+### 4. Emitting a Structured Heartbeat (`pipeline_heartbeat.json`)
+At the end of every automated run, the orchestrator writes a small JSON summary file recording `run_id`, `pipeline_status`, `execution_order`, `valid_records_written`, and `dlq_records_quarantined` so monitoring dashboards know immediately if a batch dropped to zero rows or quarantined an unusual spike of bad data.
+
+---
+
+## 2c. How Data Orchestrators Differ from Basic `cron` Scripts
+
+You do not need prior DevOps or Airflow experience to understand why modern data teams replaced Linux `cron` with **Dependency-Aware Asset Orchestrators** (like Dagster or Prefect).
+
+| Dimension | Legacy Time-Based `cron` | Modern Asset DAG Orchestrator |
+| :--- | :--- | :--- |
+| **Trigger Logic** | Blind wall-clock time (`30 3 * * *`) | Topological completion of upstream parent assets |
+| **Upstream Failure** | Downstream scripts still fire on empty/stale files! | Downstream tasks are automatically halted and alerted |
+| **Poison-Pill Row** | Single bad row crashes the entire batch | Quarantined to DLQ (`dlq_quarantine.jsonl`); valid rows succeed |
+| **Re-running Failed Jobs** | Risks duplicate rows in destination tables | Idempotent upserts guarantee zero duplicate records |
+
+This architectural contrast establishes our core rule for Unit 7:
+
+> **The Safe Automation Rule:** Never chain automated data scripts by wall-clock guessing. Every unattended pipeline must (1) execute stages in strict topological dependency order, (2) retry transient network errors with exponential backoff, (3) quarantine invalid rows into a Dead-Letter Queue, and (4) write idempotent outputs.
+
+---
+
+## 2d. Why the 4:30 AM Stranded Drivers Disaster Happened (The Cron Anti-Pattern)
 
 To understand why production data engineering abandoned unmanaged cron jobs, examine an authentic failure in nationwide fleet operations.
 
@@ -139,7 +184,7 @@ Why did this cascade happen?
 
 ---
 
-## 2c. The Core Concept — Idempotency (f(f(x)) = f(x))
+## 2e. The Core Concept — Idempotency (f(f(x)) = f(x))
 
 The single most important principle in pipeline engineering is **Idempotency**.
 
@@ -167,7 +212,7 @@ Whether this query runs once, fails twice, or is rerun by a dispatcher five time
 
 ---
 
-## 2d. Fault Tolerance — Retries & Dead-Letter Queues (DLQ)
+## 2f. Defensive Fault Tolerance — Exponential Backoff & Dead-Letter Queues (DLQ)
 
 In production, external systems fail constantly: network timeouts, `503 Service Unavailable` errors, or malformed JSON payloads. A resilient orchestrator classifies failures into two distinct categories:
 
@@ -186,9 +231,34 @@ FAILURE CLASSIFICATION:
 | **Transient Failure** | Socket timeout, `503 Gateway Busy`, brief DNS blip | Waiting a few seconds and trying again succeeds. | **Exponential Backoff Retry** (`delay * 2^attempt`). |
 | **Permanent Failure ("Poison Pill")** | Row has `gallons = -999` or missing primary key `route_id: null` | Retrying 100 times fails all 100 times because the payload is invalid. | **Dead-Letter Queue (DLQ)**: Quarantine the bad row to `dlq_quarantine.jsonl` and continue the batch. |
 
+### Tracing the 3-Step Engineering Evolution
+Let's trace the three stages of pipeline automation so you can see how production orchestrators survive 3:00 AM failures:
+
+#### Step 1: Blind `cron` + Unchecked `INSERT` (Duplicates & Cascades)
+```python
+# DANGEROUS: Crashes on first bad row and duplicates records whenever restarted
+for row in raw_batch:
+    con.execute("INSERT INTO curated_routes VALUES (?, ?)", [row["route_id"], row["gallons"]])
+```
+
+#### Step 2: Bare `try/except: pass` (Silent Data Loss)
+```python
+# DANGEROUS: Swallows errors silently—nobody knows rows were dropped!
+for row in raw_batch:
+    try:
+        validate_and_insert(row)
+    except Exception:
+        pass
+```
+
+#### Step 3: Production DAG + Exponential Backoff + DLQ + Idempotent Upsert + Heartbeat
+```python
+# PRODUCTION: Retries network glitches, quarantines bad rows to DLQ, upserts idempotently, emits heartbeat
+```
+
 ---
 
-## 2e. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python Orchestration)
+## 2g. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python Orchestration)
 
 Let's first build the three individual building blocks (Exponential Backoff, Dead-Letter Queue splitting, and Idempotent DuckDB Upserts) step by step, and then run the complete `DAGOrchestrator` walkthrough.
 
@@ -354,7 +424,7 @@ Notice that `publish_daas_service` was prevented from running until *both* upstr
 
 ---
 
-## 2f. Practice Exercises & Formative Self-Check FAQ
+## 2h. Practice Exercises & Formative Self-Check FAQ
 
 Try these three exercises in your GitHub Codespaces sandbox (`units/unit_07_orchestration_and_automation/`) before starting the graded lab:
 
@@ -372,6 +442,9 @@ Try these three exercises in your GitHub Codespaces sandbox (`units/unit_07_orch
 
 * **Question 3: Should I retry a data `ValidationError` (like `gallons = -50`) using exponential backoff?**  
   *Answer:* No! Waiting 2, 4, and 8 seconds will never turn `-50` into a positive number. Only retry **transient infrastructure failures** (`TimeoutError`, `ConnectionError`, HTTP `503`), and route **schema/domain validation errors** directly to the Dead-Letter Queue.
+
+* **Question 4: Why does `DAGOrchestrator.run()` raise a `RuntimeError` if `progress == False`?**  
+  *Answer:* If none of the remaining unexecuted tasks have all of their prerequisites satisfied, there is either a circular dependency (`A` waits for `B` while `B` waits for `A`) or a misspelled dependency name. Raising an immediate error prevents an infinite `while` loop!
 
 ---
 

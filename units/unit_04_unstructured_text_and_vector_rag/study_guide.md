@@ -3,7 +3,7 @@
 Welcome to the core instructional lecture and study hub for **Unit 4: Unstructured Text & Vector Search (RAG Targets)**. This page organizes all weekly learning materials into five structured sections:
 
 1. **Unit Overview & Objectives:** Review the architectural context and measurable learning objectives for this unit.
-2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2f):** Master the target JSONL/Parquet RAG chunk format, maintenance text source systems, document extraction, recursive and sliding-window semantic chunking, high-dimensional vector embeddings (384D unit hyperspheres), cosine similarity metrics, and metadata pre-filtering.
+2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2h):** Master the target JSONL/Parquet RAG chunk format, maintenance text source systems, bottom-up text scrubbing and overlapping chunk mechanics, how Retrieval-Augmented Generation (RAG) uses embeddings, high-dimensional vector embeddings (384D unit hyperspheres), cosine similarity metrics, and metadata pre-filtering.
 3. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from Hugging Face Sentence-Transformers, ChromaDB, and Pinecone vector engineering guides.
 4. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe embedding models and vector databases executed in live Python environments.
 5. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
@@ -76,9 +76,71 @@ When our Unit 4 pipeline finishes scrubbing, chunking, and embedding the raw wor
 }
 ```
 
+> **Companion Reference:** To see how RAG text chunks and embedding arrays compare with tabular matrices, 3D image tensors, and API contracts, open **The Shapes of AI Data: A Companion Guide** in the *Getting Started - Course Orientation* module.
+
 ---
 
-## 2b. The $42,000 Seized Engine & The "Whining Turbo"
+## 2b. Cleaning Text & Building Overlapping Chunks from the Ground Up
+
+Before we talk about vector geometry or embedding models, let's start at the beginning: **How do we turn messy, freeform operational text into clean, self-contained chunks in Python?**
+
+When mechanics type notes into a shop-floor terminal or customers submit support tickets through a web form, the raw strings are never ready for an AI model out of the box. Let's walk through the four foundational steps a data engineer uses to prepare unstructured text from the ground up.
+
+### 1. Ingesting JSON Lines (`.jsonl`) Records
+Unlike tabular data where every row has identical numeric columns, unstructured text logs often have nested metadata lists or variable-length paragraphs. Data engineers store and stream these logs as **JSON Lines (`.jsonl`)**—a text file where every individual line is a standalone JSON object that can be parsed one line at a time with `json.loads(line)` without loading the entire file into RAM at once.
+
+### 2. Scrubbing HTML Markup and Whitespace Noise
+Legacy web portals frequently wrap mechanic comments in HTML tags (`<p>`, `<br>`, `<b>`, `<div class="note">`) and erratic tab/newline spacing. If you feed `"<p>Pulled   dipstick,<br>found glitter</p>"` into an embedding model, the model wastes capacity encoding `"<p>"` and `"<br>"`. We strip tags and normalize whitespace in two lines using Python's regular expression (`re`) module:
+
+```python
+import re
+
+raw_note = "<p>Driver complained of   <b>whistling</b><br>near 1800 RPM.</p>"
+# Step A: Replace any <...> HTML tag with a single space
+without_tags = re.sub(r"<[^>]+>", " ", raw_note)
+# Step B: Collapse multiple spaces, tabs, or newlines into a single space
+clean_note = re.sub(r"\s+", " ", without_tags).strip()
+```
+
+### 3. Splitting Long Documents with a Sliding Overlap Window
+Why don't we just slice a 300-word maintenance log every 50 words (`words[0:50]`, `words[50:100]`, `words[100:150]`)? Because if an important symptom sits right on word `49` and `50` (*"noticed fine brass"* | `"glitter in oil pan"*), neither chunk contains the complete thought!
+
+Instead, we advance our window by **`step = chunk_size - overlap`** (for example, `50 - 10 = 40` words per step):
+* **Chunk 0:** Words `0` to `50`
+* **Chunk 1:** Words `40` to `90` (repeats words `40..50` so any sentence crossing word `50` remains intact!)
+* **Chunk 2:** Words `80` to `130` (repeats words `80..90`)
+
+### 4. Separating Structured Metadata from Unstructured Text
+Every work order has both **structured facts** (`truck_id = "TRUCK-219"`, `service_date = "2024-09-28"`, `shop_code = "DEN-SHOP-02"`) and **unstructured prose** (`text`). Rather than mashing the truck ID and date into the text string, we store them in a dedicated `metadata` dictionary on every chunk so our database can filter by exact truck or date in milliseconds.
+
+---
+
+## 2c. How Retrieval-Augmented Generation (RAG) & Vector Search Work
+
+You do not need prior natural language processing (NLP) coursework to understand how **Retrieval-Augmented Generation (RAG)** works or how downstream AI assistants use the chunks and vectors we engineer.
+
+Suppose a fleet safety director asks an AI assistant: *"Which trucks in our Denver shop have shown signs of turbocharger bearing wear this month?"*
+
+An off-the-shelf Large Language Model (like Llama, Claude, or GPT) **cannot answer that question on its own**—it was trained on public internet text months ago and has zero knowledge of your company's private mechanic logs from yesterday. Even worse, you cannot paste 500,000 historical work orders into the prompt every time someone asks a question.
+
+**Retrieval-Augmented Generation (RAG)** solves this in two distinct stages:
+
+1. **Offline Indexing (Our Data Pipeline):**
+   * We clean every historical work order, split it into overlapping chunks, and pass each chunk through a local **Embedding Model** (`all-MiniLM-L6-v2`).
+   * The embedding model converts the meaning of each text chunk into a list of **384 floating-point numbers** (called a *dense vector*) and stores the chunk, its metadata, and its 384-number vector inside a **Vector Database** (`ChromaDB` or `rag_vectors.parquet`).
+2. **Online Retrieval & Grounded Answering (Live Query Time):**
+   * When the safety director asks a question, our pipeline passes their question through the **exact same embedding model** to get a 384-number query vector.
+   * First, the database applies any structured **metadata filters** (e.g., `shop_code == "DEN-SHOP-02"`).
+   * Next, it compares the query vector to the candidate chunk vectors using **Cosine Similarity** and retrieves the top-*k* (e.g., top 3) most semantically similar work orders.
+   * Finally, those 3 verified work orders are handed to the LLM with the instruction: *"Answer the director's question using ONLY these 3 retrieved work orders and cite their IDs."*
+
+This establishes our core rule for Unit 4:
+
+> **The RAG Grounding Rule:** A language model is only as accurate as the text chunks your retrieval pipeline hands it. If your pipeline leaves behind HTML garbage, slices sentences in half without overlap, or drops structured metadata, vector retrieval will return the wrong documents and the downstream AI will hallucinate.
+
+---
+
+## 2d. Why the $42,000 Seized Engine Was Missed (The "Whining Turbo" Case Study)
 
 To understand why simple SQL keyword matching fails catastrophically on unstructured text, examine an authentic failure in heavy-duty fleet operations.
 
@@ -129,7 +191,7 @@ Dense vector embeddings solve this problem: an embedding model projects `"high w
 
 ---
 
-## 2c. The Semantic Sphere & Cosine Similarity
+## 2e. The Semantic Sphere & Cosine Similarity
 
 How does a computer represent the meaning of words mathematically?
 
@@ -165,7 +227,7 @@ Because vectors are pre-normalized (`||A|| = ||B|| = 1.0`), cosine similarity si
 
 ---
 
-## 2d. Semantic Chunking — Why Naive Splitting Destroys Pipelines
+## 2f. Defensive Retrieval Evolution — Semantic Chunking & Hybrid Metadata Pre-Filtering
 
 You cannot pass a 50-page PDF into an embedding model at once because transformer models have strict token context limits (typically 256 to 512 tokens for embedding models). You must split text into smaller chunks.
 
@@ -190,9 +252,36 @@ Chunk 2:                                                [ 80 ─── 90 ──
                             10-Word Overlap         10-Word Overlap
 ```
 
+### Tracing the 3-Step Engineering Evolution
+Let's trace the three stages of unstructured text retrieval to see why modern RAG combines sliding-window chunking, metadata pre-filtering, and dense vector similarity:
+
+#### Step 1: Naive SQL Keyword Matching (`ILIKE`)
+```sql
+-- FAILS ON SYNONYMS & TYPOS: Misses "whistling sound", "brass glitter", and "trbo"
+SELECT * FROM fleet_maintenance_orders WHERE mechanic_notes ILIKE '%turbocharger%';
+```
+
+#### Step 2: Fixed Character Slicing Without Overlap (Severs Context)
+```python
+# DANGEROUS: Cuts words and negations ("no | leaks") in half with zero overlap
+bad_chunks = [raw_text[i : i + 200] for i in range(0, len(raw_text), 200)]
+```
+
+#### Step 3: Production Scrubbing + Sliding-Window Overlap + Hybrid Vector Search
+```python
+# PRODUCTION: Scrub HTML -> Overlapping Word Chunks -> Metadata Filter + Cosine Similarity
+cleaned = clean_text(raw_text)
+chunks = chunk_text_sliding_window(cleaned, chunk_size=40, overlap=10)
+results = collection.query(
+    query_embeddings=embedder.encode([query_text]).tolist(),
+    where={"shop_code": "DEN-SHOP-02"},  # Exact structured pre-filter!
+    n_results=3
+)
+```
+
 ---
 
-## 2e. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python + Vector RAG)
+## 2g. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python + Vector RAG)
 
 Let's first build every core text-cleaning, sliding-window chunking, and NumPy cosine similarity function from scratch using standard Python, and then walk through a complete `SentenceTransformer` + `ChromaDB` vector search pipeline.
 
@@ -330,7 +419,7 @@ The vector search identified Truck #219 (`WO-90812`) as the #1 match with high c
 
 ---
 
-## 2f. Practice Exercises & Formative Self-Check FAQ
+## 2h. Practice Exercises & Formative Self-Check FAQ
 
 Try these three exercises in your GitHub Codespaces sandbox (`units/unit_04_unstructured_text_and_vector_rag/`) before starting the graded lab:
 
@@ -348,6 +437,9 @@ Try these three exercises in your GitHub Codespaces sandbox (`units/unit_04_unst
 
 * **Question 3: What happens if `overlap` is set equal to or larger than `chunk_size`?**  
   *Answer:* If `overlap >= chunk_size`, the sliding window step size (`chunk_size - overlap`) becomes `0` or negative, causing an infinite loop. Always enforce `0 <= overlap < chunk_size` (typically `overlap` is 10% to 25% of `chunk_size`).
+
+* **Question 4: Can I embed documents with one model (e.g., `all-MiniLM-L6-v2`, 384 dimensions) and embed search queries with a different model?**  
+  *Answer:* Never! Every embedding model has its own unique coordinate space and dimensionality. Both the indexed document chunks and the incoming search query must be encoded by the **exact same embedding model** so their coordinates live on the same unit hypersphere.
 
 ---
 

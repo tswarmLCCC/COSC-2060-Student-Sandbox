@@ -3,7 +3,7 @@
 Welcome to the core instructional lecture and study hub for **Unit 6: The Agentic Interface (Model Context Protocol - MCP)**. This page organizes all weekly learning materials into five structured sections:
 
 1. **Unit Overview & Objectives:** Review the architectural context and measurable learning objectives for this unit.
-2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2f):** Master the target MCP JSON-RPC 2.0 schemas, agentic source systems, the Model Context Protocol (MCP) architecture, the "\$500,000 Unrestricted SQL" operational catastrophe, the "USB-C for AI" mental model, defensive tool sandboxing, and JSON-RPC 2.0 communication.
+2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2h):** Master the target MCP JSON-RPC 2.0 schemas, agentic source systems, bottom-up JSON Schema & parameter-guard engineering, how autonomous LLM agents discover and call tools, the "\$500,000 Unrestricted SQL" operational catastrophe, the "USB-C for AI" mental model, defensive tool sandboxing, and JSON-RPC 2.0 communication.
 3. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from Anthropic MCP, JSON-RPC 2.0 specifications, and local tool calling standards.
 4. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe MCP tool discovery and autonomous agent execution in live environments.
 5. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
@@ -101,9 +101,61 @@ Every interaction with our MCP server follows the **JSON-RPC 2.0** specification
 }
 ```
 
+> **Companion Reference:** To see how MCP JSON-RPC schemas compare with the REST contracts, RAG chunks, and tabular matrices from Units 1–5, open **The Shapes of AI Data: A Companion Guide** in the *Getting Started - Course Orientation* module.
+
 ---
 
-## 2b. The $500,000 "Unrestricted SQL" Disaster
+## 2b. Building MCP Tool Definitions & Parameter Guards from the Ground Up
+
+Before we examine agentic database disasters or the JSON-RPC 2.0 wire protocol, let's start at the beginning: **How do we turn a regular Python data function into a safe, self-describing tool that an AI model can discover and invoke?**
+
+If you know how to write a Python function and a Python dictionary from Units 1–5, you already know 90% of what it takes to build a Model Context Protocol (MCP) server. Let's walk through the four foundational building blocks from the ground up.
+
+### 1. Writing a Read-Only, Single-Purpose Python Function
+In Unit 5, you wrote FastAPI endpoints for human web dashboards. In Unit 6, your functions are called by **autonomous AI models**. Instead of writing one giant function that accepts arbitrary SQL strings, we write small, single-purpose, **read-only** functions with explicit parameters—such as `get_truck_telemetry(truck_id: int)` or `get_recent_anomalies(limit: int = 5)`.
+
+### 2. Defending Every Argument at the Door (Type & Range Checks)
+Never assume an AI model will pass clean inputs! An LLM might accidentally pass `"219; DROP TABLE routes;"`, `-5`, `9999999`, or even a boolean `True` (and in Python, `isinstance(True, int)` evaluates to `True`!). Every MCP tool starts with a strict parameter guard:
+
+```python
+def validate_truck_id(truck_id: int) -> int:
+    if not isinstance(truck_id, int) or isinstance(truck_id, bool):
+        raise ValueError("truck_id must be an integer")
+    if truck_id < 1 or truck_id > 10000:
+        raise ValueError("truck_id must be between 1 and 10000")
+    return truck_id
+```
+
+### 3. Describing the Tool with JSON Schema (`name`, `description`, `inputSchema`)
+An AI model never reads the Python code inside your function body. Instead, it reads a JSON metadata card (`tools/list`) containing three fields:
+* **`name`:** Exact function identifier (e.g., `"get_truck_telemetry"`).
+* **`description`:** Plain-English instruction telling the model *when* to use this tool and *what* it returns.
+* **`inputSchema`:** A JSON Schema dictionary declaring `"type": "object"`, `"properties"` (each parameter's type, bounds, and description), and `"required"` parameter names.
+
+### 4. Wrapping Requests and Responses in JSON-RPC 2.0 Envelopes
+Instead of inventing a custom dictionary format for every project, MCP standardizes every message using **JSON-RPC 2.0**—a lightweight envelope with `"jsonrpc": "2.0"`, a matching `"id"` so the caller can pair each reply with its request, and either `"result"` (on success) or `"error"` (when a method or parameter is invalid).
+
+---
+
+## 2c. How Autonomous AI Agents Use Tools Without Hallucinating
+
+You do not need prior AI agent coursework to understand how **tool-calling** works under the hood.
+
+Imagine a human dispatcher sitting in front of a locked terminal. An unassisted LLM is like a brilliant analyst locked in a windowless room with no internet and no database access: if you ask *"What speed is Truck 219 driving right now?"*, the LLM has to either say *"I don't know"* or guess (hallucinate) a plausible-sounding number.
+
+An **MCP-enabled AI Agent** solves this through a deterministic 4-step conversation loop controlled by your **MCP Host** (such as VS Code, Claude Desktop, or a Python agent runner):
+1. **Discovery (`tools/list`):** When the session starts, the Host asks your MCP Server what tools exist and places those tool schemas in the LLM's system prompt.
+2. **Tool Selection (`tools/call`):** When the user asks about Truck 219, the LLM does *not* write a SQL query or guess a speed. Instead, it outputs a structured JSON request: `{"method": "tools/call", "params": {"name": "get_truck_telemetry", "arguments": {"truck_id": 219}}}`.
+3. **Sandboxed Execution (Your Code):** Your MCP Server receives that JSON-RPC message, validates `truck_id == 219`, queries the read-only Parquet/DuckDB store, and returns the exact JSON facts (`{"speed_mph": 62.5, "current_city": "Cheyenne, WY"}`).
+4. **Grounded Final Answer:** The Host feeds your JSON tool result back to the LLM, which writes a factual, hallucination-free answer citing the exact numbers your server returned.
+
+This establishes our core rule for Unit 6:
+
+> **The Principle of Least Privilege for AI Agents:** Never give an autonomous model raw database credentials or an unrestricted `execute_sql` tool. Expose only discrete, read-only, schema-validated MCP tools with strict parameter bounds and row-count caps (`limit <= 25`).
+
+---
+
+## 2d. Why the $500,000 "Unrestricted SQL" Disaster Happened (Failure Case Study)
 
 To understand why data engineers must never give raw, unconstrained database credentials to an autonomous AI agent, consider an authentic corporate failure.
 
@@ -143,7 +195,7 @@ What was the fatal flaw?
 
 ---
 
-## 2c. "The USB-C Standard for AI" & The Agent Tool-Calling Loop
+## 2e. "The USB-C Standard for AI" & The Agent Tool-Calling Loop
 
 Before MCP, every developer wrote custom wrappers for every LLM:
 * If you used OpenAI, you wrote OpenAI function schemas.
@@ -194,7 +246,7 @@ Agent reads JSON      ──> Writes a clear summary citing the exact returned v
 
 ---
 
-## 2d. The Anatomy of an MCP Tool — JSON-RPC 2.0 Protocol
+## 2f. Defensive Tool Evolution — From Raw SQL to Sandboxed JSON-RPC 2.0
 
 When an LLM requests a tool call, MCP communicates using standardized **JSON-RPC 2.0**:
 
@@ -229,9 +281,35 @@ When an LLM requests a tool call, MCP communicates using standardized **JSON-RPC
 }
 ```
 
+### Tracing the 3-Step Engineering Evolution
+Let's compare three ways teams expose data to AI agents so you can see why sandboxed MCP tools win:
+
+#### Step 1: Unrestricted `execute_sql(query: str)` (Catastrophic)
+```python
+# DANGEROUS: Allows DELETE, DROP, or dumping 1,000,000 rows into the LLM context window
+def execute_sql(query: str):
+    return db_conn.execute(query).fetchall()
+```
+
+#### Step 2: Fixed Function Without Input Validation or Row Caps (Fragile)
+```python
+# FRAGILE: No bounds check on limit; an agent asking for limit=1000000 crashes the context window
+def get_anomalies(limit: int):
+    return con.sql(f"SELECT * FROM anomalies LIMIT {limit}").df().to_dict(orient="records")
+```
+
+#### Step 3: Production Sandboxed MCP Tool (Type-Guarded, Read-Only, Bounded)
+```python
+# PRODUCTION: Strict integer/bool guards, bounded range, parameterized query, JSON-RPC 2.0 envelope
+def get_recent_anomalies(limit: int = 5):
+    if not isinstance(limit, int) or isinstance(limit, bool) or limit < 1 or limit > 25:
+        return {"error": "limit must be an integer between 1 and 25"}
+    return con.execute("SELECT * FROM anomalies LIMIT ?", [limit]).df().to_dict(orient="records")
+```
+
 ---
 
-## 2e. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python MCP Server)
+## 2g. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python MCP Server)
 
 Let's build up the Python patterns for an MCP server step by step—starting from a single guarded Python function, defining its JSON Schema, and then assembling the complete `FleetMCPServer` class.
 
@@ -353,9 +431,14 @@ test_call = json.dumps({
 print("MCP Server Response:", server.handle_request(test_call))
 ```
 
+**Verification Output:**
+```json
+MCP Server Response: {"jsonrpc": "2.0", "id": 1, "result": {"content": [{"type": "text", "text": "{\"truck_id\": 219, \"status\": \"EN_ROUTE\", \"current_city\": \"Cheyenne, WY\", \"speed_mph\": 62.5, \"last_inspection\": \"PASS\"}"}]}}
+```
+
 ---
 
-## 2f. Practice Exercises & Formative Self-Check FAQ
+## 2h. Practice Exercises & Formative Self-Check FAQ
 
 Try these three exercises in your GitHub Codespaces sandbox (`units/unit_06_agentic_interfaces_and_mcp/`) before starting the graded lab:
 
@@ -373,6 +456,9 @@ Try these three exercises in your GitHub Codespaces sandbox (`units/unit_06_agen
 
 * **Question 3: What does JSON-RPC error code `-32601` mean?**  
   *Answer:* In the official JSON-RPC 2.0 specification, `-32601` is the standard error code for **"Method not found"** (returned when a client requests a method or tool name that is not registered on the server).
+
+* **Question 4: Why do we check `isinstance(value, bool)` separately when validating integers in Python?**  
+  *Answer:* In Python, `bool` is a subclass of `int` (`isinstance(True, int)` is `True`, and `True == 1`!). Checking `isinstance(value, bool)` explicitly prevents a caller from accidentally passing `True` or `False` as a `truck_id` or `limit`.
 
 ---
 

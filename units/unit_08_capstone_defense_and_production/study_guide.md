@@ -3,7 +3,7 @@
 Welcome to the core instructional lecture and study hub for **Unit 8: Capstone Defense & Production Handoff**. This page organizes all weekly learning materials into five structured sections:
 
 1. **Unit Overview & Objectives:** Review the architectural context and measurable learning objectives for this unit.
-2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2f):** Master the target Capstone Audit Report and multi-modal source systems, containerization principles, the "Works on My Machine" tragedy, the "Intermodal Shipping Container" mental model, multi-stage Dockerfile hardening, non-root security, step-by-step multi-modal verification, and live capstone defense protocols.
+2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2h):** Master the target Capstone Audit Report and multi-modal source systems, bottom-up multi-modal data auditing & DLQ design, how Docker containers & blind-test harnesses verify production readiness, the "Works on My Machine" tragedy, the "Intermodal Shipping Container" mental model, multi-stage Dockerfile hardening, non-root security, and live capstone defense protocols.
 3. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from Docker, OWASP Container Security standards, and Twelve-Factor App methodologies.
 4. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe container builds, image optimizations, and healthcheck verifications in live environments.
 5. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
@@ -99,9 +99,56 @@ When your Unit 8 capstone script completes its run, it writes `output/capstone_a
 }
 ```
 
+> **Companion Reference:** To see how all four data modalities in this capstone (relational matrices, anomaly tables, 3D image manifests, and RAG chunks) fit together across the entire course, open **The Shapes of AI Data: A Companion Guide** in the *Getting Started - Course Orientation* module.
+
 ---
 
-## 2b. The "Works on My Machine" Tragedy
+## 2b. Building a Multi-Modal Auditor & Dead-Letter Queue from the Ground Up
+
+Before we examine production containerization tragedies or multi-stage Dockerfiles, let's start at the beginning: **How do we combine all four data modalities from Units 1–4 into one defensive Python pipeline that never crashes on messy real-world inputs?**
+
+In Units 1–7, you built each layer of the fleet logistics platform one piece at a time. In Unit 8, your capstone script (`lab8_capstone_runner.py`) acts as the **single quality gate** for an entire day of incoming fleet data. Let's walk through the four foundational building blocks of an end-to-end multi-modal verifier from the ground up.
+
+### 1. Separating Good Records from Bad Records with a Shared `DeadLetterQueue`
+When a batch contains 25 routes, 40 fuel swipes, 10 camera frames, and 15 mechanic notes, a single corrupted entry in *any* subsystem should never crash the other 95% of valid records. Instead of writing four separate error-logging loops, we create one shared `DeadLetterQueue` helper class with a `.quarantine(subsystem, record_id, raw_payload, reason)` method that tags every bad item with its origin (`"relational"`, `"anomaly_engine"`, `"vision"`, or `"rag"`) and writes them all to `output/capstone_dlq.jsonl`.
+
+### 2. Enforcing Subsystem-Specific Invariants Before Passing Data Downstream
+Each modality has its own non-negotiable physical or mathematical rule:
+* **Relational Routes (Unit 1):** `act_arrival >= dep_time` (a truck cannot arrive before it departs), and weather joins must satisfy `r.dep_time >= w.obs_time` via `ASOF LEFT JOIN`.
+* **Fuel Swipes (Unit 2):** `gallons > 0` and `amount_usd > 0` *before* computing Z-scores, plus physical anomaly flags (`gallons > 300` or `implied_speed_mph > 75`).
+* **Camera Frames (Unit 3):** `width > 0`, `height > 0`, and `mean_brightness >= 5.0` (blocking pitch-black night frames) before computing letterbox padding and `[0.0, 1.0]` normalized YOLO boxes.
+* **Mechanic Work Orders (Unit 4):** After stripping HTML tags and collapsing whitespace, `len(cleaned_text) > 0` before splitting into overlapping chunks.
+
+### 3. Packaging the Runtime Environment (`requirements.txt` + `Dockerfile`)
+In Unit 8, your Python script is only half of the deliverable. Because OpenCV relies on Linux C-libraries (`libgl1`, `libglib2.0-0`) and DuckDB/Polars rely on exact Python versions, we pin every Python package in `requirements.txt` and declare the exact operating system libraries inside a `Dockerfile` so the entire pipeline runs identically on your laptop, in GitHub Codespaces, and on any cloud server.
+
+### 4. Writing Self-Checking Assertions and an Audit Report (`capstone_audit_report.json`)
+A production pipeline never exits silently and hopes for the best. At the end of `lab8_capstone_runner.py`, it runs automated assertions (`assert` statements / `pytest` checks) verifying row counts, zero temporal leakage, and valid coordinate bounds, then writes `output/capstone_audit_report.json` with exact input, valid, and quarantined counts for every subsystem.
+
+---
+
+## 2c. How Containers & Blind-Test Harnesses Prove Production Readiness
+
+You do not need prior DevOps or Kubernetes coursework to understand why **containers** and **blind-test harnesses** are the final exam of production data engineering.
+
+### Virtual Machines vs. Linux Containers
+When engineers first tried to isolate applications on shared servers, they used **Virtual Machines (VMs)**. Every VM boots an entire separate guest operating system (Windows or Linux kernel + gigabytes of OS files), consuming 4–10 GB of RAM and taking minutes to start.
+
+A **Docker Container** shares the host machine's Linux kernel and packages *only* your application's user-space filesystem (Python 3.11 + `libgl1` + `requirements.txt` + your `.py` scripts). It starts in less than 1 second, uses a fraction of the RAM, and behaves **100% identically** everywhere Docker runs.
+
+### What Happens During a "Blind Test / Chaos Batch" Defense
+When your system is evaluated in production (and in your Unit 8 capstone lab), an automated test harness drops an unseen **"Chaos Batch"** (`datasets/unit_08_chaos_batch.json`) into your pipeline. You cannot hand-edit the input file or hardcode row IDs. Instead, your containerized pipeline must:
+1. Ingest the unseen multi-modal batch cleanly.
+2. Quarantine every injected defect (future weather timestamps, negative gallons, pitch-black frames, empty HTML notes) into `capstone_dlq.jsonl`.
+3. Export verified Parquet tables and pass every automated `pytest` invariant check without throwing an unhandled exception.
+
+This establishes our core rule for Unit 8:
+
+> **The Production Handoff Rule:** Software is not ready for production until (1) its entire OS, C-library, and Python dependency tree is pinned inside a reproducible, non-root container, and (2) it survives an unseen multi-modal chaos batch without crashing or leaking corrupted data downstream.
+
+---
+
+## 2d. Why the "Works on My Machine" Tragedy Cost $1.2M (Failure Case Study)
 
 To appreciate why containerization and reproducible handoffs are mandatory in data engineering, examine an authentic corporate tragedy.
 
@@ -145,7 +192,7 @@ The company lost the \$1.2 million contract.
 
 ---
 
-## 2c. "The Intermodal Shipping Container"
+## 2e. "The Intermodal Shipping Container"
 
 Before 1956, global ocean shipping was a logistical nightmare. Cargo arrived at docks in random wooden crates, barrels, and sacks. Longshoremen spent weeks hand-loading individual barrels into ship holds. Ships frequently sank because heavy sacks shifted during storms, and theft was rampant.
 
@@ -162,7 +209,7 @@ Rule: "If it runs in the container on your laptop, it runs identically in the cl
 
 ---
 
-## 2d. Multi-Stage Dockerfile Hardening — Security & Minimal Footprint
+## 2f. Multi-Stage Dockerfile Hardening — Security & Minimal Footprint
 
 In production, you must never ship an 8 GB development image containing compilers (`gcc`, `g++`) or run containers as `root`.
 
@@ -240,7 +287,7 @@ CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
 
 ---
 
-## 2e. Step-by-Step Code Ramp-Up — Building the End-to-End Capstone Verifier
+## 2g. Step-by-Step Code Ramp-Up — Building the End-to-End Capstone Verifier
 
 In this week's capstone lab, you will bring together the defensive patterns from Units 1–7 into a modular Python pipeline that processes an unseen multi-modal "Chaos / Blind Test Batch." Let's walk through how to structure a multi-subsystem verifier step by step.
 
@@ -321,7 +368,7 @@ Finally, a production pipeline verifies its own outputs before reporting success
 
 ---
 
-## 2f. Practice Exercises & Formative Self-Check FAQ
+## 2h. Practice Exercises & Formative Self-Check FAQ
 
 Try these three exercises in your GitHub Codespaces sandbox (`units/unit_08_capstone_defense_and_production/`) before starting the capstone lab:
 
