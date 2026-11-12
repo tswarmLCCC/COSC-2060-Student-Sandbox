@@ -11,11 +11,9 @@ Welcome to the core instructional lecture and study hub for **Unit 7: Orchestrat
 
 ---
 
-## 1. Instructor Lecture & Conceptual Deep Dive
 
-### The Unsleeping Pipeline: Dependency DAGs, Idempotency & Fault Tolerance
 
-#### 1. Unit Overview & Objectives
+## 1. Unit Overview & Objectives
 In Units 1 through 6, you built each component of an end-to-end AI infrastructure ecosystem:
 * Relational feature matrices in DuckDB (Unit 1)
 * High-throughput anomaly detection in Polars (Unit 2)
@@ -48,26 +46,26 @@ To build reliable data pipelines, data engineers use **Data Orchestrators** (suc
 
 ---
 
-#### 2. What Our Output Looks Like and Where the Data Comes From
+## 2. What Our Output Looks Like and Where the Data Comes From
 
-##### The Purpose
+### The Purpose
 Our goal in Unit 7 is to build a **Fault-Tolerant Pipeline Orchestrator** that executes our multi-stage data pipeline in strict topological dependency order and produces three verified outputs:
 1. The **Idempotent Curated Dataset** (`curated_batch.parquet`), guaranteed free of duplicate primary keys even if the pipeline is executed three times in a row.
 2. A **Dead-Letter Queue Quarantine Log** (`dlq_quarantine.jsonl`) capturing any corrupted input records along with their exact validation error messages and timestamps.
 3. A **Pipeline Execution Heartbeat Manifest** (`pipeline_heartbeat.json`) recording the execution order, status, row counts, and retry counts of every stage in the DAG.
 
-##### Why Operations Teams Need Heartbeats and Dead-Letter Queues
+### Why Operations Teams Need Heartbeats and Dead-Letter Queues
 When an automated pipeline runs overnight, two failure modes must be prevented:
 * **Silent Failure:** A script crashes or processes `0` rows, and nobody notices until dispatchers open a blank dashboard the next morning. Writing a structured `pipeline_heartbeat.json` file after every run gives monitoring tools an immediate check on whether every stage succeeded and how many rows were processed.
 * **One Bad Row Crashes 10,000 Good Rows:** If a batch of 10,000 telemetry records contains 2 corrupted records (called *"poison pills"*), an unguarded script will throw an unhandled exception on the first bad row and abort the entire batch. By catching validation errors per record and routing those 2 bad rows into `dlq_quarantine.jsonl`, the 9,998 valid rows finish on time while engineers inspect the quarantined records cleanly.
 
-##### Where the Raw Data Comes From (Source Systems)
+### Where the Raw Data Comes From (Source Systems)
 An orchestrated nightly or hourly pipeline pulls from multiple upstream sources that can each experience real-world faults:
 1. **Remote SFTP / Cloud Object Drop Zones (`incoming_batch.jsonl`):** Raw batches uploaded by partner carriers or terminal gateways, which occasionally contain truncated lines or schema violations.
 2. **External Weather & Telematics APIs:** Remote endpoints that occasionally return temporary `503 Service Unavailable` timeouts when network traffic spikes.
 3. **Automated Schedulers (`GitHub Actions` / `Dagster` / `cron`):** Scheduled triggers or webhook events that initiate the pipeline run.
 
-##### Sample Output Dataset (The Target Heartbeat & DLQ Shapes)
+### Sample Output Dataset (The Target Heartbeat & DLQ Shapes)
 When our Unit 7 orchestrator finishes a run, it outputs a structured **Heartbeat Manifest** (`pipeline_heartbeat.json`) and a **Dead-Letter Queue** (`dlq_quarantine.jsonl`):
 
 **1. `output/pipeline_heartbeat.json`:**
@@ -99,7 +97,7 @@ When our Unit 7 orchestrator finishes a run, it outputs a structured **Heartbeat
 
 ---
 
-#### 3. The 4:30 AM Stranded Drivers Disaster (The Cron Anti-Pattern)
+## 3. The 4:30 AM Stranded Drivers Disaster (The Cron Anti-Pattern)
 
 To understand why production data engineering abandoned unmanaged cron jobs, examine an authentic failure in nationwide fleet operations.
 
@@ -116,21 +114,21 @@ Apex Freight operated a fleet of 800 trucks. To monitor fuel card fraud and driv
 
 Notice the fatal assumption: The team assumed that each script would finish within exactly 30 minutes, and that each script would always succeed.
 
-##### The Midnight Glitch
+### The Midnight Glitch
 On Tuesday at 3:12 AM, the national fuel vendor's FTP server experienced high load. Script #1 (`01_download_fuel_records.py`) hung waiting for an open network socket. It did not download any new files, but because it had no timeout configured, it remained frozen in memory.
 
 At 3:30 AM, cron blindly fired Script #2 (`02_clean_and_deduplicate.py`). Script #2 found an empty incoming directory. Instead of failing with an alert, the script exited with code 0, wiping the intermediate staging table in preparation for incoming rows.
 
 At 4:00 AM, Script #3 executed. Finding zero rows for today, it generated an empty feature table.
 
-##### The Catastrophic Cascade
+### The Catastrophic Cascade
 At 4:30 AM, Script #4 (`04_run_anomaly_detection.py`) executed. Finding all current fuel totals recorded as `0.00 gallons` due to the wiped staging table, the model evaluated every active truck as an extreme statistical outlier.
 
 At 5:00 AM, Script #5 (`05_freeze_fraudulent_cards.py`) executed automatically. It read the corrupted anomaly output and **automatically deactivated the corporate fuel cards of 412 active truck drivers**.
 
 Across the Midwest and Great Plains, 412 truck drivers pulled into diesel truck stops at 5:15 AM in 12&deg;F winter temperatures. Every card was declined. Drivers could not purchase fuel or stay warm in idling trucks. Dispatch switchboards were overwhelmed with panic calls. Operations halted nationwide for 7 hours while engineers manually restored database snapshots and unblocked cards one by one. The incident cost the company **\$240,000 in emergency towing, driver compensation, and lost shipper trust**.
 
-##### The Architectural Diagnosis: The Cron Anti-Pattern
+### The Architectural Diagnosis: The Cron Anti-Pattern
 Why did this cascade happen?
 1. **Blind Time Execution:** Cron triggers tasks based on the clock, completely oblivious to whether upstream prerequisites succeeded.
 2. **No Data Lineage Awareness:** Downstream tasks had no way to verify if their input data was fresh or empty.
@@ -140,7 +138,7 @@ Why did this cascade happen?
 
 ---
 
-#### 4. The Core Concept: Idempotency (<i>f</i>(<i>f</i>(<i>x</i>)) = <i>f</i>(<i>x</i>))
+## 4. The Core Concept — Idempotency (f(f(x)) = f(x))
 
 The single most important principle in pipeline engineering is **Idempotency**.
 
@@ -149,7 +147,7 @@ In mathematics, an operation is idempotent if applying it multiple times produce
   <i>f</i>( <i>f</i>(<i>x</i>) ) = <i>f</i>(<i>x</i>)
 </p>
 
-##### Non-Idempotent Pipeline (Dangerous):
+### Non-Idempotent Pipeline (Dangerous):
 ```sql
 -- DANGEROUS: Every time you run this, you insert duplicate transactions!
 INSERT INTO daily_mileage_report
@@ -157,7 +155,7 @@ SELECT truck_id, SUM(miles) FROM live_gps_logs GROUP BY truck_id;
 ```
 If your script crashes halfway through and you rerun it, you double-count every driver's mileage!
 
-##### Idempotent Pipeline (Production Standard):
+### Idempotent Pipeline (Production Standard):
 ```sql
 -- IDEMPOTENT: Safe to run 1 time or 100 times on the same date partition
 DELETE FROM daily_mileage_report WHERE report_date = '2026-10-24';
@@ -168,7 +166,7 @@ Whether this query runs once, fails twice, or is rerun by a dispatcher five time
 
 ---
 
-#### 5. Fault Tolerance: Retries & Dead-Letter Queues (DLQ)
+## 5. Fault Tolerance — Retries & Dead-Letter Queues (DLQ)
 
 In production, external systems fail constantly: network timeouts, `503 Service Unavailable` errors, or malformed JSON payloads. A resilient orchestrator classifies failures into two distinct categories:
 
@@ -189,11 +187,11 @@ FAILURE CLASSIFICATION:
 
 ---
 
-#### 6. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python Orchestration)
+## 6. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python Orchestration)
 
 Let's first build the three individual building blocks (Exponential Backoff, Dead-Letter Queue splitting, and Idempotent DuckDB Upserts) step by step, and then run the complete `DAGOrchestrator` walkthrough.
 
-##### Step 1: Writing an Exponential Backoff Retry Wrapper
+### Step 1: Writing an Exponential Backoff Retry Wrapper
 When a remote API experiences a brief hiccup, we double our wait time between retries (`base_delay * (2 ** attempt)`) so we don't overwhelm a recovering server:
 
 ```python
@@ -224,7 +222,7 @@ result, retries = run_with_backoff(flaky_api)
 print(f"API Result: {result} (Retries used: {retries})")
 ```
 
-##### Step 2: Splitting a Batch into Valid Rows and a Dead-Letter Queue (DLQ)
+### Step 2: Splitting a Batch into Valid Rows and a Dead-Letter Queue (DLQ)
 When iterating through a batch of records, wrap per-row validation in a `try ... except` block so a poison-pill record is routed to `dlq_records` without aborting the loop:
 
 ```python
@@ -249,7 +247,7 @@ for row in raw_batch:
 print(f"Valid: {len(valid_records)} | Quarantined to DLQ: {len(dlq_records)}")
 ```
 
-##### Step 3: Enforcing Idempotent Upserts in DuckDB (`INSERT OR REPLACE INTO`)
+### Step 3: Enforcing Idempotent Upserts in DuckDB (`INSERT OR REPLACE INTO`)
 By defining a `PRIMARY KEY` on our target DuckDB table and using `INSERT OR REPLACE INTO`, running the exact same batch 3 times in a row updates keys in place and guarantees zero duplicate rows:
 
 ```python
@@ -265,7 +263,7 @@ for _ in range(3):  # Run 3 times to prove idempotency: f(f(x)) = f(x)
 print("Row count after 3 identical runs:", con.sql("SELECT COUNT(*) FROM curated_routes").fetchone()[0])
 ```
 
-##### Step 4: Guided Implementation Walkthrough — Production DAG Runner in Python
+### Step 4: Guided Implementation Walkthrough — Production DAG Runner in Python
 Here is how a complete `DAGOrchestrator` manages task dependencies, exponential backoff retries, Dead-Letter Queue logging, and topological execution order:
 
 ```python
@@ -355,7 +353,7 @@ Notice that `publish_daas_service` was prevented from running until *both* upstr
 
 ---
 
-#### 7. Practice Exercises & Formative Self-Check FAQ
+## 7. Practice Exercises & Formative Self-Check FAQ
 
 Try these three exercises in your GitHub Codespaces sandbox (`units/unit_07_orchestration_and_automation/`) before starting the graded lab:
 
@@ -363,7 +361,7 @@ Try these three exercises in your GitHub Codespaces sandbox (`units/unit_07_orch
 2. **Exercise 2 (Idempotency Proof):** Run `coding_clinic.py` twice in a row and check the output Parquet row count to verify that running the pipeline multiple times produces the exact same number of rows.
 3. **Exercise 3 (Cron Expression Practice):** Verify what time a GitHub Actions workflow with `schedule: - cron: '0 3 * * *'` triggers (3:00 AM UTC daily).
 
-##### Common Traps & Formative Self-Check FAQ
+### Common Traps & Formative Self-Check FAQ
 
 * **Question 1: What is the difference between an imperative task and a declarative software-defined asset (SDA)?**  
   *Answer:* An imperative task (like in legacy Airflow or cron) says: *"Run this script now."* A declarative asset (like in Dagster) says: *"This data table should exist and be up-to-date with these upstream sources."* The orchestrator inspects what data is missing or stale and executes only the necessary computation.
@@ -376,7 +374,7 @@ Try these three exercises in your GitHub Codespaces sandbox (`units/unit_07_orch
 
 ---
 
-## 2. Required Readings & Authoritative Tutorial Guides
+## 8. Required Readings & Authoritative Tutorial Guides
 
 Review the following five curated documentation guides and technical specifications before beginning your applied lab:
 
@@ -397,7 +395,7 @@ Review the following five curated documentation guides and technical specificati
 
 ---
 
-## 3. Required Micro-Video Lectures (Embedded)
+## 9. Required Micro-Video Lectures (Embedded)
 
 Watch each of the following video chapters to observe asset-based data orchestrators and fault-tolerant DAGs in action:
 
@@ -421,7 +419,7 @@ Watch each of the following video chapters to observe asset-based data orchestra
 
 ---
 
-## 4. Institutional Video Lecture Embeds
+## 10. Institutional Video Lecture Embeds
 
 <div style="background: #f8fafc; border-radius: 6px; padding: 1.5rem; margin: 1rem 0px; text-align: center; border: 2px dashed #94a3b8;">
   <p style="font-size: 0.95em; color: #475569; margin-bottom: 1rem;"><strong>Campus Faculty Announcements &amp; Lab Walkthrough Recordings</strong></p>

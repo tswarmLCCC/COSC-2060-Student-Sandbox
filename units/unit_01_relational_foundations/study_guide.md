@@ -11,11 +11,9 @@ Welcome to the core instructional lecture and study hub for **Unit 1: The Relati
 
 ---
 
-## 1. Instructor Lecture & Conceptual Deep Dive
 
-### Moving from Database Reports to AI Datasets
 
-#### 1. Unit Overview & Objectives
+## 1. Unit Overview & Objectives
 Welcome to **COSC 2060: Modern Data Engineering & AI Infrastructure**.
 
 When most people first see machine learning or data science examples, they are handed a clean, static, single-table flat CSV file (like Iris, Titanic, or California Housing). They split that pre-made file into <b><i>X</i></b> (features) and <b><i>y</i></b> (target labels), call `model.fit(X_train, y_train)`, and evaluate test accuracy.
@@ -40,14 +38,14 @@ We will build everything from the ground up. First, we will examine the exact sh
 
 ---
 
-#### 2. What Our Output Table Looks Like and Where the Data Comes From
+## 2. What Our Output Table Looks Like and Where the Data Comes From
 
 Before writing a single line of SQL or Python, a data engineer always starts by answering two questions: **What does the finished dataset need to look like?** and **Which source systems hold the raw ingredients?**
 
-##### The Purpose
+### The Purpose
 Our goal in Unit 1 is to build a **Flat Tabular Feature Matrix** saved as a `feature_matrix.parquet` file. Specifically, we are helping a national freight logistics company (**Apex Logistics**) predict how many minutes late a delivery truck will arrive (`target_delay_mins`) **at the exact moment the truck is getting ready to depart its origin terminal**.
 
-##### Why Models Need a Single Flat Table
+### Why Models Need a Single Flat Table
 In an operational database, data is normalized across many separate tables (drivers, routes, weather stations) so information isn't duplicated. However, standard machine learning algorithms (such as linear regression, random forests, and gradient-boosted decision trees like XGBoost) cannot browse across multiple database tables or follow foreign keys on their own.
 
 Instead, a supervised learning model requires a **single, flat two-dimensional grid**:
@@ -55,14 +53,14 @@ Instead, a supervised learning model requires a **single, flat two-dimensional g
 * **Every input column (called a feature, grouped together as <i>X</i>)** is a numeric or categorical measurement that was already known *at or before* the moment that truck left the terminal.
 * **The final column (called the target label, written as <i>y</i>)** is the actual historical outcome we want the model to learn to predict (`target_delay_mins`).
 
-##### Where the Raw Data Comes From (Source Systems)
+### Where the Raw Data Comes From (Source Systems)
 In a real freight company, the raw data does not sit in one neat file. It arrives from three separate operational systems that record events on completely different schedules:
 
 1. **Human Resources & Fleet Registry Database (`drivers` table):** Updated occasionally by HR staff when drivers are hired or complete annual safety inspections. Stores `driver_id`, `hire_date`, `safety_score`, and `vehicle_type`.
 2. **Dispatch Operational Database (`routes` table):** Updated by terminal dispatch software whenever a shipment is scheduled, departs (`dep_time`), and reaches its destination (`act_arrival`, `delivery_delay_mins`).
 3. **External Weather Sensor Stream (`weather_observations` table):** Automated weather station telemetry (`obs_time`, `precipitation_in`, `visibility_miles`, `wind_speed_mph`, `road_condition`) pulled from NOAA airport weather stations. Weather stations do not know when trucks depart; they simply log an observation on their own schedule (every hour, or whenever storm conditions change rapidly).
 
-##### Sample Output Dataset (The Target Shape)
+### Sample Output Dataset (The Target Shape)
 When our Unit 1 pipeline finishes combining, lagging, and cleaning those three sources, the finished output table looks like this:
 
 | route_id (ID) | dep_hour (<i>X</i><sub>1</sub>) | distance_miles (<i>X</i><sub>2</sub>) | safety_score (<i>X</i><sub>3</sub>) | driver_prior_avg_delay (<i>X</i><sub>4</sub>) | precipitation_in (<i>X</i><sub>5</sub>) | visibility_miles (<i>X</i><sub>6</sub>) | road_condition (<i>X</i><sub>7</sub>) | target_delay_mins (<i>y</i>) |
@@ -78,7 +76,7 @@ When our Unit 1 pipeline finishes combining, lagging, and cleaning those three s
 
 ---
 
-#### 3. Building Features in SQL from the Ground Up
+## 3. Building Features in SQL from the Ground Up
 
 Before we talk about advanced joins or data leakage, let's start at the beginning: **What is a feature, and how do we build features using SQL?**
 
@@ -86,7 +84,7 @@ A **feature** is simply a measurable clue—stored as a column in our table—th
 
 If you know how to write a basic `SELECT` query from CMAP 1815, you already know the foundation of feature engineering. Let's walk through the four primary ways data engineers build features in SQL, starting with the simplest.
 
-##### 1. Extracting Numbers from Timestamps and Arithmetic Ratios
+### 1. Extracting Numbers from Timestamps and Arithmetic Ratios
 Raw timestamps like `'2026-10-12 07:30:00'` are difficult for a mathematical model to compare directly, because every calendar date only happens once. However, the **hour of the day** (`7` for 7:00 AM rush hour) or the **day of the week** repeats every week and strongly predicts traffic congestion. We can also combine numeric columns using simple arithmetic:
 
 ```sql
@@ -103,7 +101,7 @@ SELECT
 FROM routes;
 ```
 
-##### 2. Creating Yes/No Indicator Flags with `CASE WHEN`
+### 2. Creating Yes/No Indicator Flags with `CASE WHEN`
 Often we want to highlight a specific operational threshold—such as whether a trip departs during peak morning rush hour or whether a route is a long-haul trip over 250 miles. In SQL, we turn conditions into `1` (True) and `0` (False) using `CASE WHEN`:
 
 ```sql
@@ -121,7 +119,7 @@ SELECT
 FROM routes;
 ```
 
-##### 3. Attaching Static Entity Attributes with `LEFT JOIN`
+### 3. Attaching Static Entity Attributes with `LEFT JOIN`
 Our `routes` table only records `driver_id`. To include features about the driver's safety record or truck class, we join the `drivers` table using a `LEFT JOIN`:
 
 ```sql
@@ -138,7 +136,7 @@ LEFT JOIN drivers d
 
 Why do data engineers use `LEFT JOIN` with `COALESCE` instead of `INNER JOIN`? Because `routes` is our primary event table. If a newly hired driver's record hasn't synced from HR yet, an `INNER JOIN` would silently delete that route row from the dataset. A `LEFT JOIN` preserves every route row, and `COALESCE` replaces any missing `NULL` value with a safe baseline default (`0.85`).
 
-##### 4. Summarizing Past Behavior with SQL Window Functions (`OVER`)
+### 4. Summarizing Past Behavior with SQL Window Functions (`OVER`)
 What if we want a feature that captures a driver's recent track record—for example, their average delay across their previous 3 trips?
 
 In CMAP 1815, you used `GROUP BY driver_id` to collapse a table into one summary row per driver. When building a feature matrix, however, we cannot collapse the rows—we need one row per route, with that driver's historical average *up to that trip* attached as a column.
@@ -171,7 +169,7 @@ Look closely at the window frame `ROWS BETWEEN 3 PRECEDING AND 1 PRECEDING`:
 
 ---
 
-#### 4. How Supervised Learning Uses Features and Targets
+## 4. How Supervised Learning Uses Features and Targets
 
 You do not need prior machine learning coursework to understand how a **supervised learning** model uses the table we just built.
 
@@ -188,7 +186,7 @@ This two-stage lifecycle establishes the fundamental rule of feature engineering
 
 ---
 
-#### 5. Why the \$10M Delivery Model Failed (How Future Data Leaks into Training Tables)
+## 5. Why the $10M Delivery Model Failed (How Future Data Leaks into Training Tables)
 
 To understand why data engineering is a distinct discipline from both software development and data science—and what happens when the Point-in-Time Rule is violated—consider an authentic industry failure.
 
@@ -216,7 +214,7 @@ LEFT JOIN weather_observations w
 
 The scientist trained an XGBoost model on this dataset. The results were astounding: **99.4% ROC-AUC score**. The executive team was thrilled and deployed the model to live dispatch.
 
-##### The Catastrophic Deployment Failure
+### The Catastrophic Deployment Failure
 On day one of live operation, the model's accuracy collapsed to **51%**—no better than flipping a coin. Shipments were delayed across the country, warehouses were left unstaffed, and the company lost an estimated \$10 million in contractual service level penalties.
 
 What happened?
@@ -248,7 +246,7 @@ This is **look-ahead bias** (temporal data leakage). A machine learning model wi
 
 ---
 
-#### 6. How Row and Column Databases Store Data: Row Filing vs. Columnar Straws
+## 6. How Row and Column Databases Store Data — Row Filing vs. Columnar Straws
 
 In your introductory SQL course, you used transactional databases like **PostgreSQL** or **SQLite**. In this course, we introduce **DuckDB**, **Apache Arrow**, and **Apache Parquet**. Why?
 
@@ -270,7 +268,7 @@ TABLE: routes (route_id INT, driver_id INT, origin_city VARCHAR, distance_miles 
 - The Advantage: To compute AVG(delay_mins), the engine reads ONLY that column. Vectorized CPU instructions (SIMD) process thousands of values per clock cycle.
 ```
 
-##### The "Filing Cabinet vs. Drinking Straw" Analogy
+### The "Filing Cabinet vs. Drinking Straw" Analogy
 * **Row-Store (PostgreSQL):** Imagine a warehouse of 10,000 filing folders. Each folder contains all details about one shipment (driver, vehicle, origin, fuel, delay). If your manager asks: *"What is our average delay?"*, you must walk to every single cabinet, pull out every folder, flip past 15 pages of driver info, read the delay number, and put the folder back.
 * **Column-Store (DuckDB):** Imagine 5 long drinking straws. One straw contains only route IDs; another contains only delay numbers. To answer the manager's question, you pick up the "delay numbers" straw and dump all numbers directly onto the calculator. You never touch, load, or pay I/O costs for the other attributes.
 
@@ -278,11 +276,11 @@ DuckDB executes analytical queries 10x to 100x faster than traditional row engin
 
 ---
 
-#### 7. Defensive Query Evolution: From Leakage to Native `ASOF JOIN`
+## 7. Defensive Query Evolution — From Leakage to Native ASOF JOIN
 
 How do we solve the temporal leakage problem in SQL when joining irregular sensor streams (`weather_observations`) to event tables (`routes`)? Let's trace the engineering progression through three concrete steps.
 
-##### Step 1: The Failed Naive Join
+### Step 1: The Failed Naive Join
 When joining an event table (`routes`) to an observation table (`weather_observations`), a naive `JOIN ... ON date = date` leaks evening observations into morning departures:
 ```sql
 -- DANGEROUS: Leaks future weather into morning departures
@@ -297,7 +295,7 @@ JOIN weather_observations w
  AND r.dep_time::DATE = w.obs_time::DATE;
 ```
 
-##### Step 2: The Window Function Workaround (Standard SQL)
+### Step 2: The Window Function Workaround (Standard SQL)
 Before modern analytical engines introduced temporal primitives, data engineers had to write complex subqueries using `ROW_NUMBER()` with strict lookback boundaries:
 ```sql
 -- DEFENSIVE SQL USING WINDOW FUNCTIONS (PREVENTS LOOK-AHEAD BIAS)
@@ -323,7 +321,7 @@ WHERE rank_order = 1;
 * **Why this works:** The condition `w.obs_time <= r.dep_time` guarantees that no weather record recorded after the truck left can ever enter the candidate set. Sorting `w.obs_time DESC` and taking `rank_order = 1` extracts the *latest known observation prior to departure*.  
 * **The Limitation:** On large tables, computing an inequality join followed by a window sort over millions of partitions consumes immense RAM and CPU time.
 
-##### Step 3: DuckDB's Native `ASOF JOIN`
+### Step 3: DuckDB's Native `ASOF JOIN`
 DuckDB provides native support for **`ASOF JOIN`**—a specialized physical operator engineered specifically for point-in-time event matching:
 
 ```sql
@@ -350,11 +348,11 @@ ASOF LEFT JOIN weather_observations w
 
 ---
 
-#### 8. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python + DuckDB)
+## 8. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python + DuckDB)
 
 Let's build up the Python and DuckDB syntax you will use in this week's lab from the very first line of code, and then execute a complete end-to-end verification walkthrough.
 
-##### Step 1: Running Your First DuckDB Query in Python
+### Step 1: Running Your First DuckDB Query in Python
 DuckDB runs directly inside your Python script—there is no separate database server to install or configure. You import `duckdb`, call `duckdb.connect()`, and pass any SQL string to `con.sql(...)` or `con.execute(...)`:
 
 ```python
@@ -367,7 +365,7 @@ con = duckdb.connect(database=":memory:")
 con.sql("SELECT 'Hello from DuckDB' AS greeting, 42 * 2 AS answer").show()
 ```
 
-##### Step 2: Creating Tables and Fetching Results as DataFrames or Scalars
+### Step 2: Creating Tables and Fetching Results as DataFrames or Scalars
 You can execute `CREATE TABLE` and `INSERT INTO` statements using `con.execute(...)` or `con.sql(...)`. To inspect a `SELECT` result as a Pandas DataFrame, call `.df()` (or `.fetchdf()`). To grab a single scalar number (such as a row count for an assertion check), call `.fetchone()[0]`:
 
 ```python
@@ -393,7 +391,7 @@ df = con.sql("SELECT * FROM sample_trips ORDER BY dep_time").df()
 print(df)
 ```
 
-##### Step 3: Computing Leak-Free Rolling History with `ROWS BETWEEN`
+### Step 3: Computing Leak-Free Rolling History with `ROWS BETWEEN`
 Next, let's compute two historical driver features on `sample_trips`:
 1. `driver_prior_avg_delay`: The driver's average delay across up to 5 prior trips (`ROWS BETWEEN 5 PRECEDING AND 1 PRECEDING`), defaulting to `0.0` on their very first trip.
 2. `driver_lifetime_trips`: How many trips this driver completed *before* the current trip (`COUNT(trip_id) OVER (... ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)`).
@@ -430,7 +428,7 @@ Trace what happens on each row for Driver 101:
 * **Trip 2 (Oct 11):** Only Trip 1 (`delay = 10`) is in the prior window. `driver_prior_avg_delay` is `10.0`, and `driver_lifetime_trips` is `1`.
 * **Trip 3 (Oct 12):** Trips 1 and 2 (`10` and `20`) are in the prior window. `driver_prior_avg_delay` is `15.0`, and `driver_lifetime_trips` is `2`. Notice that Trip 3's own 45-minute delay is never leaked into its input features!
 
-##### Step 4: Guided End-to-End Implementation Walkthrough (`ASOF JOIN` + Parquet Export)
+### Step 4: Guided End-to-End Implementation Walkthrough (`ASOF JOIN` + Parquet Export)
 Here is how you execute the complete defensive `ASOF JOIN` pipeline in Python using DuckDB's zero-copy relational API and export the result to Apache Parquet:
 
 ```python
@@ -503,7 +501,7 @@ Notice that Route 101 (departed 07:15) was matched with the 06:00 observation (D
 
 ---
 
-#### 9. Practice Exercises & Formative Self-Check FAQ
+## 9. Practice Exercises & Formative Self-Check FAQ
 
 Try these three quick exercises in your GitHub Codespaces sandbox (`units/unit_01_relational_foundations/`) before starting the graded lab:
 
@@ -511,7 +509,7 @@ Try these three quick exercises in your GitHub Codespaces sandbox (`units/unit_0
 2. **Exercise 2 (Window Frame Experiment):** In `coding_clinic.py`, temporarily change `ROWS BETWEEN 5 PRECEDING AND 1 PRECEDING` to `ROWS BETWEEN 5 PRECEDING AND CURRENT ROW` and re-run the script. Compare the numbers in `prior_5trip_avg_delay` and notice how `CURRENT ROW` leaks the current trip's outcome into the feature column. Change it back to `1 PRECEDING`.
 3. **Exercise 3 (Early Morning Departure Test):** Add a route that departs at `04:00:00` (before the earliest `06:00:00` weather observation) and compare `ASOF JOIN` vs. `ASOF LEFT JOIN`. Verify that `ASOF LEFT JOIN` preserves the route row while `COALESCE` fills in the default weather values.
 
-##### Common Traps & Formative Self-Check FAQ
+### Common Traps & Formative Self-Check FAQ
 
 * **Question 1: What happens if there is no weather observation prior to a route departure?**  
   *Answer:* If a truck departs at 5:00 AM and the earliest sensor observation in the database is at 6:00 AM, no weather row satisfies `r.dep_time >= w.obs_time`. A plain inner `ASOF JOIN` will drop that route row, whereas `ASOF LEFT JOIN` preserves the route row and returns `NULL` for all columns originating from the right-hand table (`matched_weather_time`, `precipitation_in`, etc.). In your ML pipeline, you handle these NULLs using `COALESCE(w.precipitation_in, 0.0)` or backward imputation.
@@ -527,7 +525,7 @@ Try these three quick exercises in your GitHub Codespaces sandbox (`units/unit_0
 
 ---
 
-## 2. Required Readings & Authoritative Tutorial Guides
+## 10. Required Readings & Authoritative Tutorial Guides
 
 Review the following five curated documentation guides and technical specifications before beginning your applied lab:
 
@@ -548,7 +546,7 @@ Review the following five curated documentation guides and technical specificati
 
 ---
 
-## 3. Required Micro-Video Lectures (Embedded)
+## 11. Required Micro-Video Lectures (Embedded)
 
 Watch each of the following video chapters to observe columnar data engines and temporal joins executed in live engineering environments:
 
@@ -578,7 +576,7 @@ Watch each of the following video chapters to observe columnar data engines and 
 
 ---
 
-## 4. Institutional Video Lecture Embeds
+## 12. Institutional Video Lecture Embeds
 
 <div style="background: #f8fafc; border-radius: 6px; padding: 1.5rem; margin: 1rem 0px; text-align: center; border: 2px dashed #94a3b8;">
   <p style="font-size: 0.95em; color: #475569; margin-bottom: 1rem;"><strong>Campus Faculty Announcements &amp; Lab Walkthrough Recordings</strong></p>

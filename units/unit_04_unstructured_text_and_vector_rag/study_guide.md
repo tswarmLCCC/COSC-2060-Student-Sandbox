@@ -11,11 +11,9 @@ Welcome to the core instructional lecture and study hub for **Unit 4: Unstructur
 
 ---
 
-## 1. Instructor Lecture & Conceptual Deep Dive
 
-### Unstructured Language Pipelines: Semantic Chunking, Embeddings & Vector Retrieval
 
-#### 1. Unit Overview & Objectives
+## 1. Unit Overview & Objectives
 In Units 1 and 2, we engineered structured relational matrices and high-throughput transactional streams. In Unit 3, we preprocessed raw camera pixels into normalized computer vision manifests.
 
 In **Unit 4**, we tackle the most prevalent and messy data modality in modern enterprise systems: **unstructured human language**.
@@ -40,24 +38,24 @@ RAW UNSTRUCTURED DATA ──> TEXT CLEANER ──> SEMANTIC CHUNKING ──> EMB
 
 ---
 
-#### 2. What Our Output Looks Like and Where the Data Comes From
+## 2. What Our Output Looks Like and Where the Data Comes From
 
-##### The Purpose
+### The Purpose
 Our goal in Unit 4 is to build a **Chunked & Embedded Document Index** (`rag_chunks.jsonl` and `rag_vectors.parquet`) from raw diesel mechanic work orders. Each record in our output contains a scrubbed text chunk, its token count, structured filter metadata, and a normalized numeric embedding vector ready for semantic retrieval.
 
-##### Why Language Models and Vector Databases Need This Format
+### Why Language Models and Vector Databases Need This Format
 Why can't we dump entire 50-page PDF manuals or raw database text dumps straight into an embedding model or a language model?
 1. **Embedding Models Have Strict Input Limits:** Most dense embedding models (such as `all-MiniLM-L6-v2`) only accept `256` to `512` tokens (roughly 150–350 words) at a time. Any text beyond that limit is silently truncated and ignored.
 2. **One Giant Document Blurs Specific Answers:** If a 20-page maintenance log covers brakes, tires, air conditioning, and turbochargers all in one giant string, a single summary vector averages all those topics together into a blurry middle ground. Splitting the text into focused chunks with a sliding overlap ensures each vector represents one clear symptom or repair event.
 3. **Structured Metadata Enables Fast Pre-Filtering:** By keeping structured fields (`truck_id`, `service_date`, `shop_code`) in a separate `metadata` dictionary alongside the text chunk, our retrieval engine can filter to `"TRUCK-219"` or a specific date range *before* computing vector dot products.
 
-##### Where the Raw Data Comes From (Source Systems)
+### Where the Raw Data Comes From (Source Systems)
 In a commercial fleet maintenance operation, unstructured text arrives from three primary operational sources:
 1. **Shop Bay Maintenance Terminals (`work_orders.jsonl`):** Mechanics type freeform repair notes at the end of a shift. These logs frequently contain shop shorthand (`"trbo"`, `"PM service"`), typos, inconsistent spacing, and HTML tags copied from legacy web forms (`<br>`, `<p>`).
 2. **Manufacturer Technical Service Bulletins (NHTSA / OEM Manuals):** Official engineering notices describing part numbers, failure symptoms, and replacement procedures.
 3. **Driver Post-Trip DVIR Logs (Mobile App Submissions):** Short text descriptions entered by drivers when reporting unusual noises, vibrations, or dashboard warning lights.
 
-##### Sample Output Dataset (The Target Shape)
+### Sample Output Dataset (The Target Shape)
 When our Unit 4 pipeline finishes scrubbing, chunking, and embedding the raw work orders, each output record in `rag_chunks.jsonl` (and Parquet) follows this exact structure:
 
 ```json
@@ -79,7 +77,7 @@ When our Unit 4 pipeline finishes scrubbing, chunking, and embedding the raw wor
 
 ---
 
-#### 3. The \$42,000 Seized Engine & The "Whining Turbo"
+## 3. The $42,000 Seized Engine & The "Whining Turbo"
 
 To understand why simple SQL keyword matching fails catastrophically on unstructured text, examine an authentic failure in heavy-duty fleet operations.
 
@@ -102,12 +100,12 @@ WHERE mechanic_notes ILIKE '%turbocharger%'
 
 The SQL query returned **12 work orders**. All 12 trucks were inspected, 3 had the line replaced, and management celebrated the safety audit.
 
-##### The Catastrophic Seizure
+### The Catastrophic Seizure
 Two weeks later, Truck #219 was hauling a 48,000-pound refrigerated trailer up a 6% grade on Interstate 70 in Colorado. At 65 mph, the turbocharger bearing suffered dry friction starvation, seized instantly, snapped the drive shaft, and threw shrapnel directly into the engine intake manifold.
 
 The engine block cracked in half, dumping 10 gallons of hot oil onto the exhaust manifold and sparking an under-hood fire. The truck was destroyed, causing a **\$42,000 engine replacement loss** and \$110,000 in spoiled cargo.
 
-##### The Post-Incident Autopsy
+### The Post-Incident Autopsy
 Investigators pulled the complete historical log for Truck #219 from 18 days prior:
 
 ```text
@@ -130,7 +128,7 @@ Dense vector embeddings solve this problem: an embedding model projects `"high w
 
 ---
 
-#### 4. The Semantic Sphere & Cosine Similarity
+## 4. The Semantic Sphere & Cosine Similarity
 
 How does a computer represent the meaning of words mathematically?
 
@@ -166,17 +164,17 @@ Because vectors are pre-normalized (`||A|| = ||B|| = 1.0`), cosine similarity si
 
 ---
 
-#### 5. Semantic Chunking: Why Naive Splitting Destroys Pipelines
+## 5. Semantic Chunking — Why Naive Splitting Destroys Pipelines
 
 You cannot pass a 50-page PDF into an embedding model at once because transformer models have strict token context limits (typically 256 to 512 tokens for embedding models). You must split text into smaller chunks.
 
-##### The Danger of Naive Fixed-Character Splitting
+### The Danger of Naive Fixed-Character Splitting
 If you naively split every 500 characters without regard for words or overlap:
 > `"...the mechanic verified that the oil line had no"` | `"[SPLIT]"` | `"leaks on Tuesday, but the turbo failed on Wednesday..."`
 
 You severed the negation `"no"` from `"leaks"`, reversing the meaning of the second chunk!
 
-##### Production Solution: Recursive Semantic Splitting with Sliding Window Overlap
+### Production Solution: Recursive Semantic Splitting with Sliding Window Overlap
 1. **Split by Structural Paragraphs (`\n\n`):** Preserve natural human topical boundaries.
 2. **Fallback to Sentence or Word Boundaries (`. ` or whole words):** If a paragraph exceeds the target chunk size, split cleanly between sentences or words rather than slicing a word in half.
 3. **Enforce Sliding Overlap (e.g., 15–20% overlap):** Repeat the trailing words/characters of Chunk 0 at the beginning of Chunk 1. This ensures that context straddling a boundary is never lost.
@@ -193,11 +191,11 @@ Chunk 2:                                                [ 80 ─── 90 ──
 
 ---
 
-#### 6. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python + Vector RAG)
+## 6. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python + Vector RAG)
 
 Let's first build every core text-cleaning, sliding-window chunking, and NumPy cosine similarity function from scratch using standard Python, and then walk through a complete `SentenceTransformer` + `ChromaDB` vector search pipeline.
 
-##### Step 1: Reading JSON Lines (`.jsonl`) and Scrubbing Dirty Text
+### Step 1: Reading JSON Lines (`.jsonl`) and Scrubbing Dirty Text
 In data engineering, multi-document text corpora are commonly stored in **JSON Lines (`.jsonl`)** format—where each line is a valid JSON object. We can strip stray HTML tags (`<p>`, `<b>`, `<br>`) and collapse extra whitespace using Python's built-in `re` module:
 
 ```python
@@ -218,7 +216,7 @@ def clean_text(raw_str: str) -> str:
 print("Cleaned text:", clean_text(record["text"]))
 ```
 
-##### Step 2: Writing a Sliding-Window Word/Token Chunker
+### Step 2: Writing a Sliding-Window Word/Token Chunker
 Here is how you write a deterministic function that splits a cleaned string into overlapping chunks of `chunk_size` words with `overlap` words repeated between consecutive chunks:
 
 ```python
@@ -248,7 +246,7 @@ for idx, c in enumerate(chunks):
     print(f"Chunk {idx}: {len(w_list)} words ({w_list[0]} ... {w_list[-1]})")
 ```
 
-##### Step 3: Computing Cosine Similarity Directly in NumPy
+### Step 3: Computing Cosine Similarity Directly in NumPy
 To see how vector search scores candidate chunks under the hood, here is the exact cosine similarity calculation in NumPy:
 
 ```python
@@ -270,7 +268,7 @@ print("Similarity to turbo_chunk:", round(cosine_similarity(query_vec, turbo_chu
 print("Similarity to brake_chunk:", round(cosine_similarity(query_vec, brake_chunk), 4))  # ~0.030
 ```
 
-##### Step 4: Guided Implementation Walkthrough — Vector RAG Ingestion with SentenceTransformers & ChromaDB
+### Step 4: Guided Implementation Walkthrough — Vector RAG Ingestion with SentenceTransformers & ChromaDB
 Here is how a full production pipeline encodes mechanic work orders using `SentenceTransformer("all-MiniLM-L6-v2")` and indexes them with structured metadata in `ChromaDB`:
 
 ```python
@@ -331,7 +329,7 @@ The vector search identified Truck #219 (`WO-90812`) as the #1 match with high c
 
 ---
 
-#### 7. Practice Exercises & Formative Self-Check FAQ
+## 7. Practice Exercises & Formative Self-Check FAQ
 
 Try these three exercises in your GitHub Codespaces sandbox (`units/unit_04_unstructured_text_and_vector_rag/`) before starting the graded lab:
 
@@ -339,7 +337,7 @@ Try these three exercises in your GitHub Codespaces sandbox (`units/unit_04_unst
 2. **Exercise 2 (Overlap Boundary Check):** Run `chunk_text_sliding_window` with `chunk_size=20` and `overlap=5` on a 50-word paragraph. Print the last 5 words of `chunks[0]` and the first 5 words of `chunks[1]` to confirm they match identically.
 3. **Exercise 3 (Unit Vector Normalization):** Normalize a NumPy vector using `u = v / np.linalg.norm(v)`, then check `np.linalg.norm(u)` to confirm its length is `1.0`.
 
-##### Common Traps & Formative Self-Check FAQ
+### Common Traps & Formative Self-Check FAQ
 
 * **Question 1: What is the difference between Cosine Distance and Cosine Similarity?**  
   *Answer:* Cosine Similarity ranges from `-1.0` (opposite) to `+1.0` (identical). ChromaDB reports **Cosine Distance**, defined as `1.0 - Cosine Similarity`. Therefore, a Cosine Distance close to `0.0` (or a Cosine Similarity close to `1.0`) indicates near-identical meaning!
@@ -352,7 +350,7 @@ Try these three exercises in your GitHub Codespaces sandbox (`units/unit_04_unst
 
 ---
 
-## 2. Required Readings & Authoritative Tutorial Guides
+## 8. Required Readings & Authoritative Tutorial Guides
 
 Review the following five curated documentation guides and technical specifications before beginning your applied lab:
 
@@ -373,7 +371,7 @@ Review the following five curated documentation guides and technical specificati
 
 ---
 
-## 3. Required Micro-Video Lectures (Embedded)
+## 9. Required Micro-Video Lectures (Embedded)
 
 Watch each of the following video chapters to observe vector embeddings and RAG pipelines in practice:
 
@@ -397,7 +395,7 @@ Watch each of the following video chapters to observe vector embeddings and RAG 
 
 ---
 
-## 4. Institutional Video Lecture Embeds
+## 10. Institutional Video Lecture Embeds
 
 <div style="background: #f8fafc; border-radius: 6px; padding: 1.5rem; margin: 1rem 0px; text-align: center; border: 2px dashed #94a3b8;">
   <p style="font-size: 0.95em; color: #475569; margin-bottom: 1rem;"><strong>Campus Faculty Announcements &amp; Lab Walkthrough Recordings</strong></p>

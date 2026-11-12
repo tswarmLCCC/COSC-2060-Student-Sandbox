@@ -11,11 +11,9 @@ Welcome to the core instructional lecture and study hub for **Unit 6: The Agenti
 
 ---
 
-## 1. Instructor Lecture & Conceptual Deep Dive
 
-### Bridging Data Engines to Autonomous LLMs: The Model Context Protocol (MCP)
 
-#### 1. Unit Overview & Objectives
+## 1. Unit Overview & Objectives
 In Unit 5, we engineered a unified REST API layer serving multimodal data products (relational matrices, anomaly engines, computer vision manifests, and vector RAG indices).
 
 In **Unit 6**, we connect this data infrastructure to the frontier of modern software engineering: **Autonomous AI Agents**.
@@ -40,22 +38,22 @@ HUMAN OPERATOR ──> LLM AGENT ──(JSON-RPC Request)──> MCP SERVER ─�
 
 ---
 
-#### 2. What Our Output Looks Like and Where the Data Comes From
+## 2. What Our Output Looks Like and Where the Data Comes From
 
-##### The Purpose
+### The Purpose
 Our goal in Unit 6 is to build a **Sandboxed MCP Tool Server** that exposes our logistics data pipelines as structured, read-only tools over **JSON-RPC 2.0**. When an AI agent asks what tools are available (`tools/list`) or invokes a specific tool (`tools/call`), our server validates the parameters, queries the underlying dataset, and returns a structured JSON-RPC response.
 
-##### Why AI Agents Need Structured Tool Schemas and Guardrails
+### Why AI Agents Need Structured Tool Schemas and Guardrails
 An AI agent does not read your Python source code to figure out how to query your database. Instead, when an agent connects to your MCP server, it relies on two standardized structures:
 1. **The Tool Registry (`tools/list`):** A JSON catalog listing every tool's `name`, plain-English `description`, and `inputSchema` (the exact parameter names, types, bounds, and required fields).
 2. **The Tool Execution Envelope (`tools/call`):** A predictable JSON-RPC 2.0 response returning either the requested records or a structured error message (`isError: true`) that allows the agent to self-correct without crashing the server.
 
-##### Where the Raw Data Comes From (Source Systems)
+### Where the Raw Data Comes From (Source Systems)
 An MCP server connects two sides of our architecture:
 1. **Inbound Agent Requests (MCP Host / LLM Client):** An AI assistant running in a dispatch console translates a human operator's question (*"Is Truck 219 safe to dispatch to Denver?"*) into one or more structured JSON-RPC `tools/call` messages.
 2. **Backend Curated Data Stores (`feature_matrix.parquet`, `anomaly_features.parquet`, `rag_chunks.jsonl`):** The MCP server executes bounded, read-only lookups against our curated tables and returns compact JSON summaries (never dumping millions of raw rows into the model's context window).
 
-##### Sample Output Dataset (The Target MCP JSON-RPC Shape)
+### Sample Output Dataset (The Target MCP JSON-RPC Shape)
 Every interaction with our MCP server follows the **JSON-RPC 2.0** specification:
 
 **1. Tool Discovery Output (`method: "tools/list"`):**
@@ -104,7 +102,7 @@ Every interaction with our MCP server follows the **JSON-RPC 2.0** specification
 
 ---
 
-#### 3. The \$500,000 "Unrestricted SQL" Disaster
+## 3. The $500,000 "Unrestricted SQL" Disaster
 
 To understand why data engineers must never give raw, unconstrained database credentials to an autonomous AI agent, consider an authentic corporate failure.
 
@@ -118,7 +116,7 @@ For three weeks, the system was a sensation. Dispatchers asked: *"How many shipm
 SELECT count(*) FROM shipments WHERE city = 'Chicago' AND status = 'DELAYED';
 ```
 
-##### The Fatal Ambiguity
+### The Fatal Ambiguity
 On a busy Thursday afternoon, a dispatcher was clearing out test shipments from a training exercise. The dispatcher typed into the AI chat window:
 > *"Hey, can you please remove all the temporary demo shipments created yesterday?"*
 
@@ -134,7 +132,7 @@ In under 400 milliseconds, the autonomous agent permanently purged **42,000 acti
 
 Dispatch screens went blank nationwide. Drivers arriving at terminals could not be matched to their trailers. The company was forced to halt interstate operations for 18 hours while database administrators performed a point-in-time recovery from off-site tape backups. The operational paralysis, driver detention fees, and missed SLA penalties totaled over **\$500,000**.
 
-##### The Engineering Autopsy
+### The Engineering Autopsy
 What was the fatal flaw?
 * **Unconstrained Tool Surface:** The agent was given arbitrary SQL execution privileges.
 * **Violation of Least Privilege:** A dispatcher assistant should never have permission to run `DELETE` or `DROP`.
@@ -144,7 +142,7 @@ What was the fatal flaw?
 
 ---
 
-#### 4. "The USB-C Standard for AI" & The Agent Tool-Calling Loop
+## 4. "The USB-C Standard for AI" & The Agent Tool-Calling Loop
 
 Before MCP, every developer wrote custom wrappers for every LLM:
 * If you used OpenAI, you wrote OpenAI function schemas.
@@ -174,7 +172,7 @@ MCP standardizes three foundational primitives:
 2. **Resources:** Static or dynamic data context (like database schemas or log files) that the host can attach to the prompt.
 3. **Prompts:** Standardized instructional templates configured by the server.
 
-##### How the 4-Step Agent Tool-Calling Loop Operates
+### How the 4-Step Agent Tool-Calling Loop Operates
 When a human operator asks an MCP-connected AI assistant a question, this four-step cycle executes behind the scenes:
 
 ```
@@ -195,11 +193,11 @@ Agent reads JSON      ──> Writes a clear summary citing the exact returned v
 
 ---
 
-#### 5. The Anatomy of an MCP Tool: JSON-RPC 2.0 Protocol
+## 5. The Anatomy of an MCP Tool — JSON-RPC 2.0 Protocol
 
 When an LLM requests a tool call, MCP communicates using standardized **JSON-RPC 2.0**:
 
-##### 1. The Client Sends Request:
+### 1. The Client Sends Request:
 ```json
 {
   "jsonrpc": "2.0",
@@ -214,7 +212,7 @@ When an LLM requests a tool call, MCP communicates using standardized **JSON-RPC
 }
 ```
 
-##### 2. The Server Validates & Responds:
+### 2. The Server Validates & Responds:
 ```json
 {
   "jsonrpc": "2.0",
@@ -232,11 +230,11 @@ When an LLM requests a tool call, MCP communicates using standardized **JSON-RPC
 
 ---
 
-#### 6. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python MCP Server)
+## 6. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python MCP Server)
 
 Let's build up the Python patterns for an MCP server step by step—starting from a single guarded Python function, defining its JSON Schema, and then assembling the complete `FleetMCPServer` class.
 
-##### Step 1: Writing a Bounded, Read-Only Data Tool Function
+### Step 1: Writing a Bounded, Read-Only Data Tool Function
 Every MCP tool starts as a regular Python function with clear type checks and defensive parameter bounds:
 
 ```python
@@ -252,10 +250,10 @@ def validate_positive_id(value: int, field_name: str, max_val: int = 10000) -> i
 print("Validated ID:", validate_positive_id(219, "truck_id"))
 ```
 
-##### Step 2: Defining the MCP Tool Schema (`inputSchema`)
+### Step 2: Defining the MCP Tool Schema (`inputSchema`)
 Next, we describe each function in a dictionary matching the MCP `tools/list` specification (`name`, `description`, and `inputSchema`). Clear descriptions are essential because the LLM reads `description` to decide when to call your tool!
 
-##### Step 3: Guided Implementation Walkthrough — Production Python MCP Server
+### Step 3: Guided Implementation Walkthrough — Production Python MCP Server
 Here is the complete `FleetMCPServer` implementation handling `tools/list` discovery, `tools/call` dispatch, defensive parameter bounds, and JSON-RPC 2.0 responses:
 
 ```python
@@ -356,7 +354,7 @@ print("MCP Server Response:", server.handle_request(test_call))
 
 ---
 
-#### 7. Practice Exercises & Formative Self-Check FAQ
+## 7. Practice Exercises & Formative Self-Check FAQ
 
 Try these three exercises in your GitHub Codespaces sandbox (`units/unit_06_agentic_interfaces_and_mcp/`) before starting the graded lab:
 
@@ -364,7 +362,7 @@ Try these three exercises in your GitHub Codespaces sandbox (`units/unit_06_agen
 2. **Exercise 2 (Testing SQL Injection Rejection):** Try passing `"219; DROP TABLE routes;"` as the `truck_id` argument in a `tools/call` request. Confirm that our integer type validation rejects the string immediately before any database query can run.
 3. **Exercise 3 (Adding a Cap to `limit`):** Write a tool function `get_recent_anomalies(limit: int = 5)` that rejects `limit < 1` or `limit > 25`, ensuring an agent can never accidentally dump 1,000,000 rows in a single call.
 
-##### Common Traps & Formative Self-Check FAQ
+### Common Traps & Formative Self-Check FAQ
 
 * **Question 1: Why shouldn't an MCP server return natural language explanations directly?**  
   *Answer:* An MCP tool should return clean, structured JSON or raw domain data. The LLM agent is responsible for translating that structured data into conversational summaries for human users.
@@ -377,7 +375,7 @@ Try these three exercises in your GitHub Codespaces sandbox (`units/unit_06_agen
 
 ---
 
-## 2. Required Readings & Authoritative Tutorial Guides
+## 8. Required Readings & Authoritative Tutorial Guides
 
 Review the following five curated documentation guides and technical specifications before beginning your applied lab:
 
@@ -398,7 +396,7 @@ Review the following five curated documentation guides and technical specificati
 
 ---
 
-## 3. Required Micro-Video Lectures (Embedded)
+## 9. Required Micro-Video Lectures (Embedded)
 
 Watch each of the following video chapters to observe the Model Context Protocol in action:
 
@@ -422,7 +420,7 @@ Watch each of the following video chapters to observe the Model Context Protocol
 
 ---
 
-## 4. Institutional Video Lecture Embeds
+## 10. Institutional Video Lecture Embeds
 
 <div style="background: #f8fafc; border-radius: 6px; padding: 1.5rem; margin: 1rem 0px; text-align: center; border: 2px dashed #94a3b8;">
   <p style="font-size: 0.95em; color: #475569; margin-bottom: 1rem;"><strong>Campus Faculty Announcements &amp; Lab Walkthrough Recordings</strong></p>

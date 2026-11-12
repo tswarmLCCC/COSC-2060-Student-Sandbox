@@ -11,11 +11,9 @@ Welcome to the core instructional lecture and study hub for **Unit 2: The Anomal
 
 ---
 
-## 1. Instructor Lecture & Conceptual Deep Dive
 
-### High-Throughput Feature Pipelines: The Polars Engine & Unsupervised Outliers
 
-#### 1. Unit Overview & Objectives
+## 1. Unit Overview & Objectives
 In Unit 1, we tackled supervised learning targets. You learned how to bridge the gap between relational databases and feature matrices using DuckDB, avoiding look-ahead bias with point-in-time `ASOF` joins and rolling window frames.
 
 In **Unit 2**, we pivot to **unsupervised learning targets** and **scale**.
@@ -36,12 +34,12 @@ In this unit, you will learn how to build high-speed pipelines with **Polars**�
 
 ---
 
-#### 2. What Our Output Table Looks Like and Where the Data Comes From
+## 2. What Our Output Table Looks Like and Where the Data Comes From
 
-##### The Purpose
+### The Purpose
 Our goal in Unit 2 is to build a **Standardized Anomaly Feature Matrix** (`anomaly_features.parquet`) from raw commercial fleet fuel card logs. This table feeds both rule-based physical audits and an unsupervised **Isolation Forest** model that scores every fuel purchase from normal (`1`) to anomalous (`-1`).
 
-##### Why Unsupervised Models Need Standardized Features
+### Why Unsupervised Models Need Standardized Features
 An unsupervised anomaly detector does not have a target column <b><i>y</i></b> to guide it. Instead, it compares input columns like `gallons`, `amount_usd`, and `implied_speed_mph` across rows to determine which transactions stand out from normal fleet behavior.
 
 To make that mathematical comparison fair and reliable, our output dataset must accomplish three things:
@@ -49,12 +47,12 @@ To make that mathematical comparison fair and reliable, our output dataset must 
 2. **Compute physical context features across consecutive rows**—such as how much time elapsed since the same driver's previous fuel card swipe and how fast the truck would have had to travel between the two fuel plazas (`implied_speed_mph`).
 3. **Standardize numeric columns onto a common scale (Z-scores)** so a column measured in thousands of dollars does not drown out a column measured in small decimals.
 
-##### Where the Raw Data Comes From (Source Systems)
+### Where the Raw Data Comes From (Source Systems)
 In a commercial trucking company, fuel transaction records originate from two primary operational systems:
 1. **Point-of-Sale (POS) Fuel Card Network (`fuel_transactions.parquet`):** Every time a driver swipes a corporate fleet card at a commercial travel center (Love's, Pilot Flying J, TravelCenters of America), the payment processor logs `trans_id`, `driver_id`, `station_id`, `timestamp`, `gallons`, and `amount_usd`.
 2. **Fleet GPS & Terminal Station Registry (`stations` / telematics coordinates):** Provides the physical location and highway mileage between travel plazas so the pipeline can compute the distance traveled between consecutive swipes by the same card.
 
-##### Sample Output Dataset (The Target Shape)
+### Sample Output Dataset (The Target Shape)
 When our Unit 2 Polars pipeline finishes scrubbing, enriching, and standardizing the raw transactions, the output table looks like this:
 
 | trans_id (ID) | driver_id (ID) | gallons (Raw) | amount_usd (Raw) | implied_speed_mph (Raw) | z_gallons (Scaled <i>X</i><sub>1</sub>) | z_speed (Scaled <i>X</i><sub>2</sub>) | flag_speed_impossible (<i>X</i><sub>3</sub>) | flag_tank_overflow (<i>X</i><sub>4</sub>) |
@@ -67,7 +65,7 @@ When our Unit 2 Polars pipeline finishes scrubbing, enriching, and standardizing
 
 ---
 
-#### 3. The Ghost Fuel Card Ring (\$2.4M Theft)
+## 3. The Ghost Fuel Card Ring ($2.4M Theft)
 
 To appreciate why multi-column feature engineering, scaling, and high-throughput engines matter, consider an authentic corporate logistics fraud case.
 
@@ -77,7 +75,7 @@ Every month, the company processed approximately **1.2 million fuel transaction 
 
 The system seemed fine. For two years, zero major alerts were triggered.
 
-##### The \$2.4 Million Discovery
+### The \$2.4 Million Discovery
 During an external audit, forensic accountants discovered that a syndicate of 14 rogue drivers had stolen **\$2.4 million in fuel** over an 18-month period.
 
 How did they bypass the data pipeline?
@@ -96,7 +94,7 @@ Delta Distance: 950 miles
 Implied Velocity: 1,266 mph! <── PHYSICAL IMPOSSIBILITY!
 ```
 
-##### Why Pandas Failed the Engineering Team
+### Why Pandas Failed the Engineering Team
 When the junior data engineer tried to write a new script in Pandas that sorted the 1.2 million transactions by driver and calculated rolling velocity vectors and Z-scores, the script **crashed the server with an Out-Of-Memory (OOM) error**.
 
 Pandas attempted to allocate **8.4 GB of RAM** to hold Python objects, ran a single-threaded Python `.apply()` loop that pegged 1 CPU core at 100% for 45 minutes, and was terminated by the Linux kernel's Out-Of-Memory Killer (`Killed: 9`).
@@ -105,7 +103,7 @@ This is why modern data engineering pairs **Polars** with **mathematical feature
 
 ---
 
-#### 4. Why Scaling Matters: "The Ruler Distortion"
+## 4. Why Scaling Matters — "The Ruler Distortion"
 
 Before writing code, let's examine why unnormalized features destroy unsupervised anomaly detection algorithms.
 
@@ -140,7 +138,7 @@ Weight (Z):     [-2.5 ======== 0 ======== +2.5] (Mean = 0, Std = 1)
 Both features now speak an identical mathematical language.
 ```
 
-##### Two Standard Formulas for Feature Scaling
+### Two Standard Formulas for Feature Scaling
 In data engineering pipelines, every numerical column destined for distance-based ML or outlier detection is scaled using one of two formulas:
 
 1. **Z-Score Standardization (Zero Mean, Unit Variance):**
@@ -159,7 +157,7 @@ In data engineering pipelines, every numerical column destined for distance-base
 
 ---
 
-#### 5. The Architectural Model: Pandas vs. Polars (Apache Arrow)
+## 5. The Architectural Model — Pandas vs. Polars (Apache Arrow)
 
 Why is Polars capable of processing 1,000,000 rows in 0.4 seconds while Pandas takes 45 seconds or crashes?
 
@@ -177,11 +175,11 @@ Why is Polars capable of processing 1,000,000 rows in 0.4 seconds while Pandas t
 
 ---
 
-#### 6. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Polars)
+## 6. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Polars)
 
 If you have never used Polars before, you will find its design very intuitive—especially right after Unit 1 SQL. In Polars, nearly every column operation uses `pl.col("column_name")` inside a context method like `.select()`, `.filter()`, or `.with_columns()`. Let's build up the syntax from the ground up, and then run the complete outlier detection walkthrough.
 
-##### Step 1: Creating a Polars DataFrame and Selecting Columns (`.select()`)
+### Step 1: Creating a Polars DataFrame and Selecting Columns (`.select()`)
 In Polars, we import `polars as pl`. To pick specific columns, pass a list of column names or `pl.col(...)` expressions to `.select()`:
 
 ```python
@@ -199,7 +197,7 @@ df = pl.DataFrame({
 print(df.select(["trans_id", "gallons"]))
 ```
 
-##### Step 2: Filtering Out Corrupted Rows with `.filter()`
+### Step 2: Filtering Out Corrupted Rows with `.filter()`
 Unlike Pandas (where you repeat the variable name like `df[df["gallons"] > 0]`), Polars uses `pl.col("...")` inside `.filter()`. To combine multiple conditions, wrap each comparison in parentheses and join them with `&` (AND) or `|` (OR):
 
 ```python
@@ -210,7 +208,7 @@ clean_df = df.filter(
 print(clean_df)
 ```
 
-##### Step 3: Adding Engineered Columns with `.with_columns()` and `.alias()`
+### Step 3: Adding Engineered Columns with `.with_columns()` and `.alias()`
 When you want to keep all existing columns and add new calculated columns (just like adding expressions to a SQL `SELECT` list), pass a list of expressions to `.with_columns([...])` and name each new column with `.alias("new_name")`:
 
 ```python
@@ -224,7 +222,7 @@ with_features = clean_df.with_columns([
 print(with_features)
 ```
 
-##### Step 4: Group-Specific Window Calculations with `.over()`
+### Step 4: Group-Specific Window Calculations with `.over()`
 Remember `OVER (PARTITION BY driver_id)` from Unit 1 SQL? In Polars, you can compute a driver-specific average, maximum, or lag across groups without collapsing the rows simply by chaining `.over("driver_id")` onto any expression:
 
 ```python
@@ -238,10 +236,10 @@ driver_window_df = clean_df.with_columns([
 print(driver_window_df)
 ```
 
-##### Step 5: Lazy Execution (`pl.scan_parquet`, `.lazy()`, and `.collect()`)
+### Step 5: Lazy Execution (`pl.scan_parquet`, `.lazy()`, and `.collect()`)
 When processing large Parquet files in production, start your pipeline with `pl.scan_parquet("file.parquet")` (or call `.lazy()` on an in-memory DataFrame). Polars builds an optimized query plan and waits to execute it across all CPU threads until you call `.collect()`.
 
-##### Step 6: Guided Implementation Walkthrough — Vectorized Outlier Detection with Polars
+### Step 6: Guided Implementation Walkthrough — Vectorized Outlier Detection with Polars
 Here is how all of these pieces come together in a production-grade anomaly detection feature pipeline:
 
 ```python
@@ -302,7 +300,7 @@ Notice that Transaction 1002 triggered both the physical speed impossibility fla
 
 ---
 
-#### 7. Practice Exercises & Formative Self-Check FAQ
+## 7. Practice Exercises & Formative Self-Check FAQ
 
 Try these three short exercises in your GitHub Codespaces sandbox (`units/unit_02_anomaly_detection_engines/`) before starting the graded lab:
 
@@ -310,7 +308,7 @@ Try these three short exercises in your GitHub Codespaces sandbox (`units/unit_0
 2. **Exercise 2 (Seeing the Effect of Sensor Glitches on Z-Scores):** In `coding_clinic.py`, check what happens to `z_gallons` if you compute the Z-score *before* filtering out negative or `99999.0` sensor error rows versus *after* filtering them out.
 3. **Exercise 3 (Group Window Practice):** Using `.over("driver_id")`, add a column that calculates the maximum `gallons` each driver has ever pumped (`pl.col("gallons").max().over("driver_id")`).
 
-##### Common Traps & Formative Self-Check FAQ
+### Common Traps & Formative Self-Check FAQ
 
 * **Question 1: What is the difference between `pl.DataFrame` and `pl.LazyFrame`?**  
   *Answer:* A `DataFrame` executes computations immediately in memory (eager evaluation). A `LazyFrame` (created via `pl.scan_parquet()` or `.lazy()`) does not load data into RAM immediately. Instead, it builds an execution query plan that Polars optimizes (pushing down filters and skipping unused columns) before executing in parallel when `.collect()` is called.
@@ -323,7 +321,7 @@ Try these three short exercises in your GitHub Codespaces sandbox (`units/unit_0
 
 ---
 
-## 2. Required Readings & Authoritative Tutorial Guides
+## 8. Required Readings & Authoritative Tutorial Guides
 
 Review the following five curated documentation guides and technical specifications before beginning your applied lab:
 
@@ -344,7 +342,7 @@ Review the following five curated documentation guides and technical specificati
 
 ---
 
-## 3. Required Micro-Video Lectures (Embedded)
+## 9. Required Micro-Video Lectures (Embedded)
 
 Watch each of the following video chapters to observe high-performance DataFrames and outlier detection algorithms in practice:
 
@@ -368,7 +366,7 @@ Watch each of the following video chapters to observe high-performance DataFrame
 
 ---
 
-## 4. Institutional Video Lecture Embeds
+## 10. Institutional Video Lecture Embeds
 
 <div style="background: #f8fafc; border-radius: 6px; padding: 1.5rem; margin: 1rem 0px; text-align: center; border: 2px dashed #94a3b8;">
   <p style="font-size: 0.95em; color: #475569; margin-bottom: 1rem;"><strong>Campus Faculty Announcements &amp; Lab Walkthrough Recordings</strong></p>

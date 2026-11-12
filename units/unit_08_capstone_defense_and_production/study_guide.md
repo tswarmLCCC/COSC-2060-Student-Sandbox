@@ -11,11 +11,9 @@ Welcome to the core instructional lecture and study hub for **Unit 8: Capstone D
 
 ---
 
-## 1. Instructor Lecture & Conceptual Deep Dive
 
-### Production Containerization & Live Capstone Defense: Eliminating "Works on My Machine"
 
-#### 1. Unit Overview & Objectives
+## 1. Unit Overview & Objectives
 Over the past seven units, you have constructed every layer of an enterprise AI infrastructure ecosystem:
 * **Relational Core:** Feature engineering with point-in-time joins in DuckDB (Unit 1)
 * **High-Throughput Analytics:** Unsupervised anomaly detection in Polars (Unit 2)
@@ -44,12 +42,12 @@ You will package your entire ecosystem into a production **Docker container**, w
 
 ---
 
-#### 2. What Our Output Looks Like and Where the Data Comes From
+## 2. What Our Output Looks Like and Where the Data Comes From
 
-##### The Purpose
+### The Purpose
 Our goal in Unit 8 is to build the **End-to-End Capstone Defense Pipeline** (`lab8_capstone_runner.py`). It ingests a multi-modal operational batch—containing route telemetry, fuel swipes, inspection image metadata, and mechanic notes—quarantines any corrupted records into a Dead-Letter Queue, runs the valid records through our feature, anomaly, vision, and RAG stages, and outputs a comprehensive **`capstone_audit_report.json`** alongside the curated `.parquet` tables.
 
-##### Why Production Systems Need End-to-End Integration Audits
+### Why Production Systems Need End-to-End Integration Audits
 When you test each unit's script in isolation on clean sample data, it is easy to assume everything works. In production, however, data flows through multiple stages in sequence, and real incoming batches often contain multiple types of defects simultaneously:
 * A route row might have a weather timestamp recorded *after* departure (temporal leakage attempt).
 * A fuel swipe might have `-120.0` gallons or a missing `driver_id`.
@@ -58,14 +56,14 @@ When you test each unit's script in isolation on clean sample data, it is easy t
 
 Your capstone pipeline proves that your system can ingest an entire messy multi-modal batch in one command, catch and quarantine every defective item in the Dead-Letter Queue (`capstone_dlq.jsonl`), and produce clean, verified outputs for all valid items.
 
-##### Where the Raw Data Comes From (Source Systems)
+### Where the Raw Data Comes From (Source Systems)
 The capstone pipeline ingests a combined operational drop (`datasets/unit_08_chaos_batch.json` and multi-table seeds) representing a full day of fleet operations across all four source systems:
 1. **Dispatch & NOAA Weather Logs** (Relational / Temporal)
 2. **POS Fleet Fuel Card Stream** (High-Volume Tabular)
 3. **Terminal Gate Camera Frames & Bounding Boxes** (Visual Sensor)
 4. **Shop Bay Maintenance Work Orders** (Unstructured Text)
 
-##### Sample Output Dataset (The Target Capstone Audit Report Shape)
+### Sample Output Dataset (The Target Capstone Audit Report Shape)
 When your Unit 8 capstone script completes its run, it writes `output/capstone_audit_report.json` with exact verification counts across every subsystem:
 
 ```json
@@ -102,7 +100,7 @@ When your Unit 8 capstone script completes its run, it writes `output/capstone_a
 
 ---
 
-#### 3. The "Works on My Machine" Tragedy
+## 3. The "Works on My Machine" Tragedy
 
 To appreciate why containerization and reproducible handoffs are mandatory in data engineering, examine an authentic corporate tragedy.
 
@@ -110,7 +108,7 @@ A team of talented junior engineers developed a cutting-edge real-time logistics
 
 The client scheduled a high-stakes final evaluation with the Chief Technology Officer, VP of Supply Chain, and lead enterprise architects. If the demonstration succeeded, the system would receive a **\$1.2 million production rollout contract**.
 
-##### The Disaster in the Boardroom
+### The Disaster in the Boardroom
 The team arrived at corporate headquarters. The client provided a fresh, clean cloud staging server running Ubuntu 22.04 LTS and instructed the team to deploy their system:
 
 ```bash
@@ -141,12 +139,12 @@ The CTO closed his laptop:
 
 The company lost the \$1.2 million contract.
 
-##### The Lesson
+### The Lesson
 **Code alone is not software.** Software is the code **plus** the exact Python runtime, the exact C-libraries (`libGL`, `libgomp`), the exact filesystem layout, the environment variables, and the network ports. Containers package all of these elements into a single, immutable artifact.
 
 ---
 
-#### 4. "The Intermodal Shipping Container"
+## 4. "The Intermodal Shipping Container"
 
 Before 1956, global ocean shipping was a logistical nightmare. Cargo arrived at docks in random wooden crates, barrels, and sacks. Longshoremen spent weeks hand-loading individual barrels into ship holds. Ships frequently sank because heavy sacks shifted during storms, and theft was rampant.
 
@@ -163,11 +161,11 @@ Rule: "If it runs in the container on your laptop, it runs identically in the cl
 
 ---
 
-#### 5. Multi-Stage Dockerfile Hardening: Security & Minimal Footprint
+## 5. Multi-Stage Dockerfile Hardening — Security & Minimal Footprint
 
 In production, you must never ship an 8 GB development image containing compilers (`gcc`, `g++`) or run containers as `root`.
 
-##### Multi-Stage Architecture:
+### Multi-Stage Architecture:
 1. **Builder Stage:** Uses a build image to compile C-extensions and install wheel dependencies into a temporary virtual environment (`/opt/venv`).
 2. **Runtime Stage:** Copies *only* the compiled virtual environment into a clean, minimal image (`python:3.11-slim`), sets up a non-privileged system user (`appuser`), and drops all root privileges.
 
@@ -178,7 +176,7 @@ BUILDER STAGE (Heavy: 1.5 GB) ──> Compiles wheels & packages
 RUNTIME STAGE (Lean: 180 MB)  ──> Non-root user + Healthcheck + Ports 8000/8001
 ```
 
-##### Guided Implementation Walkthrough — Production Multi-Stage `Dockerfile`
+### Guided Implementation Walkthrough — Production Multi-Stage `Dockerfile`
 
 ```dockerfile
 # -------------------------------------------------------------
@@ -241,11 +239,11 @@ CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
 
 ---
 
-#### 6. Step-by-Step Code Ramp-Up: Building the End-to-End Capstone Verifier
+## 6. Step-by-Step Code Ramp-Up — Building the End-to-End Capstone Verifier
 
 In this week's capstone lab, you will bring together the defensive patterns from Units 1–7 into a modular Python pipeline that processes an unseen multi-modal "Chaos / Blind Test Batch." Let's walk through how to structure a multi-subsystem verifier step by step.
 
-##### Step 1: Writing a Unified Dead-Letter Queue (DLQ) Collector
+### Step 1: Writing a Unified Dead-Letter Queue (DLQ) Collector
 First, create a reusable helper class that any subsystem (Relational, Anomaly, Vision, or RAG) can call whenever it catches a corrupted record:
 
 ```python
@@ -276,7 +274,7 @@ dlq.quarantine("anomaly_engine", "TX-99", {"gallons": -10}, "gallons must be > 0
 print("Quarantined count:", len(dlq.items))
 ```
 
-##### Step 2: Auditing Each Modality Stage Before Export
+### Step 2: Auditing Each Modality Stage Before Export
 Next, trace the exact defensive checks we run on each of the four data modalities in the capstone batch:
 
 1. **Relational Stage (Unit 1 Check):**
@@ -313,7 +311,7 @@ def process_vision_records(image_records: list[dict], dlq: DeadLetterQueue) -> l
     return valid_manifests
 ```
 
-##### Step 3: Writing Automated Verification Assertions (`pytest` & Audit Report)
+### Step 3: Writing Automated Verification Assertions (`pytest` & Audit Report)
 Finally, a production pipeline verifies its own outputs before reporting success:
 * Assert that the exported Parquet table exists and has `> 0` rows.
 * Assert that zero rows in the exported table have `weather_obs_time > dep_time`.
@@ -322,7 +320,7 @@ Finally, a production pipeline verifies its own outputs before reporting success
 
 ---
 
-#### 7. Practice Exercises & Formative Self-Check FAQ
+## 7. Practice Exercises & Formative Self-Check FAQ
 
 Try these three exercises in your GitHub Codespaces sandbox (`units/unit_08_capstone_defense_and_production/`) before starting the capstone lab:
 
@@ -330,7 +328,7 @@ Try these three exercises in your GitHub Codespaces sandbox (`units/unit_08_caps
 2. **Exercise 2 (Testing Multi-Modal DLQ Quarantine):** Run `coding_clinic.py` in `units/unit_08_capstone_defense_and_production/` and inspect how corrupted records from different modalities are logged with their subsystem name and error reason.
 3. **Exercise 3 (Running `pytest`):** Run `pytest` in your terminal to observe how automated test functions (`def test_...(): assert ...`) verify pipeline invariants in milliseconds.
 
-##### Common Traps & Formative Self-Check FAQ
+### Common Traps & Formative Self-Check FAQ
 
 * **Question 1: Why must Docker bind to `0.0.0.0` instead of `127.0.0.1`?**  
   *Answer:* Inside a container, `127.0.0.1` refers exclusively to the container's own internal loopback interface. If Uvicorn listens on `127.0.0.1`, requests from outside the container cannot reach it. Listening on `0.0.0.0` binds to all network interfaces, allowing host port forwarding (`-p 8000:8000`) to succeed.
@@ -343,7 +341,7 @@ Try these three exercises in your GitHub Codespaces sandbox (`units/unit_08_caps
 
 ---
 
-## 2. Required Readings & Authoritative Tutorial Guides
+## 8. Required Readings & Authoritative Tutorial Guides
 
 Review the following five curated documentation guides and technical specifications before beginning your applied lab:
 
@@ -364,7 +362,7 @@ Review the following five curated documentation guides and technical specificati
 
 ---
 
-## 3. Required Micro-Video Lectures (Embedded)
+## 9. Required Micro-Video Lectures (Embedded)
 
 Watch each of the following video chapters to observe containerization and production hardening in action:
 
@@ -388,7 +386,7 @@ Watch each of the following video chapters to observe containerization and produ
 
 ---
 
-## 4. Institutional Video Lecture Embeds
+## 10. Institutional Video Lecture Embeds
 
 <div style="background: #f8fafc; border-radius: 6px; padding: 1.5rem; margin: 1rem 0px; text-align: center; border: 2px dashed #94a3b8;">
   <p style="font-size: 0.95em; color: #475569; margin-bottom: 1rem;"><strong>Campus Faculty Announcements &amp; Lab Walkthrough Recordings</strong></p>
