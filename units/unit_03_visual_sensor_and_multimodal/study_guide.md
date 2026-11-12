@@ -1,11 +1,12 @@
 # Unit 3: Required Readings, Concepts & Video Lectures
 
-Welcome to the core instructional lecture and study hub for **Unit 3: The Visual Sensor Layer & Computer Vision Targets**. This page organizes all weekly learning materials into four structured chapters:
+Welcome to the core instructional lecture and study hub for **Unit 3: The Visual Sensor Layer & Computer Vision Targets**. This page organizes all weekly learning materials into five structured sections:
 
-1. **Instructor Lecture & Conceptual Deep Dive:** Master the target YOLO manifest and 3D tensor shapes, visual camera source systems, 3D NumPy array layouts (Height, Width, Channels), OpenCV BGR vs. RGB conventions, the "Stretched Photograph" mental model, aspect-ratio preserving letterboxing, and the Bounding Box Rosetta Stone (VOC, COCO, YOLO).
-2. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from OpenCV, Ultralytics YOLO, PyTorch Vision, and Albumentations.
-3. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe image tensor manipulations and coordinate transforms in live Python environments.
-4. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
+1. **Unit Overview & Objectives:** Review the architectural context and measurable learning objectives for this unit.
+2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2f):** Master the target YOLO manifest and 3D tensor shapes, visual camera source systems, 3D NumPy array layouts (Height, Width, Channels), OpenCV BGR vs. RGB conventions, the "Stretched Photograph" mental model, aspect-ratio preserving letterboxing, and the Bounding Box Rosetta Stone (VOC, COCO, YOLO).
+3. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from OpenCV, Ultralytics YOLO, PyTorch Vision, and Albumentations.
+4. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe image tensor manipulations and coordinate transforms in live Python environments.
+5. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
 
 *Work through each section in sequence as part of your 150-minute asynchronous self-study allocation before starting the applied laboratory assignment.*
 
@@ -34,7 +35,7 @@ As a data engineer, your job is to build the **visual preprocessing pipeline**: 
 
 ---
 
-## 2. What Our Output Looks Like and Where the Data Comes From
+## 2a. What Our Output Looks Like and Where the Data Comes From
 
 ### The Purpose
 Our goal in Unit 3 is to build a **Standardized Computer Vision Training Package** consisting of:
@@ -63,7 +64,7 @@ For every valid inspection photo, our pipeline produces a distortion-free 3D pix
 
 ---
 
-## 3. The $1.2M Tire Blowout Catastrophe (Why Naive Resizing Fails)
+## 2b. The $1.2M Tire Blowout Catastrophe (Why Naive Resizing Fails)
 
 Consider an authentic operational failure in freight transportation.
 
@@ -111,7 +112,7 @@ Because the naive data pipeline forced a wide 16:9 rectangular photo into a squa
 
 ---
 
-## 4. "The Stretched Photograph" & Letterbox Padding
+## 2c. "The Stretched Photograph" & Letterbox Padding
 
 To prevent geometric distortion, modern computer vision pipelines use **Letterboxing** (the same technique film directors use to show widescreen movies on a standard TV).
 
@@ -142,7 +143,7 @@ Final Dimension: 640 x 640 (Zero Distortion!)
 
 ---
 
-## 5. The Coordinate System Rosetta Stone — VOC vs. COCO vs. YOLO
+## 2d. The Coordinate System Rosetta Stone — VOC vs. COCO vs. YOLO
 
 When preprocessing object detection datasets, you will encounter three competing bounding box coordinate schemas:
 
@@ -170,7 +171,7 @@ When you **letterbox** the image by scale factor <i>r</i> and add border padding
 
 ---
 
-## 6. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (NumPy + OpenCV)
+## 2e. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (NumPy + OpenCV)
 
 If you have never manipulated 3D arrays in NumPy or called OpenCV (`cv2`) before, let's build every piece from the ground up, and then run the complete letterboxing and coordinate transformation walkthrough.
 
@@ -283,7 +284,7 @@ print("Normalized YOLO (x_center, y_center, width, height):", yolo_box)
 
 ---
 
-## 7. Practice Exercises & Formative Self-Check FAQ
+## 2f. Practice Exercises & Formative Self-Check FAQ
 
 Try these three exercises in your GitHub Codespaces sandbox (`units/unit_03_visual_sensor_and_multimodal_layer/`) before starting the graded lab:
 
@@ -304,7 +305,7 @@ Try these three exercises in your GitHub Codespaces sandbox (`units/unit_03_visu
 
 ---
 
-## 8. Required Readings & Authoritative Tutorial Guides
+## 3. Required Readings & Authoritative Tutorial Guides
 
 Review the following five curated documentation guides and technical specifications before beginning your applied lab:
 
@@ -325,7 +326,7 @@ Review the following five curated documentation guides and technical specificati
 
 ---
 
-## 9. Required Micro-Video Lectures (Embedded)
+## 4. Required Micro-Video Lectures (Embedded)
 
 Watch each of the following video chapters to observe computer vision data engineering and coordinate systems in action:
 
@@ -349,7 +350,7 @@ Watch each of the following video chapters to observe computer vision data engin
 
 ---
 
-## 10. Institutional Video Lecture Embeds
+## 5. Institutional Video Lecture Embeds
 
 <div style="background: #f8fafc; border-radius: 6px; padding: 1.5rem; margin: 1rem 0px; text-align: center; border: 2px dashed #94a3b8;">
   <p style="font-size: 0.95em; color: #475569; margin-bottom: 1rem;"><strong>Campus Faculty Announcements &amp; Lab Walkthrough Recordings</strong></p>

@@ -1,11 +1,12 @@
 # Unit 6: Required Readings, Concepts & Video Lectures
 
-Welcome to the core instructional lecture and study hub for **Unit 6: The Agentic Interface (Model Context Protocol - MCP)**. This page organizes all weekly learning materials into four structured chapters:
+Welcome to the core instructional lecture and study hub for **Unit 6: The Agentic Interface (Model Context Protocol - MCP)**. This page organizes all weekly learning materials into five structured sections:
 
-1. **Instructor Lecture & Conceptual Deep Dive:** Master the target MCP JSON-RPC 2.0 schemas, agentic source systems, the Model Context Protocol (MCP) architecture, the "\$500,000 Unrestricted SQL" operational catastrophe, the "USB-C for AI" mental model, defensive tool sandboxing, and JSON-RPC 2.0 communication.
-2. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from Anthropic MCP, JSON-RPC 2.0 specifications, and local tool calling standards.
-3. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe MCP tool discovery and autonomous agent execution in live environments.
-4. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
+1. **Unit Overview & Objectives:** Review the architectural context and measurable learning objectives for this unit.
+2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2f):** Master the target MCP JSON-RPC 2.0 schemas, agentic source systems, the Model Context Protocol (MCP) architecture, the "\$500,000 Unrestricted SQL" operational catastrophe, the "USB-C for AI" mental model, defensive tool sandboxing, and JSON-RPC 2.0 communication.
+3. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from Anthropic MCP, JSON-RPC 2.0 specifications, and local tool calling standards.
+4. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe MCP tool discovery and autonomous agent execution in live environments.
+5. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
 
 *Work through each section in sequence as part of your 150-minute asynchronous self-study allocation before starting the applied laboratory assignment.*
 
@@ -38,7 +39,7 @@ HUMAN OPERATOR ──> LLM AGENT ──(JSON-RPC Request)──> MCP SERVER ─�
 
 ---
 
-## 2. What Our Output Looks Like and Where the Data Comes From
+## 2a. What Our Output Looks Like and Where the Data Comes From
 
 ### The Purpose
 Our goal in Unit 6 is to build a **Sandboxed MCP Tool Server** that exposes our logistics data pipelines as structured, read-only tools over **JSON-RPC 2.0**. When an AI agent asks what tools are available (`tools/list`) or invokes a specific tool (`tools/call`), our server validates the parameters, queries the underlying dataset, and returns a structured JSON-RPC response.
@@ -102,7 +103,7 @@ Every interaction with our MCP server follows the **JSON-RPC 2.0** specification
 
 ---
 
-## 3. The $500,000 "Unrestricted SQL" Disaster
+## 2b. The $500,000 "Unrestricted SQL" Disaster
 
 To understand why data engineers must never give raw, unconstrained database credentials to an autonomous AI agent, consider an authentic corporate failure.
 
@@ -142,7 +143,7 @@ What was the fatal flaw?
 
 ---
 
-## 4. "The USB-C Standard for AI" & The Agent Tool-Calling Loop
+## 2c. "The USB-C Standard for AI" & The Agent Tool-Calling Loop
 
 Before MCP, every developer wrote custom wrappers for every LLM:
 * If you used OpenAI, you wrote OpenAI function schemas.
@@ -193,7 +194,7 @@ Agent reads JSON      ──> Writes a clear summary citing the exact returned v
 
 ---
 
-## 5. The Anatomy of an MCP Tool — JSON-RPC 2.0 Protocol
+## 2d. The Anatomy of an MCP Tool — JSON-RPC 2.0 Protocol
 
 When an LLM requests a tool call, MCP communicates using standardized **JSON-RPC 2.0**:
 
@@ -230,7 +231,7 @@ When an LLM requests a tool call, MCP communicates using standardized **JSON-RPC
 
 ---
 
-## 6. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python MCP Server)
+## 2e. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python MCP Server)
 
 Let's build up the Python patterns for an MCP server step by step—starting from a single guarded Python function, defining its JSON Schema, and then assembling the complete `FleetMCPServer` class.
 
@@ -354,7 +355,7 @@ print("MCP Server Response:", server.handle_request(test_call))
 
 ---
 
-## 7. Practice Exercises & Formative Self-Check FAQ
+## 2f. Practice Exercises & Formative Self-Check FAQ
 
 Try these three exercises in your GitHub Codespaces sandbox (`units/unit_06_agentic_interfaces_and_mcp/`) before starting the graded lab:
 
@@ -375,7 +376,7 @@ Try these three exercises in your GitHub Codespaces sandbox (`units/unit_06_agen
 
 ---
 
-## 8. Required Readings & Authoritative Tutorial Guides
+## 3. Required Readings & Authoritative Tutorial Guides
 
 Review the following five curated documentation guides and technical specifications before beginning your applied lab:
 
@@ -396,7 +397,7 @@ Review the following five curated documentation guides and technical specificati
 
 ---
 
-## 9. Required Micro-Video Lectures (Embedded)
+## 4. Required Micro-Video Lectures (Embedded)
 
 Watch each of the following video chapters to observe the Model Context Protocol in action:
 
@@ -420,7 +421,7 @@ Watch each of the following video chapters to observe the Model Context Protocol
 
 ---
 
-## 10. Institutional Video Lecture Embeds
+## 5. Institutional Video Lecture Embeds
 
 <div style="background: #f8fafc; border-radius: 6px; padding: 1.5rem; margin: 1rem 0px; text-align: center; border: 2px dashed #94a3b8;">
   <p style="font-size: 0.95em; color: #475569; margin-bottom: 1rem;"><strong>Campus Faculty Announcements &amp; Lab Walkthrough Recordings</strong></p>

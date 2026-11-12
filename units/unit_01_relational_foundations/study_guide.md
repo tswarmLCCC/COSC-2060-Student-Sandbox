@@ -1,11 +1,12 @@
 # Unit 1: Required Readings, Concepts & Video Lectures
 
-Welcome to the core instructional lecture and study hub for **Unit 1: The Relational Foundation & Supervised Learning Targets**. This page organizes all weekly learning materials into four structured chapters:
+Welcome to the core instructional lecture and study hub for **Unit 1: The Relational Foundation & Supervised Learning Targets**. This page organizes all weekly learning materials into five structured sections:
 
-1. **Instructor Lecture & Conceptual Deep Dive:** Master the target feature matrix format, operational source systems, bottom-up SQL feature engineering, supervised learning mechanics, physical columnar memory layouts, look-ahead bias, window lagging, and point-in-time `ASOF JOIN` syntax authored specifically for this unit.
-2. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation and engineering deep-dives from DuckDB, Apache Arrow, and columnar data architecture sources.
-3. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe columnar execution and temporal joins in live environments.
-4. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
+1. **Unit Overview & Objectives:** Review the architectural context and measurable learning objectives for this unit.
+2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2h):** Master the target feature matrix format, operational source systems, bottom-up SQL feature engineering, supervised learning mechanics, physical columnar memory layouts, look-ahead bias, window lagging, and point-in-time `ASOF JOIN` syntax authored specifically for this unit.
+3. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation and engineering deep-dives from DuckDB, Apache Arrow, and columnar data architecture sources.
+4. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe columnar execution and temporal joins in live environments.
+5. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
 
 *Work through each section in sequence as part of your 150-minute asynchronous self-study allocation before starting the applied laboratory assignment.*
 
@@ -38,7 +39,7 @@ We will build everything from the ground up. First, we will examine the exact sh
 
 ---
 
-## 2. What Our Output Table Looks Like and Where the Data Comes From
+## 2a. What Our Output Table Looks Like and Where the Data Comes From
 
 Before writing a single line of SQL or Python, a data engineer always starts by answering two questions: **What does the finished dataset need to look like?** and **Which source systems hold the raw ingredients?**
 
@@ -76,7 +77,7 @@ When our Unit 1 pipeline finishes combining, lagging, and cleaning those three s
 
 ---
 
-## 3. Building Features in SQL from the Ground Up
+## 2b. Building Features in SQL from the Ground Up
 
 Before we talk about advanced joins or data leakage, let's start at the beginning: **What is a feature, and how do we build features using SQL?**
 
@@ -169,7 +170,7 @@ Look closely at the window frame `ROWS BETWEEN 3 PRECEDING AND 1 PRECEDING`:
 
 ---
 
-## 4. How Supervised Learning Uses Features and Targets
+## 2c. How Supervised Learning Uses Features and Targets
 
 You do not need prior machine learning coursework to understand how a **supervised learning** model uses the table we just built.
 
@@ -186,7 +187,7 @@ This two-stage lifecycle establishes the fundamental rule of feature engineering
 
 ---
 
-## 5. Why the $10M Delivery Model Failed (How Future Data Leaks into Training Tables)
+## 2d. Why the $10M Delivery Model Failed (How Future Data Leaks into Training Tables)
 
 To understand why data engineering is a distinct discipline from both software development and data science—and what happens when the Point-in-Time Rule is violated—consider an authentic industry failure.
 
@@ -246,7 +247,7 @@ This is **look-ahead bias** (temporal data leakage). A machine learning model wi
 
 ---
 
-## 6. How Row and Column Databases Store Data — Row Filing vs. Columnar Straws
+## 2e. How Row and Column Databases Store Data — Row Filing vs. Columnar Straws
 
 In your introductory SQL course, you used transactional databases like **PostgreSQL** or **SQLite**. In this course, we introduce **DuckDB**, **Apache Arrow**, and **Apache Parquet**. Why?
 
@@ -276,7 +277,7 @@ DuckDB executes analytical queries 10x to 100x faster than traditional row engin
 
 ---
 
-## 7. Defensive Query Evolution — From Leakage to Native ASOF JOIN
+## 2f. Defensive Query Evolution — From Leakage to Native ASOF JOIN
 
 How do we solve the temporal leakage problem in SQL when joining irregular sensor streams (`weather_observations`) to event tables (`routes`)? Let's trace the engineering progression through three concrete steps.
 
@@ -348,7 +349,7 @@ ASOF LEFT JOIN weather_observations w
 
 ---
 
-## 8. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python + DuckDB)
+## 2g. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python + DuckDB)
 
 Let's build up the Python and DuckDB syntax you will use in this week's lab from the very first line of code, and then execute a complete end-to-end verification walkthrough.
 
@@ -501,7 +502,7 @@ Notice that Route 101 (departed 07:15) was matched with the 06:00 observation (D
 
 ---
 
-## 9. Practice Exercises & Formative Self-Check FAQ
+## 2h. Practice Exercises & Formative Self-Check FAQ
 
 Try these three quick exercises in your GitHub Codespaces sandbox (`units/unit_01_relational_foundations/`) before starting the graded lab:
 
@@ -525,7 +526,7 @@ Try these three quick exercises in your GitHub Codespaces sandbox (`units/unit_0
 
 ---
 
-## 10. Required Readings & Authoritative Tutorial Guides
+## 3. Required Readings & Authoritative Tutorial Guides
 
 Review the following five curated documentation guides and technical specifications before beginning your applied lab:
 
@@ -546,7 +547,7 @@ Review the following five curated documentation guides and technical specificati
 
 ---
 
-## 11. Required Micro-Video Lectures (Embedded)
+## 4. Required Micro-Video Lectures (Embedded)
 
 Watch each of the following video chapters to observe columnar data engines and temporal joins executed in live engineering environments:
 
@@ -576,7 +577,7 @@ Watch each of the following video chapters to observe columnar data engines and 
 
 ---
 
-## 12. Institutional Video Lecture Embeds
+## 5. Institutional Video Lecture Embeds
 
 <div style="background: #f8fafc; border-radius: 6px; padding: 1.5rem; margin: 1rem 0px; text-align: center; border: 2px dashed #94a3b8;">
   <p style="font-size: 0.95em; color: #475569; margin-bottom: 1rem;"><strong>Campus Faculty Announcements &amp; Lab Walkthrough Recordings</strong></p>

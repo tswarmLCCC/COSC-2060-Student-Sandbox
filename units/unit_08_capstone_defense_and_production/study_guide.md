@@ -1,11 +1,12 @@
 # Unit 8: Required Readings, Concepts & Video Lectures
 
-Welcome to the core instructional lecture and study hub for **Unit 8: Capstone Defense & Production Handoff**. This page organizes all weekly learning materials into four structured chapters:
+Welcome to the core instructional lecture and study hub for **Unit 8: Capstone Defense & Production Handoff**. This page organizes all weekly learning materials into five structured sections:
 
-1. **Instructor Lecture & Conceptual Deep Dive:** Master the target Capstone Audit Report and multi-modal source systems, containerization principles, the "Works on My Machine" tragedy, the "Intermodal Shipping Container" mental model, multi-stage Dockerfile hardening, non-root security, step-by-step multi-modal verification, and live capstone defense protocols.
-2. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from Docker, OWASP Container Security standards, and Twelve-Factor App methodologies.
-3. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe container builds, image optimizations, and healthcheck verifications in live environments.
-4. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
+1. **Unit Overview & Objectives:** Review the architectural context and measurable learning objectives for this unit.
+2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2f):** Master the target Capstone Audit Report and multi-modal source systems, containerization principles, the "Works on My Machine" tragedy, the "Intermodal Shipping Container" mental model, multi-stage Dockerfile hardening, non-root security, step-by-step multi-modal verification, and live capstone defense protocols.
+3. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from Docker, OWASP Container Security standards, and Twelve-Factor App methodologies.
+4. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe container builds, image optimizations, and healthcheck verifications in live environments.
+5. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
 
 *Work through each section in sequence as part of your 150-minute asynchronous self-study allocation before starting the applied laboratory assignment.*
 
@@ -42,7 +43,7 @@ You will package your entire ecosystem into a production **Docker container**, w
 
 ---
 
-## 2. What Our Output Looks Like and Where the Data Comes From
+## 2a. What Our Output Looks Like and Where the Data Comes From
 
 ### The Purpose
 Our goal in Unit 8 is to build the **End-to-End Capstone Defense Pipeline** (`lab8_capstone_runner.py`). It ingests a multi-modal operational batch—containing route telemetry, fuel swipes, inspection image metadata, and mechanic notes—quarantines any corrupted records into a Dead-Letter Queue, runs the valid records through our feature, anomaly, vision, and RAG stages, and outputs a comprehensive **`capstone_audit_report.json`** alongside the curated `.parquet` tables.
@@ -100,7 +101,7 @@ When your Unit 8 capstone script completes its run, it writes `output/capstone_a
 
 ---
 
-## 3. The "Works on My Machine" Tragedy
+## 2b. The "Works on My Machine" Tragedy
 
 To appreciate why containerization and reproducible handoffs are mandatory in data engineering, examine an authentic corporate tragedy.
 
@@ -144,7 +145,7 @@ The company lost the \$1.2 million contract.
 
 ---
 
-## 4. "The Intermodal Shipping Container"
+## 2c. "The Intermodal Shipping Container"
 
 Before 1956, global ocean shipping was a logistical nightmare. Cargo arrived at docks in random wooden crates, barrels, and sacks. Longshoremen spent weeks hand-loading individual barrels into ship holds. Ships frequently sank because heavy sacks shifted during storms, and theft was rampant.
 
@@ -161,7 +162,7 @@ Rule: "If it runs in the container on your laptop, it runs identically in the cl
 
 ---
 
-## 5. Multi-Stage Dockerfile Hardening — Security & Minimal Footprint
+## 2d. Multi-Stage Dockerfile Hardening — Security & Minimal Footprint
 
 In production, you must never ship an 8 GB development image containing compilers (`gcc`, `g++`) or run containers as `root`.
 
@@ -239,7 +240,7 @@ CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
 
 ---
 
-## 6. Step-by-Step Code Ramp-Up — Building the End-to-End Capstone Verifier
+## 2e. Step-by-Step Code Ramp-Up — Building the End-to-End Capstone Verifier
 
 In this week's capstone lab, you will bring together the defensive patterns from Units 1–7 into a modular Python pipeline that processes an unseen multi-modal "Chaos / Blind Test Batch." Let's walk through how to structure a multi-subsystem verifier step by step.
 
@@ -320,7 +321,7 @@ Finally, a production pipeline verifies its own outputs before reporting success
 
 ---
 
-## 7. Practice Exercises & Formative Self-Check FAQ
+## 2f. Practice Exercises & Formative Self-Check FAQ
 
 Try these three exercises in your GitHub Codespaces sandbox (`units/unit_08_capstone_defense_and_production/`) before starting the capstone lab:
 
@@ -341,7 +342,7 @@ Try these three exercises in your GitHub Codespaces sandbox (`units/unit_08_caps
 
 ---
 
-## 8. Required Readings & Authoritative Tutorial Guides
+## 3. Required Readings & Authoritative Tutorial Guides
 
 Review the following five curated documentation guides and technical specifications before beginning your applied lab:
 
@@ -362,7 +363,7 @@ Review the following five curated documentation guides and technical specificati
 
 ---
 
-## 9. Required Micro-Video Lectures (Embedded)
+## 4. Required Micro-Video Lectures (Embedded)
 
 Watch each of the following video chapters to observe containerization and production hardening in action:
 
@@ -386,7 +387,7 @@ Watch each of the following video chapters to observe containerization and produ
 
 ---
 
-## 10. Institutional Video Lecture Embeds
+## 5. Institutional Video Lecture Embeds
 
 <div style="background: #f8fafc; border-radius: 6px; padding: 1.5rem; margin: 1rem 0px; text-align: center; border: 2px dashed #94a3b8;">
   <p style="font-size: 0.95em; color: #475569; margin-bottom: 1rem;"><strong>Campus Faculty Announcements &amp; Lab Walkthrough Recordings</strong></p>

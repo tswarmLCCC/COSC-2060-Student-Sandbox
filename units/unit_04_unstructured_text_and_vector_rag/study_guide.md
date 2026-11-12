@@ -1,11 +1,12 @@
 # Unit 4: Required Readings, Concepts & Video Lectures
 
-Welcome to the core instructional lecture and study hub for **Unit 4: Unstructured Text & Vector Search (RAG Targets)**. This page organizes all weekly learning materials into four structured chapters:
+Welcome to the core instructional lecture and study hub for **Unit 4: Unstructured Text & Vector Search (RAG Targets)**. This page organizes all weekly learning materials into five structured sections:
 
-1. **Instructor Lecture & Conceptual Deep Dive:** Master the target JSONL/Parquet RAG chunk format, maintenance text source systems, document extraction, recursive and sliding-window semantic chunking, high-dimensional vector embeddings (384D unit hyperspheres), cosine similarity metrics, and metadata pre-filtering.
-2. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from Hugging Face Sentence-Transformers, ChromaDB, and Pinecone vector engineering guides.
-3. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe embedding models and vector databases executed in live Python environments.
-4. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
+1. **Unit Overview & Objectives:** Review the architectural context and measurable learning objectives for this unit.
+2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2f):** Master the target JSONL/Parquet RAG chunk format, maintenance text source systems, document extraction, recursive and sliding-window semantic chunking, high-dimensional vector embeddings (384D unit hyperspheres), cosine similarity metrics, and metadata pre-filtering.
+3. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from Hugging Face Sentence-Transformers, ChromaDB, and Pinecone vector engineering guides.
+4. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe embedding models and vector databases executed in live Python environments.
+5. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
 
 *Work through each section in sequence as part of your 150-minute asynchronous self-study allocation before starting the applied laboratory assignment.*
 
@@ -38,7 +39,7 @@ RAW UNSTRUCTURED DATA ──> TEXT CLEANER ──> SEMANTIC CHUNKING ──> EMB
 
 ---
 
-## 2. What Our Output Looks Like and Where the Data Comes From
+## 2a. What Our Output Looks Like and Where the Data Comes From
 
 ### The Purpose
 Our goal in Unit 4 is to build a **Chunked & Embedded Document Index** (`rag_chunks.jsonl` and `rag_vectors.parquet`) from raw diesel mechanic work orders. Each record in our output contains a scrubbed text chunk, its token count, structured filter metadata, and a normalized numeric embedding vector ready for semantic retrieval.
@@ -77,7 +78,7 @@ When our Unit 4 pipeline finishes scrubbing, chunking, and embedding the raw wor
 
 ---
 
-## 3. The $42,000 Seized Engine & The "Whining Turbo"
+## 2b. The $42,000 Seized Engine & The "Whining Turbo"
 
 To understand why simple SQL keyword matching fails catastrophically on unstructured text, examine an authentic failure in heavy-duty fleet operations.
 
@@ -128,7 +129,7 @@ Dense vector embeddings solve this problem: an embedding model projects `"high w
 
 ---
 
-## 4. The Semantic Sphere & Cosine Similarity
+## 2c. The Semantic Sphere & Cosine Similarity
 
 How does a computer represent the meaning of words mathematically?
 
@@ -164,7 +165,7 @@ Because vectors are pre-normalized (`||A|| = ||B|| = 1.0`), cosine similarity si
 
 ---
 
-## 5. Semantic Chunking — Why Naive Splitting Destroys Pipelines
+## 2d. Semantic Chunking — Why Naive Splitting Destroys Pipelines
 
 You cannot pass a 50-page PDF into an embedding model at once because transformer models have strict token context limits (typically 256 to 512 tokens for embedding models). You must split text into smaller chunks.
 
@@ -191,7 +192,7 @@ Chunk 2:                                                [ 80 ─── 90 ──
 
 ---
 
-## 6. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python + Vector RAG)
+## 2e. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python + Vector RAG)
 
 Let's first build every core text-cleaning, sliding-window chunking, and NumPy cosine similarity function from scratch using standard Python, and then walk through a complete `SentenceTransformer` + `ChromaDB` vector search pipeline.
 
@@ -329,7 +330,7 @@ The vector search identified Truck #219 (`WO-90812`) as the #1 match with high c
 
 ---
 
-## 7. Practice Exercises & Formative Self-Check FAQ
+## 2f. Practice Exercises & Formative Self-Check FAQ
 
 Try these three exercises in your GitHub Codespaces sandbox (`units/unit_04_unstructured_text_and_vector_rag/`) before starting the graded lab:
 
@@ -350,7 +351,7 @@ Try these three exercises in your GitHub Codespaces sandbox (`units/unit_04_unst
 
 ---
 
-## 8. Required Readings & Authoritative Tutorial Guides
+## 3. Required Readings & Authoritative Tutorial Guides
 
 Review the following five curated documentation guides and technical specifications before beginning your applied lab:
 
@@ -371,7 +372,7 @@ Review the following five curated documentation guides and technical specificati
 
 ---
 
-## 9. Required Micro-Video Lectures (Embedded)
+## 4. Required Micro-Video Lectures (Embedded)
 
 Watch each of the following video chapters to observe vector embeddings and RAG pipelines in practice:
 
@@ -395,7 +396,7 @@ Watch each of the following video chapters to observe vector embeddings and RAG 
 
 ---
 
-## 10. Institutional Video Lecture Embeds
+## 5. Institutional Video Lecture Embeds
 
 <div style="background: #f8fafc; border-radius: 6px; padding: 1.5rem; margin: 1rem 0px; text-align: center; border: 2px dashed #94a3b8;">
   <p style="font-size: 0.95em; color: #475569; margin-bottom: 1rem;"><strong>Campus Faculty Announcements &amp; Lab Walkthrough Recordings</strong></p>

@@ -1,11 +1,12 @@
 # Unit 7: Required Readings, Concepts & Video Lectures
 
-Welcome to the core instructional lecture and study hub for **Unit 7: Orchestration & Automation (The Unsleeping Pipeline)**. This page organizes all weekly learning materials into four structured chapters:
+Welcome to the core instructional lecture and study hub for **Unit 7: Orchestration & Automation (The Unsleeping Pipeline)**. This page organizes all weekly learning materials into five structured sections:
 
-1. **Instructor Lecture & Conceptual Deep Dive:** Master the target pipeline heartbeat and Dead-Letter Queue (DLQ) schemas, automated orchestration source systems, Directed Acyclic Graphs (DAGs), the "Cron House of Cards" operational catastrophe, mathematical idempotency (<i>f</i>(<i>f</i>(<i>x</i>)) = <i>f</i>(<i>x</i>)), exponential backoff retries, and poison-pill isolation.
-2. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from Dagster Software-Defined Assets, Prefect orchestration, and AWS idempotency standards.
-3. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe dependency-aware asset DAGs and automated backfills executed in live environments.
-4. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
+1. **Unit Overview & Objectives:** Review the architectural context and measurable learning objectives for this unit.
+2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2f):** Master the target pipeline heartbeat and Dead-Letter Queue (DLQ) schemas, automated orchestration source systems, Directed Acyclic Graphs (DAGs), the "Cron House of Cards" operational catastrophe, mathematical idempotency (<i>f</i>(<i>f</i>(<i>x</i>)) = <i>f</i>(<i>x</i>)), exponential backoff retries, and poison-pill isolation.
+3. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from Dagster Software-Defined Assets, Prefect orchestration, and AWS idempotency standards.
+4. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe dependency-aware asset DAGs and automated backfills executed in live environments.
+5. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
 
 *Work through each section in sequence as part of your 150-minute asynchronous self-study allocation before starting the applied laboratory assignment.*
 
@@ -46,7 +47,7 @@ To build reliable data pipelines, data engineers use **Data Orchestrators** (suc
 
 ---
 
-## 2. What Our Output Looks Like and Where the Data Comes From
+## 2a. What Our Output Looks Like and Where the Data Comes From
 
 ### The Purpose
 Our goal in Unit 7 is to build a **Fault-Tolerant Pipeline Orchestrator** that executes our multi-stage data pipeline in strict topological dependency order and produces three verified outputs:
@@ -97,7 +98,7 @@ When our Unit 7 orchestrator finishes a run, it outputs a structured **Heartbeat
 
 ---
 
-## 3. The 4:30 AM Stranded Drivers Disaster (The Cron Anti-Pattern)
+## 2b. The 4:30 AM Stranded Drivers Disaster (The Cron Anti-Pattern)
 
 To understand why production data engineering abandoned unmanaged cron jobs, examine an authentic failure in nationwide fleet operations.
 
@@ -138,7 +139,7 @@ Why did this cascade happen?
 
 ---
 
-## 4. The Core Concept — Idempotency (f(f(x)) = f(x))
+## 2c. The Core Concept — Idempotency (f(f(x)) = f(x))
 
 The single most important principle in pipeline engineering is **Idempotency**.
 
@@ -166,7 +167,7 @@ Whether this query runs once, fails twice, or is rerun by a dispatcher five time
 
 ---
 
-## 5. Fault Tolerance — Retries & Dead-Letter Queues (DLQ)
+## 2d. Fault Tolerance — Retries & Dead-Letter Queues (DLQ)
 
 In production, external systems fail constantly: network timeouts, `503 Service Unavailable` errors, or malformed JSON payloads. A resilient orchestrator classifies failures into two distinct categories:
 
@@ -187,7 +188,7 @@ FAILURE CLASSIFICATION:
 
 ---
 
-## 6. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python Orchestration)
+## 2e. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Python Orchestration)
 
 Let's first build the three individual building blocks (Exponential Backoff, Dead-Letter Queue splitting, and Idempotent DuckDB Upserts) step by step, and then run the complete `DAGOrchestrator` walkthrough.
 
@@ -353,7 +354,7 @@ Notice that `publish_daas_service` was prevented from running until *both* upstr
 
 ---
 
-## 7. Practice Exercises & Formative Self-Check FAQ
+## 2f. Practice Exercises & Formative Self-Check FAQ
 
 Try these three exercises in your GitHub Codespaces sandbox (`units/unit_07_orchestration_and_automation/`) before starting the graded lab:
 
@@ -374,7 +375,7 @@ Try these three exercises in your GitHub Codespaces sandbox (`units/unit_07_orch
 
 ---
 
-## 8. Required Readings & Authoritative Tutorial Guides
+## 3. Required Readings & Authoritative Tutorial Guides
 
 Review the following five curated documentation guides and technical specifications before beginning your applied lab:
 
@@ -395,7 +396,7 @@ Review the following five curated documentation guides and technical specificati
 
 ---
 
-## 9. Required Micro-Video Lectures (Embedded)
+## 4. Required Micro-Video Lectures (Embedded)
 
 Watch each of the following video chapters to observe asset-based data orchestrators and fault-tolerant DAGs in action:
 
@@ -419,7 +420,7 @@ Watch each of the following video chapters to observe asset-based data orchestra
 
 ---
 
-## 10. Institutional Video Lecture Embeds
+## 5. Institutional Video Lecture Embeds
 
 <div style="background: #f8fafc; border-radius: 6px; padding: 1.5rem; margin: 1rem 0px; text-align: center; border: 2px dashed #94a3b8;">
   <p style="font-size: 0.95em; color: #475569; margin-bottom: 1rem;"><strong>Campus Faculty Announcements &amp; Lab Walkthrough Recordings</strong></p>

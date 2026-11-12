@@ -1,11 +1,12 @@
 # Unit 5: Required Readings, Concepts & Video Lectures
 
-Welcome to the core instructional lecture and study hub for **Unit 5: Data as a Service (DaaS) & The API Layer**. This page organizes all weekly learning materials into four structured chapters:
+Welcome to the core instructional lecture and study hub for **Unit 5: Data as a Service (DaaS) & The API Layer**. This page organizes all weekly learning materials into five structured sections:
 
-1. **Instructor Lecture & Conceptual Deep Dive:** Master the target JSON API contract shapes, operational DaaS source systems, decoupled microservices, the "Death of the CSV" operational postmortem, HTTP REST semantics, strict Pydantic v2 data validation schemas, and asynchronous FastAPI endpoints.
-2. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from FastAPI, Pydantic v2, Starlette, and Uvicorn.
-3. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe RESTful endpoints and real-time schema validation in live Python environments.
-4. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
+1. **Unit Overview & Objectives:** Review the architectural context and measurable learning objectives for this unit.
+2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2f):** Master the target JSON API contract shapes, operational DaaS source systems, decoupled microservices, the "Death of the CSV" operational postmortem, HTTP REST semantics, strict Pydantic v2 data validation schemas, and asynchronous FastAPI endpoints.
+3. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from FastAPI, Pydantic v2, Starlette, and Uvicorn.
+4. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe RESTful endpoints and real-time schema validation in live Python environments.
+5. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
 
 *Work through each section in sequence as part of your 150-minute asynchronous self-study allocation before starting the applied laboratory assignment.*
 
@@ -41,7 +42,7 @@ To make data accessible, secure, and resilient, we must treat **Data as a Servic
 
 ---
 
-## 2. What Our Output Looks Like and Where the Data Comes From
+## 2a. What Our Output Looks Like and Where the Data Comes From
 
 ### The Purpose
 Our goal in Unit 5 is to build a **Validated Fleet Data Microservice** (`app = FastAPI()`) enforced by **Pydantic v2 Request and Response Schemas**. When a client application requests route delay predictions or submits a new fuel transaction for anomaly scoring, our service validates every field, queries the underlying Parquet/DuckDB store, and returns a guaranteed JSON response.
@@ -98,7 +99,7 @@ When a client interacts with our API, the exchange follows these exact HTTP + JS
 
 ---
 
-## 3. The $380,000 Monday Morning Outage (The Death of the CSV)
+## 2b. The $380,000 Monday Morning Outage (The Death of the CSV)
 
 To appreciate why production data engineering abandoned CSV handoffs, consider an authentic incident at a national freight logistics firm.
 
@@ -136,7 +137,7 @@ Why did this disaster occur?
 
 ---
 
-## 4. "The Restaurant Waiter" & API Contracts
+## 2c. "The Restaurant Waiter" & API Contracts
 
 To understand how APIs decouple systems, consider a restaurant dining room:
 
@@ -162,7 +163,7 @@ When a client talks to your FastAPI server, the server replies with a 3-digit **
 
 ---
 
-## 5. The Power of Pydantic v2 — Zero-Cost Rust Data Contracts
+## 2d. The Power of Pydantic v2 — Zero-Cost Rust Data Contracts
 
 In Python, types are normally dynamic and unenforced. Pydantic v2 changes this by executing Python type validation in compiled **Rust**.
 
@@ -184,7 +185,7 @@ Pydantic automatically:
 
 ---
 
-## 6. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Pydantic + FastAPI)
+## 2e. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Pydantic + FastAPI)
 
 Let's build up the Python syntax for Pydantic v2 and FastAPI step by step from the ground up, and then examine the complete production microservice and `TestClient` verification harness.
 
@@ -340,7 +341,7 @@ print("Invalid POST blocked with status code:", resp_bad.status_code)
 
 ---
 
-## 7. Practice Exercises & Formative Self-Check FAQ
+## 2f. Practice Exercises & Formative Self-Check FAQ
 
 Try these three exercises in your GitHub Codespaces sandbox (`units/unit_05_data_as_a_service_and_apis/`) before starting the graded lab:
 
@@ -361,7 +362,7 @@ Try these three exercises in your GitHub Codespaces sandbox (`units/unit_05_data
 
 ---
 
-## 8. Required Readings & Authoritative Tutorial Guides
+## 3. Required Readings & Authoritative Tutorial Guides
 
 Review the following five curated documentation guides and technical specifications before beginning your applied lab:
 
@@ -382,7 +383,7 @@ Review the following five curated documentation guides and technical specificati
 
 ---
 
-## 9. Required Micro-Video Lectures (Embedded)
+## 4. Required Micro-Video Lectures (Embedded)
 
 Watch each of the following video chapters to observe RESTful APIs and schema contracts in action:
 
@@ -406,7 +407,7 @@ Watch each of the following video chapters to observe RESTful APIs and schema co
 
 ---
 
-## 10. Institutional Video Lecture Embeds
+## 5. Institutional Video Lecture Embeds
 
 <div style="background: #f8fafc; border-radius: 6px; padding: 1.5rem; margin: 1rem 0px; text-align: center; border: 2px dashed #94a3b8;">
   <p style="font-size: 0.95em; color: #475569; margin-bottom: 1rem;"><strong>Campus Faculty Announcements &amp; Lab Walkthrough Recordings</strong></p>

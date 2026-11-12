@@ -1,11 +1,12 @@
 # Unit 2: Required Readings, Concepts & Video Lectures
 
-Welcome to the core instructional lecture and study hub for **Unit 2: The Anomaly Engine & Unsupervised Learning Targets**. This page organizes all weekly learning materials into four structured chapters:
+Welcome to the core instructional lecture and study hub for **Unit 2: The Anomaly Engine & Unsupervised Learning Targets**. This page organizes all weekly learning materials into five structured sections:
 
-1. **Instructor Lecture & Conceptual Deep Dive:** Master the target unsupervised feature matrix shape, operational fuel-card source systems, the mathematical mechanics of distance metrics, the "Ruler Distortion" mental model, Polars multithreaded Arrow memory layouts, step-by-step Polars expressions, and streaming LazyFrames for anomaly detection.
-2. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from the Polars Rust project, Scikit-Learn outlier detection guides, and Apache Arrow zero-copy memory specifications.
-3. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe high-throughput streaming DataFrames in live Python environments.
-4. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
+1. **Unit Overview & Objectives:** Review the architectural context and measurable learning objectives for this unit.
+2. **Instructor Lecture & Conceptual Deep Dive (Ribbon Slices 2a–2f):** Master the target unsupervised feature matrix shape, operational fuel-card source systems, the mathematical mechanics of distance metrics, the "Ruler Distortion" mental model, Polars multithreaded Arrow memory layouts, step-by-step Polars expressions, and streaming LazyFrames for anomaly detection.
+3. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from the Polars Rust project, Scikit-Learn outlier detection guides, and Apache Arrow zero-copy memory specifications.
+4. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe high-throughput streaming DataFrames in live Python environments.
+5. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
 
 *Work through each section in sequence as part of your 150-minute asynchronous self-study allocation before starting the applied laboratory assignment.*
 
@@ -34,7 +35,7 @@ In this unit, you will learn how to build high-speed pipelines with **Polars**�
 
 ---
 
-## 2. What Our Output Table Looks Like and Where the Data Comes From
+## 2a. What Our Output Table Looks Like and Where the Data Comes From
 
 ### The Purpose
 Our goal in Unit 2 is to build a **Standardized Anomaly Feature Matrix** (`anomaly_features.parquet`) from raw commercial fleet fuel card logs. This table feeds both rule-based physical audits and an unsupervised **Isolation Forest** model that scores every fuel purchase from normal (`1`) to anomalous (`-1`).
@@ -65,7 +66,7 @@ When our Unit 2 Polars pipeline finishes scrubbing, enriching, and standardizing
 
 ---
 
-## 3. The Ghost Fuel Card Ring ($2.4M Theft)
+## 2b. The Ghost Fuel Card Ring ($2.4M Theft)
 
 To appreciate why multi-column feature engineering, scaling, and high-throughput engines matter, consider an authentic corporate logistics fraud case.
 
@@ -103,7 +104,7 @@ This is why modern data engineering pairs **Polars** with **mathematical feature
 
 ---
 
-## 4. Why Scaling Matters — "The Ruler Distortion"
+## 2c. Why Scaling Matters — "The Ruler Distortion"
 
 Before writing code, let's examine why unnormalized features destroy unsupervised anomaly detection algorithms.
 
@@ -157,7 +158,7 @@ In data engineering pipelines, every numerical column destined for distance-base
 
 ---
 
-## 5. The Architectural Model — Pandas vs. Polars (Apache Arrow)
+## 2d. The Architectural Model — Pandas vs. Polars (Apache Arrow)
 
 Why is Polars capable of processing 1,000,000 rows in 0.4 seconds while Pandas takes 45 seconds or crashes?
 
@@ -175,7 +176,7 @@ Why is Polars capable of processing 1,000,000 rows in 0.4 seconds while Pandas t
 
 ---
 
-## 6. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Polars)
+## 2e. Step-by-Step Code Ramp-Up & Guided Implementation Walkthrough (Polars)
 
 If you have never used Polars before, you will find its design very intuitive—especially right after Unit 1 SQL. In Polars, nearly every column operation uses `pl.col("column_name")` inside a context method like `.select()`, `.filter()`, or `.with_columns()`. Let's build up the syntax from the ground up, and then run the complete outlier detection walkthrough.
 
@@ -300,7 +301,7 @@ Notice that Transaction 1002 triggered both the physical speed impossibility fla
 
 ---
 
-## 7. Practice Exercises & Formative Self-Check FAQ
+## 2f. Practice Exercises & Formative Self-Check FAQ
 
 Try these three short exercises in your GitHub Codespaces sandbox (`units/unit_02_anomaly_detection_engines/`) before starting the graded lab:
 
@@ -321,7 +322,7 @@ Try these three short exercises in your GitHub Codespaces sandbox (`units/unit_0
 
 ---
 
-## 8. Required Readings & Authoritative Tutorial Guides
+## 3. Required Readings & Authoritative Tutorial Guides
 
 Review the following five curated documentation guides and technical specifications before beginning your applied lab:
 
@@ -342,7 +343,7 @@ Review the following five curated documentation guides and technical specificati
 
 ---
 
-## 9. Required Micro-Video Lectures (Embedded)
+## 4. Required Micro-Video Lectures (Embedded)
 
 Watch each of the following video chapters to observe high-performance DataFrames and outlier detection algorithms in practice:
 
@@ -366,7 +367,7 @@ Watch each of the following video chapters to observe high-performance DataFrame
 
 ---
 
-## 10. Institutional Video Lecture Embeds
+## 5. Institutional Video Lecture Embeds
 
 <div style="background: #f8fafc; border-radius: 6px; padding: 1.5rem; margin: 1rem 0px; text-align: center; border: 2px dashed #94a3b8;">
   <p style="font-size: 0.95em; color: #475569; margin-bottom: 1rem;"><strong>Campus Faculty Announcements &amp; Lab Walkthrough Recordings</strong></p>
