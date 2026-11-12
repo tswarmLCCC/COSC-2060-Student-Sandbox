@@ -73,6 +73,11 @@ Now, construct a resilient, automated DAG orchestrator that automates data inges
 
 ## 2. 100-Point Graded Challenges
 
+#### Part 0: Basics Warm-Up — Idempotent Key Writes & DLQ Filtering
+Before running the full topological DAG orchestrator, run `part0_basics_warmup()` in `lab7_starter.py` to verify that overwriting records by primary key in a dictionary is idempotent across repeated runs.
+
+
+
 You will complete four progressive challenges inside `lab7_starter.py`.
 
 ```
@@ -88,7 +93,7 @@ COSC 2060 - UNIT 7 LAB: ORCHESTRATION, DAGS, & DEAD-LETTER QUEUES
 
 ### Complete Copy-and-Paste Starter Script (`lab7_starter.py`)
 
-Save the following code as `units/unit_07_orchestration_and_automation/lab7_starter.py`:
+Save the following code as `courses/cosc-2060-data-engineering/content/labs/lab7_starter.py`:
 
 ```python
 """
@@ -99,6 +104,24 @@ Date: [Current Date]
 
 import time
 from typing import Dict, List, Any, Callable
+
+# =========================================================================
+# PART 0: BASICS WARM-UP — IDEMPOTENCY & DLQ FILTERING FROM SCRATCH
+# =========================================================================
+def part0_basics_warmup() -> Dict[str, Any]:
+    """
+    PART 0: Basics Warm-Up (Ground-Up Idempotency & DLQ Routing)
+    Demonstrates why overwriting a dictionary key by ID is idempotent (running twice
+    never creates duplicate keys) before building the full DAG orchestrator.
+    """
+    print("=== Part 0: Basics Warm-Up (Idempotent Key Writes & DLQ Filtering) ===")
+    store = {}
+    for run in range(2):
+        store["TRUCK-101"] = 120.0
+        store["TRUCK-219"] = 240.0
+    print(f"Store after 2 identical runs has {len(store)} trucks (Zero duplicates!): {store}")
+    return store
+
 
 # =========================================================================
 # CHALLENGE 1: Directed Acyclic Graph (DAG) Dependency Resolver (25 pts)
@@ -263,7 +286,8 @@ def task_write_features(ctx):
 # VERIFICATION SUITE (Do not modify)
 # =========================================================================
 if __name__ == "__main__":
-    print("=== Step 1: Building DAG & Checking Topological Order ===")
+    part0_basics_warmup()
+    print("\n=== Step 1: Building DAG & Checking Topological Order ===")
     orchestrator = DAGOrchestrator()
     orchestrator.add_node(PipelineNode("ingest_fuel", task_ingest_fuel, dependencies=[], max_retries=2))
     orchestrator.add_node(PipelineNode("clean_fuel", task_clean_and_dlq, dependencies=["ingest_fuel"]))

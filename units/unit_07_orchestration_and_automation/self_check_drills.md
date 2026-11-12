@@ -44,7 +44,7 @@ The **in-degree** of a node in a directed graph represents the number of direct 
 **Architectural Rationale:**
 Kahn's algorithm initializes a queue of all nodes with `in_degree == 0`. It dequeues nodes one-by-one, adds them to the execution order list, and decrements the in-degrees of their neighbors. 
 
-If a circular dependency exists (e.g. Node A $\to$ Node B $\to$ Node A), both nodes retain an in-degree of at least 1, and neither can ever enter the zero-degree queue. When the queue is empty, if the number of sorted nodes is less than the total number of nodes in the graph (`len(order) != len(nodes)`), a circular dependency cycle is mathematically proven to exist.
+If a circular dependency exists (e.g. Node A -> Node B -> Node A), both nodes retain an in-degree of at least 1, and neither can ever enter the zero-degree queue. When the queue is empty, if the number of sorted nodes is less than the total number of nodes in the graph (`len(order) != len(nodes)`), a circular dependency cycle is mathematically proven to exist.
 </details>
 
 <details>
@@ -87,7 +87,7 @@ Calculate the initial in-degree counts and determine a valid topological executi
    - Dequeue `joined_features`: Add to order. Decrement `trained_model` in-degree ($1 \to 0$). Queue `trained_model`.
    - Dequeue `trained_model`: Add to order.
 4. **Valid Topological Order**:
-   `raw_trips` $\to$ `raw_weather` $\to$ `clean_weather` $\to$ `joined_features` $\to$ `trained_model`
+   `raw_trips` -> `raw_weather` -> `clean_weather` -> `joined_features` -> `trained_model`
 </details>
 
 ### Trace Drill 2: Detecting Infinite Dependency Loops

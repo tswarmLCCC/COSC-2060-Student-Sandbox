@@ -70,13 +70,13 @@ target_w, target_h = 640, 640
 
 **Step-by-Step Derivation:**
 1. **Scale Factor**:
-   $$\text{scale} = \min\left(\frac{640}{1280}, \frac{640}{720}\right) = \min(0.5, 0.8889) = 0.5$$
+   `scale = min(640 / 1280, 640 / 720) = min(0.5, 0.8889) = 0.5`
 2. **Scaled Dimensions**:
-   $$W_{\text{new}} = 1280 \times 0.5 = 640$$
-   $$H_{\text{new}} = 720 \times 0.5 = 360$$
+   `new_w = 1280 * 0.5 = 640`
+   `new_h = 720 * 0.5 = 360`
 3. **Vertical Padding Needed**:
-   $$\text{pad\_total} = 640 - 360 = 280 \text{ pixels}$$
-   $$\text{pad\_top} = 280 / 2 = 140 \text{ pixels}, \quad \text{pad\_bottom} = 140 \text{ pixels}$$
+   `pad_total = 640 - 360 = 280 pixels`
+   `pad_top = 280 / 2 = 140 pixels, pad_bottom = 140 pixels`
 4. The scaled image is placed in the vertical center of the $640 \times 640$ canvas with 140 pixels of neutral gray (114) border on the top and bottom.
 </details>
 

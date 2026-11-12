@@ -39,7 +39,7 @@ If a truck departs at **7:15 AM** and a severe blizzard is logged at **5:30 PM**
 <summary>Question 3: In an ASOF JOIN, what happens if an event occurs before the earliest observation?</summary>
 
 **Architectural Rationale:**
-In DuckDB, `ASOF JOIN` searches for the maximum right-hand timestamp that is $\le$ the left-hand timestamp. If a vehicle departs at 05:00 AM and the earliest weather observation logged in the database is at 06:00 AM, there is no historical observation satisfying `05:00 >= obs_time`. 
+In DuckDB, `ASOF JOIN` searches for the maximum right-hand timestamp that is <= the left-hand timestamp. If a vehicle departs at 05:00 AM and the earliest weather observation logged in the database is at 06:00 AM, there is no historical observation satisfying `05:00 >= obs_time`. 
 
 DuckDB returns `NULL` for all columns originating from the right-hand table. Production pipelines must defensively handle these NULLs using `COALESCE` with domain-appropriate physical defaults (e.g., normal road conditions, 0.0 rain) or forward imputation.
 </details>
@@ -116,7 +116,7 @@ FROM driver_telemetry;
 <div style="background: #f8fafc; border-left: 4px solid #1e3a8a; padding: 1rem 1.25rem; margin: 1.5rem 0; border-radius: 0 4px 4px 0;">
   <h4 style="margin: 0 0 0.5rem 0; color: #1e3a8a;">The Three Golden Rules of Point-in-Time Joins:</h4>
   <ol style="margin: 0; padding-left: 1.25rem; line-height: 1.7;">
-    <li><strong>The Cutoff Rule:</strong> Every feature row has an immutable cutoff timestamp ($t_{\text{cutoff}}$). Any data point logged at $t > t_{\text{cutoff}}$ is toxic waste and must be mathematically excluded.</li>
+    <li><strong>The Cutoff Rule:</strong> Every feature row has an immutable cutoff timestamp (`t_cutoff`). Any data point logged at `t > t_cutoff` is toxic waste and must be mathematically excluded.</li>
     <li><strong>The Preceding Rule:</strong> Rolling feature windows must terminate at <code>1 PRECEDING</code>, never <code>CURRENT ROW</code>.</li>
     <li><strong>The Coalesce Rule:</strong> Always wrap right-table fields in <code>COALESCE</code> to defend downstream ML estimators from unhandled NULLs caused by pre-observation departures.</li>
   </ol>

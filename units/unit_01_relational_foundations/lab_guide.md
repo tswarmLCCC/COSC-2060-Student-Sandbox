@@ -1,10 +1,11 @@
 # Unit 1 Applied Lab: The Feature Matrix Builder
 
 > **Course**: COSC 2060 — Modern Data Engineering & AI Infrastructure  
-> **Unit**: Unit 1 — The Relational Foundation & Supervised Learning Targets  
+> **Unit**: Unit 1 — Relational Foundations & Feature Tables  
 > **Deliverable**: `lab1_yourlastname.py`  
 > **Total Points**: 100 Points  
-> **Toolchain**: Python 3.10+, DuckDB 0.10+
+> **Toolchain**: Python 3.10+, DuckDB  
+> **New to the Sandbox?** If you haven't created your personal GitHub Codespaces workspace from the template repository yet, open **Getting Started with the Lab Environment** (`getting-started-lab-sandbox.html`) in the *Getting Started - Course Orientation* module first.
 
 ---
 
@@ -29,7 +30,7 @@ INSERT INTO departures VALUES
     (1, 'Cheyenne', '2026-10-15 06:00:00'),
     (2, 'Cheyenne', '2026-10-15 14:00:00');
 
--- Weather observations (intermittent weather station logs)
+# Weather observations (intermittent weather station logs)
 CREATE TABLE weather_station (
     city VARCHAR,
     obs_time TIMESTAMP,
@@ -159,6 +160,9 @@ Your pipeline will create and populate three tables:
 
 ### Graded Challenges
 
+#### Part 0: Basics Warm-Up — SQL Feature Building Blocks
+Before writing the full `ASOF JOIN` and window functions, run `part0_basics_warmup(con)` in `lab1_starter.py` to verify your DuckDB connection, inspect table row counts, extract `dep_hour`, compute an arithmetic ratio (`distance_miles / 55.0`), create a `CASE WHEN` flag (`is_long_haul`), and run a basic `LEFT JOIN` between `routes` and `drivers`.
+
 #### Part 1: DuckDB Environment & Schema Introspection (20 Points)
 1. **Engine Verification**: Write DuckDB SQL to inspect the active version and verify in-memory execution.
 2. **Schema Ingestion**: Programmatically create the three relational tables and populate them with the provided mock logistics dataset (10 drivers, 30 routes, 50 weather observations).
@@ -178,8 +182,8 @@ Your pipeline will create and populate three tables:
 3. **Final 2D Matrix Export**:
    - Select the final feature matrix columns:
      - Entity IDs: `route_id`, `driver_id`
-     - Features ($X$): `dep_hour`, `dep_day_of_week`, `distance_miles`, `safety_score`, `vehicle_type`, `driver_prior_avg_delay`, `driver_lifetime_trips`, `precipitation_in`, `visibility_miles`, `wind_speed_mph`, `road_condition`
-     - Target Label ($y$): `target_delay_mins`
+     - Features (<b><i>X</i></b>): `dep_hour`, `dep_day_of_week`, `distance_miles`, `safety_score`, `vehicle_type`, `driver_prior_avg_delay`, `driver_lifetime_trips`, `precipitation_in`, `visibility_miles`, `wind_speed_mph`, `road_condition`
+     - Target Label (<b><i>y</i></b>): `target_delay_mins`
    - Export the result directly to Parquet format using DuckDB's `COPY ... TO 'output/feature_matrix.parquet' (FORMAT PARQUET)`.
 
 ---
@@ -269,6 +273,35 @@ def initialize_database():
     return con
 
 
+def part0_basics_warmup(con):
+    """
+    PART 0: Basics Warm-Up (Ground-Up SQL Feature Building)
+    Verifies basic DuckDB row counts, arithmetic feature ratios, CASE WHEN flags,
+    and a simple LEFT JOIN before moving into ASOF JOIN and window functions.
+    """
+    print("\n--- Part 0: Basics Warm-Up (SQL Feature Building Blocks) ---")
+    driver_count = con.sql("SELECT COUNT(*) FROM drivers").fetchone()[0]
+    route_count = con.sql("SELECT COUNT(*) FROM routes").fetchone()[0]
+    print(f"Loaded {driver_count} drivers and {route_count} routes.")
+
+    basic_features = con.sql("""
+    SELECT
+        r.route_id,
+        r.origin_city,
+        EXTRACT(HOUR FROM r.dep_time) AS dep_hour,
+        ROUND(r.distance_miles / 55.0, 2) AS est_drive_hours,
+        CASE WHEN r.distance_miles >= 200.0 THEN 1 ELSE 0 END AS is_long_haul,
+        COALESCE(d.safety_score, 0.85) AS safety_score
+    FROM routes r
+    LEFT JOIN drivers d ON r.driver_id = d.driver_id
+    ORDER BY r.route_id
+    LIMIT 3;
+    """).df()
+    print("Basic SQL Features Preview (First 3 Routes):")
+    print(basic_features)
+    return basic_features
+
+
 def build_feature_matrix(con):
     """
     Constructs the leak-free feature matrix query and returns the DuckDB relation.
@@ -317,6 +350,9 @@ def main():
     print("=" * 60)
     
     con = initialize_database()
+    
+    # Run Part 0 Basics Warm-Up first
+    part0_basics_warmup(con)
     
     # Run defensive verification
     verify_no_leakage(con)

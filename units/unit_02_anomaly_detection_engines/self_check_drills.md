@@ -50,7 +50,7 @@ It keeps the entire dataset in Apache Arrow contiguous arrays and computes rolli
 **Architectural Rationale:**
 Anomalies are "few and different." An Isolation Forest recursively partitions feature space using random orthogonal splits. 
 
-Because outliers exist in sparse regions of the distribution, they require significantly fewer splits to isolate (they terminate near the root of the tree, resulting in a short average path length $h(x)$). In contrast, inliers require deep tree traversal. This allows the model to score anomalies without requiring labeled failure training sets.
+Because outliers exist in sparse regions of the distribution, they require significantly fewer splits to isolate (they terminate near the root of the tree, resulting in a short average path length `h(x)`). In contrast, inliers require deep tree traversal. This allows the model to score anomalies without requiring labeled failure training sets.
 </details>
 
 ---

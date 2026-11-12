@@ -114,9 +114,9 @@ def process_sensor_stream(records):
 <summary>Trace the Output: What are the lengths and contents of clean_batch and dlq_batch given input: [{"id": 1, "temperature_f": 72.0}, {"id": 2, "temperature_f": -459.6}, {"id": 3}]?</summary>
 
 **Execution Trace:**
-1. Record 1 (`72.0`): Valid temperature $\implies$ added to `clean_batch`.
-2. Record 2 (`-459.6`): Below physical threshold ($-100.0$) $\implies$ routed to `dlq_batch` with `ERR_INVALID_TEMPERATURE`.
-3. Record 3 (`None`): Missing `temperature_f` key $\implies$ routed to `dlq_batch` with `ERR_INVALID_TEMPERATURE`.
+1. Record 1 (`72.0`): Valid temperature => added to `clean_batch`.
+2. Record 2 (`-459.6`): Below physical threshold ($-100.0$) => routed to `dlq_batch` with `ERR_INVALID_TEMPERATURE`.
+3. Record 3 (`None`): Missing `temperature_f` key => routed to `dlq_batch` with `ERR_INVALID_TEMPERATURE`.
 
 **Final Counts**:
 - `len(clean_batch) == 1`

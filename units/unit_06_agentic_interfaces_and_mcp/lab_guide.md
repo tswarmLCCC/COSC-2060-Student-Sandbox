@@ -75,6 +75,11 @@ Now, construct a full MCP-compatible tool bridge that allows an AI model to safe
 
 ## 2. 100-Point Graded Challenges
 
+#### Part 0: Basics Warm-Up — JSON-RPC 2.0 Envelope Structure
+Before registering and invoking multi-modal MCP tools, run `part0_basics_warmup()` in `lab6_starter.py` to build and inspect a minimal JSON-RPC 2.0 response envelope (`{"jsonrpc": "2.0", "id": 1, "result": ...}`).
+
+
+
 You will complete four progressive challenges inside `lab6_starter.py`.
 
 ```
@@ -90,7 +95,7 @@ COSC 2060 - UNIT 6 LAB: MODEL CONTEXT PROTOCOL (MCP) INTERFACE
 
 ### Complete Copy-and-Paste Starter Script (`lab6_starter.py`)
 
-Save the following code as `units/unit_06_agentic_interfaces_and_mcp/lab6_starter.py`:
+Save the following code as `courses/cosc-2060-data-engineering/content/labs/lab6_starter.py`:
 
 ```python
 """
@@ -120,6 +125,25 @@ MAINTENANCE_RAG = {
     "TRUCK-219": "Work Order WO-10045: Whistling sound at 1800 rpm; brass glitter in oil pan. Turbo recall active.",
     "TRUCK-101": "Work Order WO-09921: Standard oil filter change. All fluids topped off."
 }
+
+
+# =========================================================================
+# PART 0: BASICS WARM-UP — JSON-RPC 2.0 MESSAGE FORMAT
+# =========================================================================
+def part0_basics_warmup() -> Dict[str, Any]:
+    """
+    PART 0: Basics Warm-Up (Ground-Up JSON-RPC 2.0 Structure)
+    Constructs a minimal JSON-RPC 2.0 response envelope before registering
+    and invoking multi-modal MCP tools.
+    """
+    print("=== Part 0: Basics Warm-Up (JSON-RPC 2.0 Envelope Structure) ===")
+    rpc_response = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {"content": [{"type": "text", "text": json.dumps({"status": "READY"})}]}
+    }
+    print("Sample JSON-RPC Response:", json.dumps(rpc_response))
+    return rpc_response
 
 
 # =========================================================================
@@ -274,7 +298,8 @@ def execute_agent_call(rpc_request: Dict[str, Any]) -> Dict[str, Any]:
 # VERIFICATION SUITE (Do not modify)
 # =========================================================================
 if __name__ == "__main__":
-    print("=== Step 1: Verifying Tool Manifest Registration ===")
+    part0_basics_warmup()
+    print("\n=== Step 1: Verifying Tool Manifest Registration ===")
     tools_list = server.list_tools()
     assert len(tools_list["tools"]) >= 2, f"Expected at least 2 tools, got {len(tools_list['tools'])}"
     tool_names = [t["name"] for t in tools_list["tools"]]

@@ -63,6 +63,11 @@ Now, apply these principles to build an enterprise RAG ingestion engine that pro
 
 ## 2. 100-Point Graded Challenges
 
+#### Part 0: Basics Warm-Up — Regex Scrubbing & 2D Dot Product
+Before indexing 384-dimensional embeddings, run `part0_basics_warmup()` in `lab4_starter.py` to strip HTML tags and extra spaces from a single string using `re.sub()` and compute the cosine similarity dot product of two 2D unit vectors using `np.dot()`.
+
+
+
 You will complete four progressive challenges inside `lab4_starter.py`.
 
 ```
@@ -78,7 +83,7 @@ COSC 2060 - UNIT 4 LAB: UNSTRUCTURED TEXT & RAG INGESTION PIPELINE
 
 ### Complete Copy-and-Paste Starter Script (`lab4_starter.py`)
 
-Save the following code as `units/unit_04_unstructured_text_and_vector_rag/lab4_starter.py`:
+Save the following code as `courses/cosc-2060-data-engineering/content/labs/lab4_starter.py`:
 
 ```python
 """
@@ -129,6 +134,25 @@ CATEGORY: TIRES
 NOTES: Routine pre-trip tire tread depth measurement. Steer tires at 8/32nds, drive tires at 6/32nds. Adjusted inflation to 105 PSI cold.
 --- LOG_END ---
 """
+
+# =========================================================================
+# PART 0: BASICS WARM-UP — REGEX CLEANING & DOT PRODUCT SIMILARITY
+# =========================================================================
+def part0_basics_warmup() -> dict:
+    """
+    PART 0: Basics Warm-Up (Ground-Up Text Scrubbing & Vector Dot Product)
+    Demonstrates stripping HTML/extra spaces with regex and computing cosine similarity
+    on two simple 2D unit vectors before running full 384-D SentenceTransformer RAG.
+    """
+    print("=== Part 0: Basics Warm-Up (Regex Scrubbing & Vector Dot Product) ===")
+    raw_snippet = "<p>Turbo   oil  line\n\ninspected;   no leaks found.</p>"
+    scrubbed = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", raw_snippet)).strip()
+    vec_1 = np.array([0.6, 0.8])
+    vec_2 = np.array([0.6, 0.8])
+    sim = float(np.dot(vec_1, vec_2) / (np.linalg.norm(vec_1) * np.linalg.norm(vec_2)))
+    print(f"Scrubbed text: '{scrubbed}' | 2D Unit Vector Cosine Similarity: {sim:.4f}")
+    return {"scrubbed": scrubbed, "similarity": sim}
+
 
 # =========================================================================
 # CHALLENGE 1: Raw Log Ingestion & Header Metadata Extraction (25 pts)
@@ -271,7 +295,8 @@ class LocalVectorIndex:
 # VERIFICATION SUITE (Do not modify)
 # =========================================================================
 if __name__ == "__main__":
-    print("=== Step 1: Parsing Raw Logs ===")
+    part0_basics_warmup()
+    print("\n=== Step 1: Parsing Raw Logs ===")
     parsed = parse_maintenance_logs(RAW_MAINTENANCE_DUMP)
     print(f"Extracted {len(parsed)} structured work orders.")
     assert len(parsed) == 4, f"Expected 4 records, got {len(parsed)}"

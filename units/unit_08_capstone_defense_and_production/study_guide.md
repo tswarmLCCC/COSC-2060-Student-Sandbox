@@ -1,75 +1,71 @@
 # Unit 8: Required Readings, Concepts & Video Lectures
 
-Welcome to the instructional reading and study guide for **Unit 8: Capstone Defense, Containerization & Production Verification**. This page organizes the week's learning materials into four sections:
+Welcome to the core instructional lecture and study hub for **Unit 8: Capstone Defense & Production Handoff**. This page organizes all weekly learning materials into four structured chapters:
 
-1. **Instructor Lecture & Conceptual Deep Dive:** Learn how all seven layers of our course fit together into an end-to-end architecture, what our final Capstone Audit Manifest and Docker container configuration look like, how containers eliminate environment mismatches, and how to defend your pipeline against an unseen blind test batch.
-2. **Required Readings & Tutorial Guides:** Explore official documentation on Dockerfile best practices, multi-stage builds, OWASP container security, and the Twelve-Factor App methodology.
-3. **Required Micro-Video Lectures (Embedded):** Watch focused video tutorials covering Docker containers, packaging Python data pipelines, and production container security.
-4. **Institutional Video Lecture Embeds:** Access instructor announcements and capstone walkthrough recordings.
+1. **Instructor Lecture & Conceptual Deep Dive:** Master the target Capstone Audit Report and multi-modal source systems, containerization principles, the "Works on My Machine" tragedy, the "Intermodal Shipping Container" mental model, multi-stage Dockerfile hardening, non-root security, step-by-step multi-modal verification, and live capstone defense protocols.
+2. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from Docker, OWASP Container Security standards, and Twelve-Factor App methodologies.
+3. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe container builds, image optimizations, and healthcheck verifications in live environments.
+4. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
 
-*Work through each section in sequence as part of your 150-minute self-study block before starting the capstone lab.*
+*Work through each section in sequence as part of your 150-minute asynchronous self-study allocation before starting the applied laboratory assignment.*
 
 ---
 
 ## 1. Instructor Lecture & Conceptual Deep Dive
 
-### Bringing Every Layer Together for Production Handoff
+### Production Containerization & Live Capstone Defense: Eliminating "Works on My Machine"
 
-Over the past seven units, you have built every core layer of a modern data and AI infrastructure system:
-* **Unit 1 (Relational Feature Tables):** Point-in-time `ASOF JOIN` and rolling lag windows in DuckDB.
-* **Unit 2 (High-Speed Outlier Detection):** Multithreaded `LazyFrame` filtering and Z-score standardization in Polars.
-* **Unit 3 (Computer Vision Tensors):** Aspect-ratio-preserving letterbox padding and normalized YOLO coordinates in OpenCV/NumPy.
-* **Unit 4 (Unstructured Text & RAG):** HTML/whitespace scrubbing, sliding-window chunking, and cosine similarity vector search.
-* **Unit 5 (Data as a Service):** Pydantic v2 data contracts and REST API endpoints in FastAPI.
-* **Unit 6 (Agentic Interfaces):** Read-only JSON-RPC 2.0 tool servers using the Model Context Protocol (MCP).
-* **Unit 7 (Orchestration & Fault Tolerance):** Topological DAG execution, idempotent writes, exponential backoff, and Dead-Letter Queues (DLQs).
+#### 1. Unit Overview & Objectives
+Over the past seven units, you have constructed every layer of an enterprise AI infrastructure ecosystem:
+* **Relational Core:** Feature engineering with point-in-time joins in DuckDB (Unit 1)
+* **High-Throughput Analytics:** Unsupervised anomaly detection in Polars (Unit 2)
+* **Visual Intelligence:** Standardized computer vision manifests in OpenCV (Unit 3)
+* **Unstructured Knowledge:** Dense vector search and semantic RAG in Sentence-Transformers (Unit 4)
+* **Data as a Service:** Contract-guaranteed REST APIs in FastAPI (Unit 5)
+* **Agentic Bridges:** Model Context Protocol (MCP) tool integration (Unit 6)
+* **Resilient Automation:** Asset-based DAG orchestration and DLQs (Unit 7)
 
-In **Unit 8**, we bring all of these pieces together into a single, end-to-end **Capstone Verification Pipeline** and learn how data engineers package their code inside **Docker Containers** so it runs identically on any laptop or cloud server.
+In **Unit 8**, you face the final and most critical milestone of a professional engineer: **Production Handoff and Live Capstone Defense.**
+
+Building software that only runs on your local development laptop is an incomplete engineering achievement. In the enterprise, your pipeline must run reliably in reproducible cloud environments, survive unseen messy data inputs, and be defended before executive stakeholders and technical review boards.
+
+You will package your entire ecosystem into a production **Docker container**, write automated healthchecks, and defend your architecture against an **unseen blind test batch** during a live technical evaluation.
 
 ```
-RAW MULTIMODAL BATCH (Tabular + Sensor + Vision + Text)
-         │
-         ▼
-[1. Defensive Validation & Dead-Letter Queue (DLQ)]
-         │
-         ▼
-[2. DuckDB / Polars / OpenCV / RAG Processing Engines]
-         │
-         ▼
-[3. FastAPI + MCP Service Layer + Capstone Audit Report]
+[Local Dev Code] ──> [Hardened Multi-Stage Dockerfile] ──> [Immutable Container Image] ──> [Cloud Staging / Blind Test Defense]
 ```
 
-#### Measurable Learning Objectives
-* **Integrate** tabular (DuckDB/Polars), visual (OpenCV/NumPy), unstructured text (RAG chunking), and service/contract layers (Pydantic/MCP) into a unified end-to-end pipeline.
-* **Process** an unseen **"Chaos / Blind Test Batch"** containing mixed valid records and intentional corruptions (negative values, future-leaked timestamps, zero-dimension images, empty text) without unhandled crashes.
-* **Explain** how Docker containers package Python code, system C-libraries (`libgl1`), and dependencies into a reproducible image.
-* **Write** a hardened multi-stage `Dockerfile` using a non-root user and healthcheck endpoint.
-* **Generate** a verified `capstone_audit_report.json` and curated `.parquet` output proving zero data leakage and 100% contract compliance.
+**Measurable Learning Objectives:**
+* **Explain** the principles of containerization (Virtual Machines vs. Linux Containers) and eliminate the "Works on My Machine" failure mode.
+* **Author** a hardened, multi-stage `Dockerfile` and `docker-compose.yml` that pins dependencies, enforces non-root execution, and exposes healthcheck endpoints.
+* **Execute** an end-to-end integration test where an unseen "Blind Test / Chaos Batch" of multimodal data is ingested, cleansed, evaluated, and served without human intervention.
+* **Articulate** architectural trade-offs, latency SLAs, memory constraints, and defensive failure recoveries in an executive technical presentation.
+* **Defend** your ecosystem against real-time operational stress-tests in a live 15-minute capstone evaluation.
 
 ---
 
-### What Our Output Looks Like and Where the Data Comes From
+#### 2. What Our Output Looks Like and Where the Data Comes From
 
-#### The Purpose
+##### The Purpose
 Our goal in Unit 8 is to build the **End-to-End Capstone Defense Pipeline** (`lab8_capstone_runner.py`). It ingests a multi-modal operational batch—containing route telemetry, fuel swipes, inspection image metadata, and mechanic notes—quarantines any corrupted records into a Dead-Letter Queue, runs the valid records through our feature, anomaly, vision, and RAG stages, and outputs a comprehensive **`capstone_audit_report.json`** alongside the curated `.parquet` tables.
 
-#### Why Production Systems Need End-to-End Integration Audits
-When you test each unit's script by itself on clean sample data, it is easy to assume everything works. In production, however, data flows through multiple stages in sequence, and real incoming batches often contain multiple types of defects at the same time:
+##### Why Production Systems Need End-to-End Integration Audits
+When you test each unit's script in isolation on clean sample data, it is easy to assume everything works. In production, however, data flows through multiple stages in sequence, and real incoming batches often contain multiple types of defects simultaneously:
 * A route row might have a weather timestamp recorded *after* departure (temporal leakage attempt).
 * A fuel swipe might have `-120.0` gallons or a missing `driver_id`.
-* A camera frame might be `0 x 0` pixels or completely black (`mean_brightness < 5.0`).
-* A mechanic work order might be empty HTML tags (`"<p>   </p>"`).
+* A camera frame might be `0 x 0` pixels or completely pitch black (`mean_brightness < 5.0`).
+* A mechanic work order might consist only of empty HTML tags (`"<p>   </p>"`).
 
-Your capstone pipeline proves that your system can ingest an entire messy multi-modal batch in one command, catch and quarantine every defective item in the Dead-Letter Queue (`dlq_quarantine.jsonl`), and produce clean, verified outputs for all valid items.
+Your capstone pipeline proves that your system can ingest an entire messy multi-modal batch in one command, catch and quarantine every defective item in the Dead-Letter Queue (`capstone_dlq.jsonl`), and produce clean, verified outputs for all valid items.
 
-#### Where the Raw Data Comes From (Source Systems)
-The capstone pipeline ingests a combined operational drop (`datasets/unit_08_chaos_batch.json` or multi-table seed) representing a full day of fleet operations across all four source systems:
+##### Where the Raw Data Comes From (Source Systems)
+The capstone pipeline ingests a combined operational drop (`datasets/unit_08_chaos_batch.json` and multi-table seeds) representing a full day of fleet operations across all four source systems:
 1. **Dispatch & NOAA Weather Logs** (Relational / Temporal)
 2. **POS Fleet Fuel Card Stream** (High-Volume Tabular)
 3. **Terminal Gate Camera Frames & Bounding Boxes** (Visual Sensor)
 4. **Shop Bay Maintenance Work Orders** (Unstructured Text)
 
-#### Sample Output Dataset (The Target Capstone Audit Report Shape)
+##### Sample Output Dataset (The Target Capstone Audit Report Shape)
 When your Unit 8 capstone script completes its run, it writes `output/capstone_audit_report.json` with exact verification counts across every subsystem:
 
 ```json
@@ -106,79 +102,151 @@ When your Unit 8 capstone script completes its run, it writes `output/capstone_a
 
 ---
 
-### Why "It Works on My Laptop" Fails in Production
+#### 3. The "Works on My Machine" Tragedy
 
-Suppose you finish writing your Python pipeline on your personal Windows or Mac laptop, and you email `pipeline.py` to your company's cloud operations team so they can deploy it on a Linux server.
+To appreciate why containerization and reproducible handoffs are mandatory in data engineering, examine an authentic corporate tragedy.
 
-Ten minutes later, they write back: *"Your script crashed immediately on startup."*
+A team of talented junior engineers developed a cutting-edge real-time logistics routing and delay-prediction system for a regional freight carrier. They spent four months refining their algorithms on their high-end local development laptops running macOS and Windows.
 
-Why does code that works on your laptop fail on another machine?
-1. **Missing Python Packages or Version Drift:** Your laptop had `pydantic==2.9.0` installed, while the server had an older `pydantic==1.10.0` where `.model_dump()` doesn't exist.
-2. **Missing Operating System C-Libraries:** Libraries like OpenCV (`cv2`), DuckDB, and Polars rely on compiled C/C++ and Rust libraries (such as `libGL.so.1` on Linux). Even if `pip install` finishes, importing `cv2` on a bare Linux server fails if the operating system package `libgl1` isn't installed.
-3. **Hardcoded File Paths:** A path written with Windows backslashes (`"C:\\Users\\Trevor\\output\\data.parquet"`) fails immediately on a Linux cloud server.
+The client scheduled a high-stakes final evaluation with the Chief Technology Officer, VP of Supply Chain, and lead enterprise architects. If the demonstration succeeded, the system would receive a **\$1.2 million production rollout contract**.
+
+##### The Disaster in the Boardroom
+The team arrived at corporate headquarters. The client provided a fresh, clean cloud staging server running Ubuntu 22.04 LTS and instructed the team to deploy their system:
+
+```bash
+git clone https://github.com/tswarmLCCC/COSC-2060-Student-Sandbox.git
+python3 main.py
+```
+
+Within 12 seconds, the terminal exploded in red text:
+
+```text
+Traceback (most recent call last):
+  File "main.py", line 4, in <module>
+    import cv2
+ModuleNotFoundError: No module named 'cv2'
+```
+
+The lead engineer stammered: *"Oh, we just need to install OpenCV. Let me run `pip install`..."*
+
+When they ran `pip install opencv-python`, the staging server failed with a missing system C-library:
+```text
+ImportError: libGL.so.1: cannot open shared object file: No such file or directory
+```
+
+For 45 agonized minutes in front of the executive committee, the engineers frantically typed `sudo apt-get install`, battled version conflicts with Python 3.10 vs. 3.11, discovered that their local macOS NumPy binaries behaved differently than Linux glibc, and watched their demo freeze with an Out-Of-Memory segmentation fault.
+
+The CTO closed his laptop:
+> *"If this system requires an army of engineers to manually configure an operating system, it cannot survive in our automated Kubernetes cloud infrastructure. The demo is concluded."*
+
+The company lost the \$1.2 million contract.
+
+##### The Lesson
+**Code alone is not software.** Software is the code **plus** the exact Python runtime, the exact C-libraries (`libGL`, `libgomp`), the exact filesystem layout, the environment variables, and the network ports. Containers package all of these elements into a single, immutable artifact.
 
 ---
 
-### How Docker Containers Solve Environment Drift
+#### 4. "The Intermodal Shipping Container"
 
-To make sure code runs identically everywhere, software and data engineers use **Docker Containers** (in fact, the GitHub Codespaces sandbox you have been using all semester is a Docker container defined by `.devcontainer/devcontainer.json`!).
+Before 1956, global ocean shipping was a logistical nightmare. Cargo arrived at docks in random wooden crates, barrels, and sacks. Longshoremen spent weeks hand-loading individual barrels into ship holds. Ships frequently sank because heavy sacks shifted during storms, and theft was rampant.
 
-Think of a **standardized steel shipping container** on a cargo ship:
-* Before shipping containers were invented, workers had to load individual wooden barrels, sacks, and crates onto ships by hand.
-* With a standardized steel shipping container, the factory packs everything inside the box once. That exact same sealed box can be lifted onto a train, a semi-truck, or a cargo ship anywhere in the world without ever unpacking the contents.
+In 1956, Malcom McLean invented the standardized **Intermodal Shipping Container**—a sealed steel box with standard dimensions (40 &times; 8 &times; 8.5 feet).
+
+The ship captain does not care what is inside the container (shoes, car engines, or apples). The container fits identically on a ship, on a flatbed semi-truck, or on a train car.
 
 ```
-WHAT IS INSIDE A DOCKER CONTAINER IMAGE:
-┌────────────────────────────────────────────────────────────┐
-│  Your Pipeline Scripts (lab8_capstone_runner.py, api.py)   │
-│  Python Libraries (duckdb, polars, opencv, fastapi, ...)   │
-│  Python Runtime (Python 3.11)                              │
-│  OS System Libraries (Debian/Ubuntu Slim + libgl1)         │
-└────────────────────────────────────────────────────────────┘
-Rule: If it runs inside the container during testing, it runs identically in the cloud!
+DOCKER IS THE INTERMODAL CONTAINER FOR CODE:
+Inside the Container:  [Ubuntu Base + Python 3.11 + OpenCV + DuckDB + Polars + App Code]
+Outside the Container: [Docker Engine / Kubernetes / Cloud AWS / Laptop]
+Rule: "If it runs in the container on your laptop, it runs identically in the cloud!"
 ```
 
-#### Three Production Dockerfile Best Practices
-When writing a `Dockerfile` for a data engineering service, follow three rules:
-1. **Multi-Stage Builds (`FROM ... AS builder` then `FROM ... AS runtime`):** Install heavy C compilers (`build-essential`) only in a temporary `builder` stage to compile Python wheels into `/opt/venv`, then copy *only* `/opt/venv` into a clean, lightweight `runtime` stage. This shrinks your container size by 70–80%.
-2. **Run as a Non-Root User (`USER appuser`):** Never run web servers or data pipelines as the Linux `root` administrator inside a container. Creating a dedicated unprivileged user (`useradd -r appuser`) limits damage if an attacker ever finds a vulnerability.
-3. **Include a `HEALTHCHECK` and Bind to `0.0.0.0`:** Add a `HEALTHCHECK` instruction that pings `/health` every 30 seconds so cloud orchestrators know if the service is alive, and bind Uvicorn to `--host 0.0.0.0` so traffic from outside the container can reach port `8000`.
+---
+
+#### 5. Multi-Stage Dockerfile Hardening: Security & Minimal Footprint
+
+In production, you must never ship an 8 GB development image containing compilers (`gcc`, `g++`) or run containers as `root`.
+
+##### Multi-Stage Architecture:
+1. **Builder Stage:** Uses a build image to compile C-extensions and install wheel dependencies into a temporary virtual environment (`/opt/venv`).
+2. **Runtime Stage:** Copies *only* the compiled virtual environment into a clean, minimal image (`python:3.11-slim`), sets up a non-privileged system user (`appuser`), and drops all root privileges.
+
+```
+BUILDER STAGE (Heavy: 1.5 GB) ──> Compiles wheels & packages
+                                        │ (Copies only /opt/venv)
+                                        ▼
+RUNTIME STAGE (Lean: 180 MB)  ──> Non-root user + Healthcheck + Ports 8000/8001
+```
+
+##### Guided Implementation Walkthrough — Production Multi-Stage `Dockerfile`
 
 ```dockerfile
-# STAGE 1: Builder (Compiles dependencies into /opt/venv)
+# -------------------------------------------------------------
+# STAGE 1: Build & Dependencies
+# -------------------------------------------------------------
 FROM python:3.11-slim AS builder
+
 WORKDIR /build
+
+# Install system compilation prerequisites
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create isolated virtual environment
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
 
-# STAGE 2: Lean Production Runtime
+# Install production dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# -------------------------------------------------------------
+# STAGE 2: Hardened Production Runtime
+# -------------------------------------------------------------
 FROM python:3.11-slim AS runtime
-RUN apt-get update && apt-get install -y --no-install-recommends libgl1 curl && rm -rf /var/lib/apt/lists/*
+
+# Install runtime system libraries required by OpenCV & ML engines
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1 \
+    libglib2.0-0 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy pre-built virtual environment from builder
 COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Create and switch to non-root user
-RUN useradd -r -s /sbin/nologin appuser
+# Security: Create non-root execution user (Principle of Least Privilege)
+RUN groupadd -r appgroup && useradd -r -g appgroup -s /sbin/nologin appuser
+
 WORKDIR /app
 COPY . /app
-RUN chown -R appuser /app
+
+# Grant read access to application directory
+RUN chown -R appuser:appgroup /app
 USER appuser
 
-EXPOSE 8000
-HEALTHCHECK --interval=30s --timeout=5s CMD curl -f http://localhost:8000/health || exit 1
+# Expose DaaS API and MCP ports
+EXPOSE 8000 8001
+
+# Production Container Healthcheck
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:8000/health || exit 1
+
+# Production Entrypoint
 CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
 ---
 
-### Step-by-Step Code Ramp-Up: Building the End-to-End Capstone Verifier
+#### 6. Step-by-Step Code Ramp-Up: Building the End-to-End Capstone Verifier
 
-In this week's lab, you will bring together the defensive patterns from Units 1–7 into a clean, modular Python pipeline that processes a multi-modal "Chaos Batch." Let's walk through how to structure a multi-subsystem verifier step by step.
+In this week's capstone lab, you will bring together the defensive patterns from Units 1–7 into a modular Python pipeline that processes an unseen multi-modal "Chaos / Blind Test Batch." Let's walk through how to structure a multi-subsystem verifier step by step.
 
-#### Step 1: Writing a Unified Dead-Letter Queue (DLQ) Collector
-First, let's create a simple helper class or list that any subsystem (Relational, Anomaly, Vision, or RAG) can call whenever it catches a bad record:
+##### Step 1: Writing a Unified Dead-Letter Queue (DLQ) Collector
+First, create a reusable helper class that any subsystem (Relational, Anomaly, Vision, or RAG) can call whenever it catches a corrupted record:
 
 ```python
 import json
@@ -208,15 +276,15 @@ dlq.quarantine("anomaly_engine", "TX-99", {"gallons": -10}, "gallons must be > 0
 print("Quarantined count:", len(dlq.items))
 ```
 
-#### Step 2: Auditing Each Modality Stage Before Export
-Next, let's trace the exact defensive check we run on each of the four data modalities in the capstone batch:
+##### Step 2: Auditing Each Modality Stage Before Export
+Next, trace the exact defensive checks we run on each of the four data modalities in the capstone batch:
 
 1. **Relational Stage (Unit 1 Check):**
-   * Check that `act_arrival >= dep_time` and that any matched weather observation satisfies `obs_time <= dep_time`. If a row has corrupt timestamps (`act_arrival < dep_time`), quarantine it in `dlq` and exclude it from the DuckDB `ASOF LEFT JOIN` feature table.
+   * Verify `act_arrival >= dep_time` and ensure weather observations are joined via `ASOF LEFT JOIN ... ON r.origin_city = w.city AND r.dep_time >= w.obs_time`. If a route record has corrupted timestamps (`act_arrival < dep_time`), quarantine it in `dlq`.
 2. **Tabular Anomaly Stage (Unit 2 Check):**
-   * Check that `gallons > 0` and `amount_usd > 0`. Quarantine negative sensor glitches in `dlq`, then compute Z-scores (`(col - mean) / std`) and physical anomaly flags (`gallons > 300` or `implied_speed_mph > 75`) on the clean rows using Polars.
+   * Verify `gallons > 0` and `amount_usd > 0`. Quarantine negative sensor glitches in `dlq`, then compute Z-scores (`(col - mean) / std`) and physical anomaly flags (`gallons > 300` or `implied_speed_mph > 75`) on the clean rows using Polars.
 3. **Visual Sensor Stage (Unit 3 Check):**
-   * Check that each image has positive dimensions (`width > 0 and height > 0`) and is not a pitch-black broken camera frame (`mean_brightness >= 5.0`). Quarantine broken frames in `dlq`, and compute letterbox scale `r`, padding `(pad_x, pad_y)`, and normalized `[0.0, 1.0]` YOLO coordinates for valid frames.
+   * Verify each image has positive dimensions (`width > 0 and height > 0`) and is not a pitch-black broken camera frame (`mean_brightness >= 5.0`). Quarantine broken frames in `dlq`, and compute letterbox scale `r`, padding `(pad_x, pad_y)`, and normalized `[0.0, 1.0]` YOLO coordinates for valid frames.
 4. **Unstructured Text / RAG Stage (Unit 4 Check):**
    * Strip HTML tags and normalize whitespace. If a document is empty after cleaning (`len(cleaned_text) == 0`), quarantine it in `dlq`. Otherwise, split into overlapping chunks and attach metadata.
 
@@ -230,7 +298,7 @@ def process_vision_records(image_records: list[dict], dlq: DeadLetterQueue) -> l
         brightness = rec.get("mean_brightness", 0.0)
 
         if w <= 0 or h <= 0 or brightness < 5.0:
-            dlq.quarantine("vision", img_id, rec, f"Invalid frame dimensions ({w}x{h}) or dark frame (brightness={brightness})")
+            dlq.quarantine("vision", img_id, rec, f"Invalid frame ({w}x{h}) or dark frame (brightness={brightness})")
             continue
 
         ratio = min(640.0 / w, 640.0 / h)
@@ -245,7 +313,7 @@ def process_vision_records(image_records: list[dict], dlq: DeadLetterQueue) -> l
     return valid_manifests
 ```
 
-#### Step 3: Writing Automated Assertions (`pytest` / Verification Audit)
+##### Step 3: Writing Automated Verification Assertions (`pytest` & Audit Report)
 Finally, a production pipeline verifies its own outputs before reporting success:
 * Assert that the exported Parquet table exists and has `> 0` rows.
 * Assert that zero rows in the exported table have `weather_obs_time > dep_time`.
@@ -254,51 +322,51 @@ Finally, a production pipeline verifies its own outputs before reporting success
 
 ---
 
-### Practice Exercises and Common Questions
+#### 7. Practice Exercises & Formative Self-Check FAQ
 
 Try these three exercises in your GitHub Codespaces sandbox (`units/unit_08_capstone_defense_and_production/`) before starting the capstone lab:
 
-1. **Exercise 1 (Inspecting Our Own Sandbox Container):** Open `.devcontainer/devcontainer.json` in your workspace and look at how the `image`, `postCreateCommand`, and VS Code `extensions` are configured. You have been working inside a Linux container all semester!
-2. **Exercise 2 (Testing the DLQ Quarantine):** Run `coding_clinic.py` in `units/unit_08_capstone_defense_and_production/` and inspect how corrupted records from different modalities are logged with their subsystem name and error reason.
-3. **Exercise 3 (Running `pytest`):** Run `pytest` in your terminal to see how automated test functions (`def test_...(): assert ...`) verify pipeline outputs in milliseconds.
+1. **Exercise 1 (Inspecting Our Own Sandbox Container):** Open `.devcontainer/devcontainer.json` in your workspace and examine how the container `image`, `postCreateCommand`, and VS Code `extensions` are configured. You have been developing inside a reproducible Linux container all semester!
+2. **Exercise 2 (Testing Multi-Modal DLQ Quarantine):** Run `coding_clinic.py` in `units/unit_08_capstone_defense_and_production/` and inspect how corrupted records from different modalities are logged with their subsystem name and error reason.
+3. **Exercise 3 (Running `pytest`):** Run `pytest` in your terminal to observe how automated test functions (`def test_...(): assert ...`) verify pipeline invariants in milliseconds.
 
-#### Common Questions & Troubleshooting
+##### Common Traps & Formative Self-Check FAQ
 
-* **Question 1: Why does a FastAPI server inside Docker need `--host 0.0.0.0` instead of `--host 127.0.0.1`?**  
-  *Answer:* Inside a Docker container, `127.0.0.1` (`localhost`) only listens to traffic coming from *inside* that exact same container. Binding to `0.0.0.0` tells the server to listen on all network interfaces so requests forwarded from your host computer or cloud load balancer can reach it.
+* **Question 1: Why must Docker bind to `0.0.0.0` instead of `127.0.0.1`?**  
+  *Answer:* Inside a container, `127.0.0.1` refers exclusively to the container's own internal loopback interface. If Uvicorn listens on `127.0.0.1`, requests from outside the container cannot reach it. Listening on `0.0.0.0` binds to all network interfaces, allowing host port forwarding (`-p 8000:8000`) to succeed.
 
-* **Question 2: Why do we copy `requirements.txt` and run `pip install` *before* running `COPY . /app` in a `Dockerfile`?**  
-  *Answer:* Docker caches each step (layer) of a `Dockerfile`. You edit your `.py` code files every day, but you rarely change `requirements.txt`. By installing `requirements.txt` first, Docker reuses the cached package installation layer whenever you rebuild after editing your Python code, making builds take 2 seconds instead of 3 minutes!
+* **Question 2: What is the Blind Test Batch defense protocol?**  
+  *Answer:* During your capstone evaluation, the review harness injects an unseen batch of raw files containing edge-case anomalies (corrupted image headers, fuel card teleportation, negative gallons, and malformed rows). Your automated orchestrator and API must process the batch, isolate the bad rows to the DLQ, and serve clean predictions without throwing unhandled exceptions.
 
-* **Question 3: In the Capstone Lab, should my script crash with an exception when it encounters a corrupted record in the Chaos Batch?**  
-  *Answer:* No! Your script should catch corrupted records using defensive validation, quarantine them into the Dead-Letter Queue (`dlq`), and finish processing all valid records cleanly (`exit code 0`). Only raise an unhandled exception if a *system invariant* fails (such as leakage making it into the final output table).
+* **Question 3: Why do we copy `requirements.txt` and run `pip install` *before* running `COPY . /app` in a `Dockerfile`?**  
+  *Answer:* Docker caches each instruction layer in order. Because you edit your `.py` files frequently while rarely changing `requirements.txt`, copying and installing `requirements.txt` first allows Docker to reuse the cached dependency layer whenever you rebuild after code edits.
 
 ---
 
 ## 2. Required Readings & Authoritative Tutorial Guides
 
-Review the following five curated documentation guides and technical references before beginning your capstone lab:
+Review the following five curated documentation guides and technical specifications before beginning your applied lab:
 
 1. **[Docker Official Documentation: Best Practices for Writing Dockerfiles](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)**
-   *Learn how layer caching, `.dockerignore`, and minimal base images keep containers fast and small.*
+   *Learn how to optimize image caching, minimize layer count, manage secrets, and eliminate unnecessary bloat.*
 
 2. **[Docker Documentation: Multi-Stage Builds](https://docs.docker.com/build/building/multi-stage/)**
-   *Understand how separating build tools from the runtime image shrinks container sizes and improves security.*
+   *Understand how separating build tools from runtime environments reduces container attack surface and shrinks image sizes by 80%.*
 
-3. **[OWASP Docker Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html)**
-   *Review container hardening standards: non-root users, read-only filesystems, and secret management.*
+3. **[OWASP Container Security Verification Standard](https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html)**
+   *Review the gold standard for container hardening: non-root users, read-only root filesystems, and dropped Linux capabilities.*
 
-4. **[The Twelve-Factor App Methodology](https://12factor.net/)**
-   *Study the industry standard principles for building portable, cloud-ready services.*
+4. **[The Twelve-Factor App: Cloud-Native Architecture Principles](https://12factor.net/)**
+   *Study the foundational methodology for designing modern, scalable, container-ready services.*
 
-5. **[Docker Compose File Specification](https://docs.docker.com/compose/compose-file/)**
-   *See how multi-container services, volumes, and healthcheck dependencies are configured.*
+5. **[Docker Compose Specification: Multi-Container Environments](https://docs.docker.com/compose/compose-file/)**
+   *Master multi-service local orchestration, volume mounting, network bridging, and dependency startup ordering.*
 
 ---
 
 ## 3. Required Micro-Video Lectures (Embedded)
 
-Watch each of the following video chapters to see containerization and production best practices in action:
+Watch each of the following video chapters to observe containerization and production hardening in action:
 
 ### Docker in 100 Seconds <span style="font-size: 0.9em; color: #64748b;">(Fireship - 2:15)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">

@@ -11,7 +11,7 @@ Welcome to the hands-on student repository for **COSC 2060: Modern Data Engineer
 Because this repository is a **GitHub Template**, you must first create your own personal copy before launching your Codespace. **(Do NOT launch a Codespace directly on the instructor's `tswarmLCCC` template repository!)**
 
 ### Step 1: Create Your Personal Sandbox Repository (One-Time Setup) 
-1. Click the button below (or click the green **"Use this template" $\rightarrow$ "Create a new repository"** button in the top-right corner of this GitHub page):
+1. Click the button below (or click the green **"Use this template" -> "Create a new repository"** button in the top-right corner of this GitHub page):
 
    [![Use This Template](https://img.shields.io/badge/Step_1-Create_Your_Personal_Sandbox_Repo-2ea44f?style=for-the-badge&logo=github)](https://github.com/new?template_owner=tswarmLCCC&template_name=COSC-2060-Student-Sandbox&owner=%40me&name=COSC-2060-Student-Sandbox&description=My+COSC+2060+Data+Engineering+Sandbox&visibility=private)
 
@@ -37,7 +37,7 @@ Once you are inside **your own repository** (`<your-username>/COSC-2060-Student-
 
 ## 🛠️ Three Ways to Work in This Sandbox
 
-### 1. Interactive "DS Prototype $\rightarrow$ DE Engine" Notebooks (`ds_to_engine.ipynb`)
+### 1. Interactive "DS Prototype -> DE Engine" Notebooks (`ds_to_engine.ipynb`)
 Each unit folder includes a guided Jupyter Notebook showing how fragile Data Science prototypes are refactored into defensive Data Engineering engines:
 1. Open the current unit folder (e.g., `units/unit_01_relational_foundations/`).
 2. Click **`ds_to_engine.ipynb`**.
@@ -123,4 +123,4 @@ Inside **each unit folder**, you will find:
 3. Open `lab{N}_starter.py` and implement your pipeline logic under each `# TODO` challenge section.
 4. **Verify your pipeline:** Run your script in the terminal (`python lab1_starter.py`) and confirm all built-in `assert` verification checks print `PASS`.
 5. Save a copy of your completed file as `lab{N}_{yourlastname}.py` (e.g., `lab1_smith.py`).
-6. You can both commit/push to your personal GitHub repo (`git add . && git commit -m "Complete Lab 1" && git push`) AND download your `lab{N}_{yourlastname}.py` file from VS Code (Right-click file $\rightarrow$ **Download...**) to upload it to the **Applied Lab Assignment in Canvas**.
+6. You can both commit/push to your personal GitHub repo (`git add . && git commit -m "Complete Lab 1" && git push`) AND download your `lab{N}_{yourlastname}.py` file from VS Code (Right-click file -> **Download...**) to upload it to the **Applied Lab Assignment in Canvas**.

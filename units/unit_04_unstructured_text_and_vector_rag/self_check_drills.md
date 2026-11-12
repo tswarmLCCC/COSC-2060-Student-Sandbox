@@ -31,10 +31,10 @@ If a mechanic's ticket describes `"whistling noise near turbine"` and the user s
 <summary>Question 2: What is the geometric formula for Cosine Similarity and why is L2 normalization critical?</summary>
 
 **Architectural Rationale:**
-Cosine similarity measures the angle between two vectors $\vec{u}$ and $\vec{v}$:
-$$\text{Cosine Similarity} = \frac{\vec{u} \cdot \vec{v}}{\|\vec{u}\| \|\vec{v}\|}$$
-When embedding vectors are L2-normalized such that their Euclidean norm $\|\vec{u}\| = 1.0$, the denominator becomes $1.0$, and cosine similarity reduces to a fast hardware dot product:
-$$\text{Cosine Similarity} = \vec{u} \cdot \vec{v} = \sum_{i=1}^D u_i v_i$$
+Cosine similarity measures the angle between two vectors `u` and `v`:
+`Cosine Similarity = dot(u, v) / (norm(u) * norm(v))`
+When embedding vectors are L2-normalized such that their Euclidean norm `norm(u) = 1.0`, the denominator becomes $1.0$, and cosine similarity reduces to a fast hardware dot product:
+`Cosine Similarity = dot(u, v) = sum(u_i * v_i)`
 This enables sub-millisecond similarity scans using CPU SIMD instructions.
 </details>
 
@@ -44,7 +44,7 @@ This enables sub-millisecond similarity scans using CPU SIMD instructions.
 **Architectural Rationale:**
 Hierarchical Navigable Small World (HNSW) organizes high-dimensional vectors into multi-layer proximity graphs (analogous to a Skip List in data structures). 
 
-The top layers have long-range sparse edges for rapid cross-cluster navigation, while the bottom layers have dense short-range edges for fine-grained nearest neighbor discovery. This reduces search complexity from linear $\mathcal{O}(N)$ brute-force comparison to logarithmic $\mathcal{O}(\log N)$, retrieving nearest vectors in under 2 milliseconds across millions of entries.
+The top layers have long-range sparse edges for rapid cross-cluster navigation, while the bottom layers have dense short-range edges for fine-grained nearest neighbor discovery. This reduces search complexity from linear `mathcal{O(N)` brute-force comparison to logarithmic `mathcal{O(log N)`, retrieving nearest vectors in under 2 milliseconds across millions of entries.
 </details>
 
 <details>

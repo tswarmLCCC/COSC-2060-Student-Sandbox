@@ -11,7 +11,7 @@
 ## 1. Coding Clinic: "I Do, We Do, You Do"
 
 ### "I Do" — The Instructor Demonstration: Aspect-Preserving Letterbox Resizing
-In computer vision data pipelines, directly squashing or stretching non-square camera images to fit neural network inputs ($640 \times 640$) warps aspect ratios and corrupts defect geometries. The data engineering standard is **letterbox padding**: uniformly scaling the image to fit inside the target bounding box and padding the remainder with neutral gray (`114`):
+In computer vision data pipelines, directly squashing or stretching non-square camera images to fit neural network inputs (640 &times; 640) warps aspect ratios and corrupts defect geometries. The data engineering standard is **letterbox padding**: uniformly scaling the image to fit inside the target bounding box and padding the remainder with neutral gray (`114`):
 
 ```python
 import cv2
@@ -44,7 +44,7 @@ print(f"Resized image: {resized.shape}, Canvas: {canvas.shape}, Offsets: dx={pad
 ---
 
 ### "We Do" — Guided Class Practice: Converting Bounding Boxes to Normalized YOLO Format
-When resizing with letterboxing, object bounding boxes must undergo the exact same transformation: scaling by `scale`, translating by `pad_x` and `pad_y`, and normalizing to $[0.0, 1.0]$:
+When resizing with letterboxing, object bounding boxes must undergo the exact same transformation: scaling by `scale`, translating by `pad_x` and `pad_y`, and normalizing to `[0.0, 1.0]`:
 
 ```python
 # Raw bounding box in Pascal VOC format: [x_min, y_min, x_max, y_max]
@@ -80,14 +80,14 @@ Now apply these transformations across hundreds of gate camera inspection images
 ### Scenario & Business Context
 You are a computer vision data engineer at **Apex Logistics Inc.** To prevent steer tire blowouts and catastrophic jackknife accidents, the fleet maintenance department has installed automated multi-angle inspection cameras at all regional gate terminals.
 
-Every day, trucks trigger high-speed camera sensors as they pull through the inspection lane. The photos arrive in an unorganized, nested folder structure with mixed dimensions ($3840 \times 2160$ 4K terminal cameras, $1920 \times 1080$ lane cameras, and $1280 \times 720$ mobile tablet photos).
+Every day, trucks trigger high-speed camera sensors as they pull through the inspection lane. The photos arrive in an unorganized, nested folder structure with mixed dimensions ($3840 \times 2160$ 4K terminal cameras, 1920 &times; 1080 lane cameras, and $1280 \times 720$ mobile tablet photos).
 
 The machine learning team is training a **YOLOv8 defect detector** to identify three critical failure modes:
 - **Class 0**: `Sidewall_Crack` (structural tire fractures).
 - **Class 1**: `Tread_Separation` (peeling or delaminating rubber).
 - **Class 2**: `Rim_Damage` (cracked or bent aluminum wheel rims).
 
-Your mission is to write an automated preprocessing pipeline (`lab3_yourlastname.py`) that walks the raw image directory, extracts EXIF metadata, resizes all photos to $640 \times 640$ using **letterbox padding (zero distortion)**, transforms raw bounding box coordinates, and generates a master `yolo_train.txt` manifest.
+Your mission is to write an automated preprocessing pipeline (`lab3_yourlastname.py`) that walks the raw image directory, extracts EXIF metadata, resizes all photos to 640 &times; 640 using **letterbox padding (zero distortion)**, transforms raw bounding box coordinates, and generates a master `yolo_train.txt` manifest.
 
 ---
 
@@ -107,27 +107,30 @@ Your mission is to write an automated preprocessing pipeline (`lab3_yourlastname
 
 ### Graded Challenges
 
+#### Part 0: Basics Warm-Up — 3D Image Arrays & Color Channels
+Before running letterbox padding and YOLO coordinate conversions, run `part0_basics_warmup()` in `lab3_starter.py` to create a `(120, 240, 3)` `np.uint8` image array, verify `(Height, Width, Channels)` shape ordering, and convert a `BGR` pixel to `RGB` using `cv2.cvtColor()`.
+
 #### Part 1: Directory Traversal & EXIF Telemetry Extraction (20 Points)
 1. **Directory Traversal**: Write a recursive file scanner using Python's `pathlib.Path` or `os.walk` to discover all `.jpg` and `.png` inspection photos across nested subdirectories.
 2. **Defensive Image Loading**: Protect against corrupted or truncated files; verify `cv2.imread()` does not return `None`.
 3. **Metadata Extraction**: Extract image dimensions (Width, Height, Channels) and EXIF capture timestamp (fallback to file modification time if EXIF is absent).
 
 #### Part 2: Letterbox Padding & Aspect Ratio Preservation (40 Points)
-1. **Uniform Scaling**: Calculate the exact scale factor: $\text{scale} = \min(640 / W, 640 / H)$.
+1. **Uniform Scaling**: Calculate the exact scale factor: `scale = min(640 / W, 640 / H)`.
 2. **Aspect-Preserving Resize**: Resize the image using `cv2.resize()` with `cv2.INTER_AREA` interpolation.
 3. **Neutral Canvas Assembly**: Create a $640 \times 640 \times 3$ NumPy array filled with neutral gray (RGB: `(114, 114, 114)`).
 4. **Centering & Offset Math**: Paste the resized image into the exact center of the canvas, calculating integer pixel offsets:
-   $$\Delta x = \lfloor (640 - W_{\text{new}}) / 2 \rfloor, \quad \Delta y = \lfloor (640 - H_{\text{new}}) / 2 \rfloor$$
+   `dx = (640 - new_w) // 2` and `dy = (640 - new_h) // 2`
 
 #### Part 3: Bounding Box Transformation & YOLO Manifest (40 Points)
 1. **Coordinate Shift & Scale**:
-   - For each raw bounding box $[x_1, y_1, x_2, y_2]$ from the raw annotations:
-     $$x_1' = x_1 \times \text{scale} + \Delta x, \quad x_2' = x_2 \times \text{scale} + \Delta x$$
-     $$y_1' = y_1 \times \text{scale} + \Delta y, \quad y_2' = y_2 \times \text{scale} + \Delta y$$
+   - For each raw bounding box `[x1, y1, x2, y2]` from the raw annotations:
+     `x1_pad = (x1 * scale) + dx` and `x2_pad = (x2 * scale) + dx`
+     `y1_pad = (y1 * scale) + dy` and `y2_pad = (y2 * scale) + dy`
 2. **YOLO Normalization**:
    - Compute normalized center coordinates and dimensions:
-     $$x_{\text{center}} = \frac{x_1' + x_2'}{2 \times 640}, \quad y_{\text{center}} = \frac{y_1' + y_2'}{2 \times 640}$$
-     $$w_{\text{norm}} = \frac{x_2' - x_1'}{640}, \quad h_{\text{norm}} = \frac{y_2' - y_1'}{640}$$
+     `x_center = ((x1_pad + x2_pad) / 2.0) / 640.0` and `y_center = ((y1_pad + y2_pad) / 2.0) / 640.0`
+     `w_norm = (x2_pad - x1_pad) / 640.0` and `h_norm = (y2_pad - y1_pad) / 640.0`
 3. **Label File Generation**:
    - Write each box to an individual label file (`output/labels/<filename>.txt`) formatted as:
      `<class_id> <x_center> <y_center> <width> <height>` (with floats rounded to 6 decimal places).
@@ -161,6 +164,22 @@ CLASS_MAPPING = {
     "Tread_Separation": 1,
     "Rim_Damage": 2
 }
+
+def part0_basics_warmup():
+    """
+    PART 0: Basics Warm-Up (3D NumPy Image Arrays & BGR/RGB Conversion)
+    Inspects a simple (Height, Width, Channels) NumPy image array and converts
+    OpenCV BGR channels to RGB before running letterboxing and YOLO coordinate math.
+    """
+    print("\n--- Part 0: Basics Warm-Up (Image Tensor Shapes & BGR/RGB) ---")
+    sample_img = np.zeros((120, 240, 3), dtype=np.uint8)
+    sample_img[:] = (255, 0, 0)  # Blue in BGR
+    h, w, c = sample_img.shape
+    rgb_img = cv2.cvtColor(sample_img, cv2.COLOR_BGR2RGB)
+    print(f"Sample image shape -> Height: {h}, Width: {w}, Channels: {c}")
+    print(f"Top-left BGR pixel: {sample_img[0, 0].tolist()} | Top-left RGB pixel: {rgb_img[0, 0].tolist()}")
+    return sample_img
+
 
 def letterbox_image(image, target_size=(640, 640), pad_color=(114, 114, 114)):
     """
@@ -243,6 +262,7 @@ def main():
     print("Apex Logistics Fleet Vision Pipeline (Unit 3)")
     print("=" * 60)
     
+    part0_basics_warmup()
     annotations = setup_mock_data()
     
     os.makedirs("output/images", exist_ok=True)
@@ -291,7 +311,7 @@ if __name__ == "__main__":
 | Criteria | Exemplary (Full Points) | Competent (Partial Points) | Developing (Needs Revision) | Points |
 |---|---|---|---|---|
 | **1. Aspect Ratio Preservation (Letterboxing)** | Images are scaled uniformly using `scale = min(tw/iw, th/ih)` and centered on a 640x640 neutral gray canvas (`114, 114, 114`). Zero stretching or squishing. | Canvas is 640x640, but scaling is non-uniform or offsets result in cropped edges. | Naive `cv2.resize()` used directly; images suffer severe geometric distortion. | **35** |
-| **2. Bounding Box Coordinate Transformation** | Raw coordinates are shifted by letterbox padding offsets and scaled; normalized center coordinates $[x_c, y_c, w, h]$ match the padded image space within $[0.0, 1.0]$. | Math is mostly correct, but forgot to add padding offset $\Delta y$, causing box vertical shift. | Coordinate math is inverted or coordinates exceed 1.0 bound. | **35** |
+| **2. Bounding Box Coordinate Transformation** | Raw coordinates are shifted by letterbox padding offsets and scaled; normalized center coordinates $[x_c, y_c, w, h]$ match the padded image space within `[0.0, 1.0]`. | Math is mostly correct, but forgot to add padding offset `dy`, causing box vertical shift. | Coordinate math is inverted or coordinates exceed 1.0 bound. | **35** |
 | **3. Automated Batch Processing & Manifest Output** | Pipeline programmatically traverses directory tree, creates individual `.txt` label files, and writes absolute paths to `yolo_train.txt`. | Files processed, but requires hardcoded filenames or manifest contains relative paths that break in training. | Script crashes on missing files or fails to write label files. | **15** |
 | **4. Defensive Image & Coordinate Validation** | Code defensively checks for `NoneType` loads from `cv2.imread()` and asserts bounding box coordinate bounds. | Code runs, but lacks validation checks for corrupt images. | Unhandled exceptions on empty files or corrupt headers. | **15** |
 | **5. Code Quality & Standards** | Modular, well-documented functions, descriptive variable names, and clear docstrings. | Minor style issues (mixed variable casing, minimal comments). | Monolithic unformatted code block. | **10** |

@@ -62,6 +62,11 @@ Now, unify all four data layers from Units 1 through 4 into a single, high-perfo
 
 ## 2. 100-Point Graded Challenges
 
+#### Part 0: Basics Warm-Up — Minimal Pydantic Model & Validation
+Before testing the multi-endpoint FastAPI service, run `part0_basics_warmup()` in `lab5_starter.py` to validate a 2-field `Pydantic` `BaseModel` (`SimpleRoutePing`) and serialize it to a dictionary using `.model_dump()`.
+
+
+
 You will complete four progressive challenges inside `lab5_starter.py`.
 
 ```
@@ -77,7 +82,7 @@ COSC 2060 - UNIT 5 LAB: DATA AS A SERVICE (FASTAPI & PYDANTIC V2)
 
 ### Complete Copy-and-Paste Starter Script (`lab5_starter.py`)
 
-Save the following code as `units/unit_05_data_as_a_service_and_apis/lab5_starter.py`:
+Save the following code as `courses/cosc-2060-data-engineering/content/labs/lab5_starter.py`:
 
 ```python
 """
@@ -99,6 +104,25 @@ app = FastAPI(
     description="Production REST API serving multimodal feature matrices, anomaly scoring, vision manifests, and RAG retrieval.",
     version="1.0.0"
 )
+
+# =========================================================================
+# PART 0: BASICS WARM-UP — PYDANTIC MODEL DUMP & VALIDATION ERROR
+# =========================================================================
+def part0_basics_warmup() -> dict:
+    """
+    PART 0: Basics Warm-Up (Ground-Up Pydantic Validation)
+    Practices creating a simple 2-field Pydantic BaseModel, dumping a valid record
+    to a dict, and catching a ValidationError before testing the full FastAPI service.
+    """
+    print("=== Part 0: Basics Warm-Up (Pydantic BaseModel & Field Bounds) ===")
+    class SimpleRoutePing(BaseModel):
+        route_id: int = Field(gt=0)
+        origin_city: str = Field(min_length=2)
+
+    valid_ping = SimpleRoutePing(route_id=101, origin_city="Cheyenne")
+    print("Validated ping:", valid_ping.model_dump())
+    return valid_ping.model_dump()
+
 
 # =========================================================================
 # CHALLENGE 1: Defensive Pydantic v2 Data Contracts (25 pts)
@@ -256,7 +280,8 @@ def search_maintenance_logs(request: RAGSearchRequest):
 # CHALLENGE 4: Automated Verification Suite with TestClient (25 pts)
 # =========================================================================
 if __name__ == "__main__":
-    print("Running Automated API Test Suite...")
+    part0_basics_warmup()
+    print("\nRunning Automated API Test Suite...")
     client = TestClient(app)
 
     # Test 1: Health Check (200 OK)
