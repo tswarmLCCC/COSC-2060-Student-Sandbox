@@ -12,6 +12,18 @@ demonstrations:
 
 
 # ====================================================================
+# PART 0: BASICS WARM-UP — MULTI-MODAL DEFENSIVE CHECKS AT A GLANCE
+# ====================================================================
+print("\n>>> Executing PART 0: BASICS WARM-UP (Multi-Modal Sanity Checks)...")
+sample_checks = {
+    "tabular_gallons_positive": 140.0 > 0.0,
+    "vision_confidence_valid": 0.0 <= 0.94 <= 1.0,
+    "rag_notes_non_empty": len("Recall notice Part #TC-884".strip()) > 0
+}
+print("Part 0 Warm-Up — Defensive Check Results:", sample_checks)
+
+
+# ====================================================================
 # PART 1: 'I DO' — INSTRUCTOR DEMONSTRATION
 # ====================================================================
 print("\n>>> Executing PART 1: 'I DO' — INSTRUCTOR DEMONSTRATION...")

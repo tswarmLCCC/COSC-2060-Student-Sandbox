@@ -12,6 +12,22 @@ demonstrations:
 
 
 # ====================================================================
+# PART 0: BASICS WARM-UP — TEXT CLEANING & BASIC WORD SPLITTING
+# ====================================================================
+print("\n>>> Executing PART 0: BASICS WARM-UP (Text Scrubbing & Word Slicing)...")
+import re
+import numpy as np
+
+dirty_note = "<p>Driver   reported  <b>whistling</b>\n\nsound near 1800 RPM.</p>"
+clean_note = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", dirty_note)).strip()
+words_preview = clean_note.split()
+vec_a = np.array([0.8, 0.6])
+vec_b = np.array([0.8, 0.6])
+print(f"Part 0 Warm-Up — Cleaned note ({len(words_preview)} words): '{clean_note}'")
+print(f"Part 0 Warm-Up — Dot product of identical unit vectors: {float(np.dot(vec_a, vec_b)):.2f}")
+
+
+# ====================================================================
 # PART 1: 'I DO' — INSTRUCTOR DEMONSTRATION
 # ====================================================================
 print("\n>>> Executing PART 1: 'I DO' — INSTRUCTOR DEMONSTRATION...")

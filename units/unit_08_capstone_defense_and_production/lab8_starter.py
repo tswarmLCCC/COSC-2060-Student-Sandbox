@@ -30,6 +30,21 @@ BLIND_TEST_BATCH = {
 
 
 # =========================================================================
+# PART 0: BASICS WARM-UP — CAPSTONE PRE-FLIGHT SANITY CHECK
+# =========================================================================
+def part0_basics_warmup() -> Dict[str, int]:
+    """
+    PART 0: Basics Warm-Up (Pre-Flight Inspection of the Blind Test Batch)
+    Counts the incoming records across all three modalities in BLIND_TEST_BATCH
+    before executing the full Capstone Defense verification suite.
+    """
+    print("--- Part 0: Basics Warm-Up (Inspecting Blind Batch Counts) ---")
+    counts = {k: len(v) for k, v in BLIND_TEST_BATCH.items()}
+    print("Incoming Blind Batch Modality Counts:", counts)
+    return counts
+
+
+# =========================================================================
 # CHALLENGE 1: Multi-Modal System Architecture & Config (25 pts)
 # =========================================================================
 class CapstoneDefenseSystem:
@@ -127,6 +142,7 @@ if __name__ == "__main__":
     print("COSC 2060 CAPSTONE TECHNICAL DEFENSE: LIVE SIMULATION")
     print("================================================================================")
     
+    part0_basics_warmup()
     defense = CapstoneDefenseSystem()
 
     # Step 1: Ingesting Blind Batch

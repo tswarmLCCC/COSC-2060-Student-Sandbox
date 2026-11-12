@@ -1,275 +1,341 @@
 # Unit 6: Required Readings, Concepts & Video Lectures
 
-Welcome to the core instructional lecture and study hub for **Unit 6: The Agentic Interface (Model Context Protocol - MCP)**. This page organizes all weekly learning materials into four structured chapters:
+Welcome to the instructional reading and study guide for **Unit 6: Agentic Interfaces & Model Context Protocol (MCP)**. This page organizes the week's learning materials into four sections:
 
-1. **Instructor Lecture & Conceptual Deep Dive:** Master the Model Context Protocol (MCP) architecture, the "$500,000 Unrestricted SQL" operational catastrophe, the "USB-C for AI" mental model, defensive tool sandboxing, and JSON-RPC 2.0 communication.
-2. **Required Readings & Authoritative Tutorial Guides:** Study curated official documentation from Anthropic MCP, JSON-RPC 2.0 specifications, and local tool calling standards.
-3. **Required Micro-Video Lectures (Embedded):** Watch high-definition video chapters with verified timestamp navigation to observe MCP tool discovery and autonomous agent execution in live environments.
-4. **Institutional Video Lecture Embeds:** Access campus-specific video recordings and announcements uploaded by your instructor.
+1. **Instructor Lecture & Conceptual Deep Dive:** Learn how AI agents call external tools, what an MCP tool schema and JSON-RPC 2.0 response look like, why agents should never be given unrestricted SQL permissions, and how to build a safe, read-only MCP tool server in Python step by step.
+2. **Required Readings & Tutorial Guides:** Explore official documentation from the Model Context Protocol (MCP), Anthropic tool use guides, JSON-RPC 2.0, and Ollama local tool calling.
+3. **Required Micro-Video Lectures (Embedded):** Watch focused video tutorials covering MCP architecture, function calling, and building custom MCP servers in Python.
+4. **Institutional Video Lecture Embeds:** Access instructor announcements and lab walkthrough recordings.
 
-*Work through each section in sequence as part of your 150-minute asynchronous self-study allocation before starting the applied laboratory assignment.*
+*Work through each section in sequence as part of your 150-minute self-study block before starting the applied lab.*
 
 ---
 
 ## 1. Instructor Lecture & Conceptual Deep Dive
 
-### Bridging Data Engines to Autonomous LLMs: The Model Context Protocol (MCP)
+### Connecting AI Agents to Data Safely with MCP
 
-#### 1. Unit Overview & Objectives
-In Unit 5, we engineered a unified REST API layer serving multimodal data products (relational matrices, anomaly engines, computer vision manifests, and vector RAG indices).
+In Unit 5, we wrapped our datasets behind FastAPI endpoints so web dashboards and mobile apps could request clean, validated JSON data. In **Unit 6**, we look at a new type of software client that needs access to our data pipelines: **AI Agents**.
 
-In **Unit 6**, we connect this data infrastructure to the frontier of modern software engineering: **Autonomous AI Agents**.
+By itself, a Large Language Model (LLM) only predicts words based on what it read during training. It has no built-in way to check whether Truck #219 is delayed right now, whether a fuel card swipe was flagged for fraud, or what a mechanic typed in yesterday's work order.
 
-An AI model by itself is simply a next-token predictor. It cannot check current warehouse inventory, it cannot query your database, and it cannot inspect live fleet telemetry. To make an AI model capable of taking action, we give it **tools** (function calling).
-
-Historically, every company invented its own ad-hoc, proprietary framework to connect LLMs to databases. This led to dangerous security vulnerabilities, brittle integrations, and massive code duplication.
-
-In 2024, the industry converged around an open standard: the **Model Context Protocol (MCP)**. Developed by Anthropic and adopted across the AI ecosystem, MCP is the **"USB-C standard for AI applications"**. It establishes an open, standardized, secure client-server protocol where AI models discover and invoke backend data tools through structured JSON-RPC messages.
+To let an AI assistant look up live facts, engineers give the model **tools**—Python functions that the model can ask to run. Instead of writing custom integration code for every different AI vendor, the industry uses an open standard called the **Model Context Protocol (MCP)**. Think of MCP as a **universal USB-C port for AI**: write one MCP server around your DuckDB, Polars, and RAG pipelines, and any MCP-compatible AI client (such as Claude Desktop, VS Code Copilot, or local Ollama agents) can discover and call your tools safely.
 
 ```
-HUMAN OPERATOR ──> LLM AGENT ──(JSON-RPC Request)──> MCP SERVER ──> DAAS BACKEND (DuckDB / Polars)
-                          <──(Structured Tool Result)───┘
+USER QUESTION ──> AI AGENT ──(JSON-RPC Tool Call)──> MCP SERVER ──> DUCKDB / POLARS / RAG
+                           <──(Structured JSON)──────┘
 ```
 
-**Measurable Learning Objectives:**
-* **Explain** the architectural role of the Model Context Protocol (MCP) as a standardized, secure JSON-RPC bridge between LLMs and enterprise data stores.
-* **Design** descriptive, deterministic MCP Tool definitions (including function signatures, Pydantic argument schemas, and semantic prompt descriptions).
-* **Enforce** defensive security boundaries (the Principle of Least Privilege, read-only sandboxes, and parameter bounds) to prevent prompt injection and unauthorized execution.
-* **Implement** an MCP Server in Python exposing the logistics data engines developed in Units 1 through 5.
-* **Simulate and Verify** an agentic tool-calling loop where an LLM dynamically discovers tools, executes multi-step queries, and generates a factual, hallucination-free executive fleet report.
+#### Measurable Learning Objectives
+* **Explain** how the Model Context Protocol (MCP) connects AI models to backend datasets using standard **JSON-RPC 2.0** messages (`tools/list` and `tools/call`).
+* **Design** clear MCP tool definitions with descriptive docstrings and JSON Schema / Pydantic input rules so an AI agent knows when and how to call each tool.
+* **Apply** the **Principle of Least Privilege** by exposing bounded, read-only query tools instead of raw SQL execution.
+* **Implement** a Python MCP server that serves live telemetry, anomaly statuses, and maintenance RAG search results from our Units 1–4 datasets.
+* **Verify** multi-step agentic tool loops against malformed arguments and injection attempts.
 
 ---
 
-#### 2. The Narrative of Data: The $500,000 "Unrestricted SQL" Disaster
-To understand why data engineers must never give raw, unconstrained database credentials to an autonomous AI agent, consider an authentic corporate failure.
+### What Our Output Looks Like and Where the Data Comes From
 
-Global Freightways deployed an experimental "AI Logistics Assistant" powered by an LLM to help terminal dispatchers answer questions about shipments. The system prompt instructed the model:
-> *"You are a helpful logistics assistant. When users ask questions, translate their intent into a SQL query and execute it using the attached `execute_sql` database connection tool."*
+#### The Purpose
+Our goal in Unit 6 is to build a **Sandboxed MCP Tool Server** that exposes our logistics data pipelines as structured, read-only tools over **JSON-RPC 2.0**. When an AI agent asks what tools are available (`tools/list`) or invokes a specific tool (`tools/call`), our server validates the parameters, queries the underlying dataset, and returns a structured JSON-RPC response.
 
-The database connection tool was connected with read/write administrative credentials to the central PostgreSQL production cluster.
+#### Why AI Agents Need Structured Tool Schemas and Guardrails
+An AI agent does not read your Python source code to figure out how to query your database. Instead, when an agent connects to your MCP server, it reads two things:
+1. **The Tool Registry (`tools/list`):** A JSON catalog listing every tool's `name`, plain-English `description`, and `inputSchema` (the exact parameter names, types, and required fields).
+2. **The Tool Response (`tools/call`):** A predictable JSON envelope returning either the requested records or a clear validation error message that helps the agent self-correct if it passed an invalid ID.
 
-For three weeks, the system was a sensation. Dispatchers asked: *"How many shipments in Chicago are running late?"* and the AI generated:
-```sql
-SELECT count(*) FROM shipments WHERE city = 'Chicago' AND status = 'DELAYED';
-```
+#### Where the Raw Data Comes From (Source Systems)
+An MCP server connects two sides of our architecture:
+1. **Inbound Agent Requests (MCP Host / LLM Client):** An AI assistant running in a dispatch console translates a human dispatcher's question (*"Is Truck 219 safe to dispatch to Denver?"*) into one or more structured JSON-RPC `tools/call` messages.
+2. **Backend Curated Data Stores (`feature_matrix.parquet`, `anomaly_features.parquet`, `rag_chunks.jsonl`):** The MCP server executes read-only lookups against our curated tables and returns compact JSON summaries (never dumping millions of raw rows into the model's context window).
 
-##### The Fatal Ambiguity
-On a busy Thursday afternoon, a dispatcher was clearing out test shipments from a training exercise. The dispatcher typed into the AI chat window:
-> *"Hey, can you please remove all the temporary demo shipments created yesterday?"*
+#### Sample Output Dataset (The Target MCP JSON-RPC Shape)
+Every interaction with our MCP server follows the **JSON-RPC 2.0** specification:
 
-The LLM attempted to construct a SQL delete command. However, the `shipments` table did not have a column called `is_demo`. The model reasoned:
-> *"Since there is no demo flag, all shipments created yesterday must have been part of the demo."*
-
-The LLM generated and executed:
-```sql
-DELETE FROM shipments WHERE created_at >= '2024-11-13 00:00:00';
-```
-
-In under 400 milliseconds, the autonomous agent permanently purged **42,000 active, multi-million-dollar commercial freight manifests** across the United States.
-
-Dispatch screens went blank nationwide. Drivers arriving at terminals could not be matched to their trailers. The company was forced to halt interstate operations for 18 hours while database administrators performed a point-in-time point recovery from off-site tape backups. The operational paralysis, driver detention fees, and missed SLA penalties totaled over **$500,000**.
-
-##### The Engineering Autopsy
-What was the fatal flaw?
-* **Unconstrained Tool Surface**: The agent was given arbitrary SQL execution privileges.
-* **Violation of Least Privilege**: A dispatcher assistant should never have permission to run `DELETE` or `DROP`.
-* **Lack of Guardrails**: There was no schema validation, no parameter boundaries, and no sandboxing.
-
-**The Lesson:** Never give an LLM raw SQL access. Instead, expose **discrete, validated, read-only MCP Tools** (`get_truck_status(truck_id: int)`, `get_terminal_delays(city: str)`) that execute tightly bounded queries.
-
----
-
-#### 3. The Mental Model: "The USB-C Standard for AI"
-Before MCP, every developer wrote custom wrappers for every LLM:
-* If you used OpenAI, you wrote OpenAI function schemas.
-* If you used Anthropic, you wrote Claude tool schemas.
-* If you used Ollama, you wrote another custom parser.
-
-This was like the 1990s computer era, when every peripheral device required a proprietary cable: serial ports, parallel printer ports, PS/2 mouse plugs, and SCSI connectors.
-
-```
-BEFORE MCP (Proprietary Mess):
-[OpenAI] ──> Custom JSON Schema A ──> Database
-[Claude] ──> Custom JSON Schema B ──> Database
-[Ollama] ──> Custom Regex Parser  ──> Database
-
-AFTER MCP (Universal USB-C Standard):
-[OpenAI / Claude / Ollama / Copilot] 
-               │ (Standard JSON-RPC 2.0)
-               ▼
-       [MCP Client Host]
-               │
-               ▼
-       [MCP Data Server] ──> [Enterprise Data Engine]
-```
-
-MCP standardizes three foundational primitives:
-1. **Tools**: Functions that the model can invoke to perform computations or fetch live state.
-2. **Resources**: Static or dynamic data context (like database schemas or log files) that the host can attach to the prompt.
-3. **Prompts**: Standardized instructional templates configured by the server.
-
----
-
-#### 4. The Anatomy of an MCP Tool: JSON-RPC 2.0 Protocol
-When an LLM requests a tool call, MCP communicates using standardized **JSON-RPC 2.0**:
-
-##### 1. The Client Sends Request:
+**1. Tool Discovery Output (`method: "tools/list"`):**
 ```json
 {
   "jsonrpc": "2.0",
-  "id": "req-101",
-  "method": "tools/call",
-  "params": {
-    "name": "get_truck_telemetry",
-    "arguments": {
-      "truck_id": 219
-    }
-  }
-}
-```
-
-##### 2. The Server Validates & Responds:
-```json
-{
-  "jsonrpc": "2.0",
-  "id": "req-101",
+  "id": "req-1",
   "result": {
-    "content": [
+    "tools": [
       {
-        "type": "text",
-        "text": "{\"truck_id\": 219, \"status\": \"ACTIVE\", \"speed_mph\": 64.2, \"fuel_pct\": 82.0}"
+        "name": "get_truck_telemetry",
+        "description": "Fetch current city, speed, and delay status for a specific fleet truck_id (1 to 10000).",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "truck_id": { "type": "integer", "minimum": 1, "maximum": 10000 }
+          },
+          "required": ["truck_id"]
+        }
       }
     ]
   }
 }
 ```
 
----
-
-#### 5. Guided Implementation Walkthrough: Production Python MCP Server
-
-```python
-import json
-from typing import Dict, Any
-
-class FleetMCPServer:
-    """
-    Production-grade Model Context Protocol server exposing
-    defensive, read-only tools to autonomous LLM agents.
-    """
-    def __init__(self):
-        self.tools = {
-            "get_truck_telemetry": self.get_truck_telemetry,
-            "check_anomaly_status": self.check_anomaly_status
-        }
-        
-    def list_tools(self) -> Dict[str, Any]:
-        """Exposes tool definitions following the MCP specification."""
-        return {
-            "tools": [
-                {
-                    "name": "get_truck_telemetry",
-                    "description": "Retrieve current operational status, speed, and fuel level for a commercial truck.",
-                    "inputSchema": {
-                        "type": "object",
-                        "properties": {
-                            "truck_id": {"type": "integer", "description": "The unique truck number (e.g. 219)"}
-                        },
-                        "required": ["truck_id"]
-                    }
-                },
-                {
-                    "name": "check_anomaly_status",
-                    "description": "Check if a fuel transaction triggered fraud or physical anomaly flags.",
-                    "inputSchema": {
-                        "type": "object",
-                        "properties": {
-                            "trans_id": {"type": "integer", "description": "The transaction ID"}
-                        },
-                        "required": ["trans_id"]
-                    }
-                }
-            ]
-        }
-
-    def get_truck_telemetry(self, truck_id: int) -> Dict[str, Any]:
-        # Defensive constraint: Validate positive integer bounds
-        if truck_id <= 0 or truck_id > 10000:
-            return {"error": "Invalid truck_id: Must be between 1 and 10000"}
-        return {
-            "truck_id": truck_id,
-            "status": "EN_ROUTE",
-            "current_city": "Cheyenne, WY",
-            "speed_mph": 62.5,
-            "last_inspection": "PASS"
-        }
-
-    def check_anomaly_status(self, trans_id: int) -> Dict[str, Any]:
-        if trans_id == 1002:
-            return {"trans_id": 1002, "is_anomaly": True, "reason": "Tank overflow violation"}
-        return {"trans_id": trans_id, "is_anomaly": False, "reason": "Normal"}
-
-    def handle_request(self, json_rpc_str: str) -> str:
-        req = json.loads(json_rpc_str)
-        method = req.get("method")
-        
-        if method == "tools/list":
-            return json.dumps({"jsonrpc": "2.0", "id": req.get("id"), "result": self.list_tools()})
-        elif method == "tools/call":
-            params = req.get("params", {})
-            name = params.get("name")
-            args = params.get("arguments", {})
-            if name in self.tools:
-                result = self.tools[name](**args)
-                return json.dumps({"jsonrpc": "2.0", "id": req.get("id"), "result": {"content": [{"type": "text", "text": json.dumps(result)}]}})
-            return json.dumps({"jsonrpc": "2.0", "id": req.get("id"), "error": {"code": -32601, "message": "Method not found"}})
-
-server = FleetMCPServer()
-test_call = json.dumps({
-    "jsonrpc": "2.0",
-    "id": 1,
-    "method": "tools/call",
-    "params": {"name": "get_truck_telemetry", "arguments": {"truck_id": 219}}
-})
-print("MCP Server Response:", server.handle_request(test_call))
+**2. Tool Execution Output (`method: "tools/call"`):**
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "req-2",
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"truck_id\": 219, \"status\": \"EN_ROUTE\", \"origin_city\": \"Cheyenne\", \"predicted_delay_mins\": 15}"
+      }
+    ],
+    "isError": false
+  }
+}
 ```
 
 ---
 
-#### 6. Common Traps & Formative Self-Check FAQ
+### Why You Should Never Give an AI Agent Raw SQL Access
 
-* **Question 1: Why shouldn't an MCP server return natural language explanations directly?**  
-  *Answer:* An MCP tool should return clean, structured JSON or raw domain data. The LLM agent is responsible for translating that structured data into conversational summaries for human users.
+When developers build their first AI database assistant, it is tempting to write a single tool called `run_sql(query: str)` and tell the language model: *"Write any SQL query you need and run it on the database."*
 
-* **Question 2: How does MCP prevent prompt injection attacks?**  
-  *Answer:* By enforcing strict JSON-RPC schemas and Pydantic parameter boundaries, untrusted user text cannot escape into database queries or shell commands. The tool boundary acts as a cryptographic sandbox.
+Let's look at why that approach fails in real operations.
+
+A freight company built an internal chatbot to help dispatchers check on shipments. They connected the chatbot directly to their PostgreSQL database using an admin account that had both read (`SELECT`) and write (`DELETE`, `UPDATE`) permissions.
+
+For a few weeks, dispatchers asked questions like *"How many shipments in Chicago are running late?"* and the model ran harmless `SELECT` queries. Then one afternoon, after a training session, a dispatcher typed:
+> *"Can you clear out the temporary demo shipments we created yesterday?"*
+
+The `shipments` table didn't have a column named `is_demo`. Guessing at what the user meant, the language model generated and ran:
+
+```sql
+DELETE FROM shipments WHERE created_at >= '2026-10-23 00:00:00';
+```
+
+In less than a second, the database deleted **42,000 real, active customer shipments**, forcing the company to shut down dispatch terminals for hours while administrators restored backups.
+
+#### Three Defensive Rules for AI Data Tools
+To prevent accidents and malicious **prompt injection**, data engineers follow three rules when building MCP servers:
+1. **Never Expose Raw SQL Execution:** Instead of `run_sql(query)`, expose specific, purpose-built Python functions like `get_truck_telemetry(truck_id: int)` or `search_maintenance_logs(query: str, limit: int = 5)`.
+2. **Enforce Read-Only Connections and Parameter Bounds:** Validate that IDs are positive integers and cap `limit` parameters (for example, `1 <= limit <= 20`) so a single tool call cannot dump the entire database into memory.
+3. **Use Parameterized Queries:** Never glue user strings directly into SQL with f-strings (`f"WHERE city = '{city}'"`). Always use parameterized placeholders (`?`) or validated domain lookups.
+
+---
+
+### How the Agent Tool-Calling Loop Works
+
+When a human asks an MCP-enabled AI assistant a question, the human does not type JSON. Here is the four-step loop that happens behind the scenes:
+
+```
+STEP 1 (Discovery):
+Agent asks MCP Server ──> {"method": "tools/list"}
+MCP Server replies    ──> Lists available tools, descriptions, and argument schemas.
+
+STEP 2 (User Question & Tool Selection):
+Human asks Agent      ──> "Did Truck 219 have any recent fuel anomalies or turbo issues?"
+Agent decides         ──> Calls get_truck_anomalies(truck_id=219) AND search_maintenance(truck_id="TRUCK-219").
+
+STEP 3 (Sandboxed Execution):
+MCP Server validates  ──> Checks truck_id bounds, queries Parquet/RAG index, returns structured JSON.
+
+STEP 4 (Grounded Answer):
+Agent reads JSON      ──> Writes a clear summary citing the exact transaction ID and work order ID.
+```
+
+Notice why the **tool description** and **parameter descriptions** in your MCP server are so important: those descriptions are the instructions the AI model reads to decide *which* tool to call and *what* arguments to pass!
+
+---
+
+### Step-by-Step Code Ramp-Up: Building an MCP Server from the Ground Up
+
+Let's build up the Python patterns for an MCP tool server step by step, starting from a simple Python function and wrapping it in JSON-RPC 2.0 discovery, validation, and dispatch.
+
+#### Step 1: Writing a Bounded, Read-Only Data Tool Function
+Every MCP tool starts as a regular Python function with clear type hints, defensive parameter checks, and a dictionary return value:
+
+```python
+def get_truck_telemetry(truck_id: int) -> dict:
+    """Fetch current operational status, city, and predicted delay for a fleet truck."""
+    # 1. Defensive type & boundary check
+    if not isinstance(truck_id, int) or isinstance(truck_id, bool):
+        raise ValueError("truck_id must be an integer.")
+    if truck_id < 1 or truck_id > 10000:
+        raise ValueError("truck_id must be between 1 and 10000.")
+
+    # 2. Read-only lookup (e.g. from DuckDB/Parquet or in-memory table)
+    sample_fleet = {
+        101: {"truck_id": 101, "origin_city": "Cheyenne", "status": "ON_TIME", "delay_mins": 0},
+        219: {"truck_id": 219, "origin_city": "Denver", "status": "DELAYED", "delay_mins": 45},
+    }
+    if truck_id not in sample_fleet:
+        return {"truck_id": truck_id, "status": "NOT_FOUND", "message": f"No telemetry found for truck {truck_id}"}
+    return sample_fleet[truck_id]
+
+print(get_truck_telemetry(219))
+```
+
+#### Step 2: Defining the MCP Tool Schema (`tools/list`)
+Next, we describe our function using the standard MCP tool schema format so any AI model can inspect its name, description, and required parameters:
+
+```python
+MCP_TOOLS_CATALOG = [
+    {
+        "name": "get_truck_telemetry",
+        "description": "Retrieve current city, operational status, and delay minutes for a specific truck_id (1 to 10000).",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "truck_id": {
+                    "type": "integer",
+                    "description": "Unique positive integer truck ID (between 1 and 10000)",
+                    "minimum": 1,
+                    "maximum": 10000
+                }
+            },
+            "required": ["truck_id"]
+        }
+    }
+]
+```
+
+#### Step 3: Handling JSON-RPC 2.0 Requests (`tools/list` and `tools/call`)
+Now let's connect our catalog and function inside a clean `FleetMCPServer` class that processes standard JSON-RPC 2.0 messages and catches any validation errors cleanly without crashing:
+
+```python
+import json
+
+class FleetMCPServer:
+    def __init__(self):
+        self.tool_functions = {
+            "get_truck_telemetry": get_truck_telemetry,
+        }
+
+    def handle_jsonrpc(self, raw_request: str) -> dict:
+        """Processes a JSON-RPC 2.0 request string and returns a JSON-RPC 2.0 response dict."""
+        req = json.loads(raw_request)
+        req_id = req.get("id")
+        method = req.get("method")
+
+        # 1. Handle Tool Discovery (tools/list)
+        if method == "tools/list":
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"tools": MCP_TOOLS_CATALOG}
+            }
+
+        # 2. Handle Tool Execution (tools/call)
+        if method == "tools/call":
+            params = req.get("params", {})
+            tool_name = params.get("name")
+            arguments = params.get("arguments", {})
+
+            if tool_name not in self.tool_functions:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "error": {"code": -32601, "message": f"Unknown tool: {tool_name}"}
+                }
+
+            try:
+                output = self.tool_functions[tool_name](**arguments)
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [{"type": "text", "text": json.dumps(output)}],
+                        "isError": False
+                    }
+                }
+            except Exception as exc:
+                # Return structured error feedback so the agent knows what parameter was invalid
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [{"type": "text", "text": json.dumps({"error": str(exc)})}],
+                        "isError": True
+                    }
+                }
+
+        return {
+            "jsonrpc": "2.0",
+            "id": req_id,
+            "error": {"code": -32601, "message": f"Unsupported method: {method}"}
+        }
+
+server = FleetMCPServer()
+
+# Test 1: Discover available tools
+list_req = json.dumps({"jsonrpc": "2.0", "id": 1, "method": "tools/list"})
+print("Discovered tools:", len(server.handle_jsonrpc(list_req)["result"]["tools"]))
+
+# Test 2: Valid tool call
+call_req = json.dumps({
+    "jsonrpc": "2.0",
+    "id": 2,
+    "method": "tools/call",
+    "params": {"name": "get_truck_telemetry", "arguments": {"truck_id": 219}}
+})
+print("Valid call response:", server.handle_jsonrpc(call_req))
+
+# Test 3: Out-of-bounds tool call (truck_id = -5) caught safely!
+bad_req = json.dumps({
+    "jsonrpc": "2.0",
+    "id": 3,
+    "method": "tools/call",
+    "params": {"name": "get_truck_telemetry", "arguments": {"truck_id": -5}}
+})
+print("Guarded error response:", server.handle_jsonrpc(bad_req))
+```
+
+---
+
+### Practice Exercises and Common Questions
+
+Try these three exercises in your GitHub Codespaces sandbox (`units/unit_06_agentic_interfaces_and_mcp/`) before starting the graded lab:
+
+1. **Exercise 1 (Inspecting Tool Schemas):** Run `coding_clinic.py` and inspect the output of `tools/list`. Check how every required parameter is listed in both `properties` and `required`.
+2. **Exercise 2 (Testing SQL Injection Rejection):** Try passing `"219; DROP TABLE routes;"` as the `truck_id` argument in a `tools/call` request. Confirm that our integer type validation rejects the string immediately before any database query can run.
+3. **Exercise 3 (Adding a Cap to `limit`):** Write a tool function `get_recent_anomalies(limit: int = 5)` that raises a `ValueError` if `limit < 1` or `limit > 25`, ensuring an agent can never accidentally request 1,000,000 rows in a single message.
+
+#### Common Questions & Troubleshooting
+
+* **Question 1: Why does `isinstance(True, int)` evaluate to `True` in Python, and why did we check `not isinstance(truck_id, bool)`?**  
+  *Answer:* In Python, `bool` is a subclass of `int` (`True == 1` and `False == 0`)! If an AI agent mistakenly passes `{"truck_id": true}`, `isinstance(True, int)` would pass unless you also check `not isinstance(truck_id, bool)` (or use Pydantic's strict integer validation).
+
+* **Question 2: Should an MCP tool return a long conversational paragraph or a compact JSON dictionary?**  
+  *Answer:* Always return a compact, structured JSON dictionary containing the exact fields and values from your data store. The AI agent will read that structured JSON and write the conversational explanation for the user.
+
+* **Question 3: What does JSON-RPC error code `-32601` mean?**  
+  *Answer:* In the official JSON-RPC 2.0 specification, `-32601` is the standard code for **"Method not found"** (for example, when a client asks to call a tool name that does not exist on the server).
 
 ---
 
 ## 2. Required Readings & Authoritative Tutorial Guides
 
-Review the following five curated documentation guides and technical specifications before beginning your applied lab:
+Review the following five curated documentation guides and technical references before beginning your applied lab:
 
-1. **[Model Context Protocol (MCP) Official Specification](https://modelcontextprotocol.io/introduction)**
-   *Understand the core architecture, client-server lifecycle, transport layers (stdio vs SSE), and protocol primitives.*
+1. **[Model Context Protocol (MCP) Official Introduction](https://modelcontextprotocol.io/introduction)**
+   *Understand the core architecture, client-server lifecycle, and protocol primitives (Tools, Resources, Prompts).*
 
-2. **[Anthropic: Tool Use & Function Calling Guide](https://docs.anthropic.com/en/docs/build-with-claude/tool-use)**
-   *Master how modern foundation models parse tool schemas, construct function call arguments, and integrate tool outputs.*
+2. **[Anthropic Documentation: Tool Use & Function Calling](https://docs.anthropic.com/en/docs/build-with-claude/tool-use)**
+   *Learn how language models read tool schemas, construct function arguments, and interpret tool results.*
 
 3. **[JSON-RPC 2.0 Official Specification](https://www.jsonrpc.org/specification)**
-   *Review the lightweight remote procedure call specification that powers all MCP message exchanges.*
+   *Review the request/response envelope format and standard error codes used by MCP.*
 
-4. **[Model Context Protocol Python SDK](https://github.com/modelcontextprotocol/python-sdk)**
-   *Explore the official Python library for implementing standard-compliant MCP servers and clients.*
+4. **[Model Context Protocol Python SDK (`FastMCP`)](https://github.com/modelcontextprotocol/python-sdk)**
+   *Explore the official Python SDK for building MCP servers and clients.*
 
-5. **[Ollama: Local LLM Tool Calling & Structured Outputs](https://ollama.com/blog/tool-support)**
-   *Learn how to execute local agentic tool loops using open-weights models (`llama3.2`, `qwen2.5`) with zero API costs.*
+5. **[Ollama Blog: Local LLM Tool Support](https://ollama.com/blog/tool-support)**
+   *See how open-weight models execute local tool calls on your own hardware.*
 
 ---
 
 ## 3. Required Micro-Video Lectures (Embedded)
 
-Watch each of the following video chapters to observe the Model Context Protocol in action:
+Watch each of the following video chapters to see the Model Context Protocol and agent tool calling in action:
 
 ### What is the Model Context Protocol (MCP)? Integrating AI Agents with Data <span style="font-size: 0.9em; color: #64748b;">(IBM Technology - Architecture Overview)</span>
 <div class="dp-embed-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">

@@ -12,6 +12,20 @@ demonstrations:
 
 
 # ====================================================================
+# PART 0: BASICS WARM-UP — BASIC TRY/EXCEPT DLQ QUARANTINE LOOP
+# ====================================================================
+print("\n>>> Executing PART 0: BASICS WARM-UP (Dead-Letter Queue Quarantine Loop)...")
+raw_rows = [{"id": 1, "gallons": 120.0}, {"id": 2, "gallons": -15.0}, {"id": 3, "gallons": 95.0}]
+warm_valid, warm_dlq = [], []
+for r in raw_rows:
+    if r["gallons"] <= 0:
+        warm_dlq.append({"record": r, "reason": "gallons must be > 0"})
+    else:
+        warm_valid.append(r)
+print(f"Part 0 Warm-Up — Valid rows: {len(warm_valid)} | Quarantined in DLQ: {len(warm_dlq)}")
+
+
+# ====================================================================
 # PART 1: 'I DO' — INSTRUCTOR DEMONSTRATION
 # ====================================================================
 print("\n>>> Executing PART 1: 'I DO' — INSTRUCTOR DEMONSTRATION...")

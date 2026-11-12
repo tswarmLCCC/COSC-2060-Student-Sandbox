@@ -28,6 +28,25 @@ MAINTENANCE_RAG = {
 
 
 # =========================================================================
+# PART 0: BASICS WARM-UP — JSON-RPC 2.0 MESSAGE FORMAT
+# =========================================================================
+def part0_basics_warmup() -> Dict[str, Any]:
+    """
+    PART 0: Basics Warm-Up (Ground-Up JSON-RPC 2.0 Structure)
+    Constructs a minimal JSON-RPC 2.0 response envelope before registering
+    and invoking multi-modal MCP tools.
+    """
+    print("=== Part 0: Basics Warm-Up (JSON-RPC 2.0 Envelope Structure) ===")
+    rpc_response = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {"content": [{"type": "text", "text": json.dumps({"status": "READY"})}]}
+    }
+    print("Sample JSON-RPC Response:", json.dumps(rpc_response))
+    return rpc_response
+
+
+# =========================================================================
 # CHALLENGE 1: MCP Tool Registry & Schema Introspection (25 pts)
 # =========================================================================
 class MCPLogisticsServer:
@@ -179,7 +198,8 @@ def execute_agent_call(rpc_request: Dict[str, Any]) -> Dict[str, Any]:
 # VERIFICATION SUITE (Do not modify)
 # =========================================================================
 if __name__ == "__main__":
-    print("=== Step 1: Verifying Tool Manifest Registration ===")
+    part0_basics_warmup()
+    print("\n=== Step 1: Verifying Tool Manifest Registration ===")
     tools_list = server.list_tools()
     assert len(tools_list["tools"]) >= 2, f"Expected at least 2 tools, got {len(tools_list['tools'])}"
     tool_names = [t["name"] for t in tools_list["tools"]]

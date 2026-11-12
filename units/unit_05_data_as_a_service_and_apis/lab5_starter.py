@@ -19,6 +19,25 @@ app = FastAPI(
 )
 
 # =========================================================================
+# PART 0: BASICS WARM-UP — PYDANTIC MODEL DUMP & VALIDATION ERROR
+# =========================================================================
+def part0_basics_warmup() -> dict:
+    """
+    PART 0: Basics Warm-Up (Ground-Up Pydantic Validation)
+    Practices creating a simple 2-field Pydantic BaseModel, dumping a valid record
+    to a dict, and catching a ValidationError before testing the full FastAPI service.
+    """
+    print("=== Part 0: Basics Warm-Up (Pydantic BaseModel & Field Bounds) ===")
+    class SimpleRoutePing(BaseModel):
+        route_id: int = Field(gt=0)
+        origin_city: str = Field(min_length=2)
+
+    valid_ping = SimpleRoutePing(route_id=101, origin_city="Cheyenne")
+    print("Validated ping:", valid_ping.model_dump())
+    return valid_ping.model_dump()
+
+
+# =========================================================================
 # CHALLENGE 1: Defensive Pydantic v2 Data Contracts (25 pts)
 # =========================================================================
 class FuelEvaluationRequest(BaseModel):
@@ -174,7 +193,8 @@ def search_maintenance_logs(request: RAGSearchRequest):
 # CHALLENGE 4: Automated Verification Suite with TestClient (25 pts)
 # =========================================================================
 if __name__ == "__main__":
-    print("Running Automated API Test Suite...")
+    part0_basics_warmup()
+    print("\nRunning Automated API Test Suite...")
     client = TestClient(app)
 
     # Test 1: Health Check (200 OK)

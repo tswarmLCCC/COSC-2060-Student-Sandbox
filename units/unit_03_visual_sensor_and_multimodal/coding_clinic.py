@@ -12,11 +12,25 @@ demonstrations:
 
 
 # ====================================================================
+# PART 0: BASICS WARM-UP — 3D NUMPY IMAGE ARRAYS & COLOR CHANNELS
+# ====================================================================
+print("\n>>> Executing PART 0: BASICS WARM-UP (3D Image Arrays from Scratch)...")
+import cv2
+import numpy as np
+
+# 1. Create a tiny 100x200 color image array (Height=100, Width=200, Channels=3)
+warmup_img = np.zeros((100, 200, 3), dtype=np.uint8)
+warmup_img[:] = (255, 0, 0)  # Pure Blue in OpenCV's BGR channel order
+h_warm, w_warm, c_warm = warmup_img.shape
+rgb_warm = cv2.cvtColor(warmup_img, cv2.COLOR_BGR2RGB)
+print(f"Part 0 Warm-Up — Array shape (H, W, C): ({h_warm}, {w_warm}, {c_warm})")
+print(f"Top-left pixel in BGR: {warmup_img[0, 0].tolist()} -> Converted to RGB: {rgb_warm[0, 0].tolist()}")
+
+
+# ====================================================================
 # PART 1: 'I DO' — INSTRUCTOR DEMONSTRATION
 # ====================================================================
 print("\n>>> Executing PART 1: 'I DO' — INSTRUCTOR DEMONSTRATION...")
-import cv2
-import numpy as np
 
 # Create a mock 1920x1080 camera frame
 mock_img = np.zeros((1080, 1920, 3), dtype=np.uint8)

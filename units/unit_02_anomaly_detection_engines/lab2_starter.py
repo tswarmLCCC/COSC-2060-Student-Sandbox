@@ -14,6 +14,31 @@ import time
 import polars as pl
 from sklearn.ensemble import IsolationForest
 
+def part0_basics_warmup():
+    """
+    PART 0: Basics Warm-Up (Ground-Up Polars Expressions)
+    Practices creating a small Polars DataFrame, filtering out negative sensor glitches,
+    and adding a basic arithmetic column before running the 1,000,000-row LazyFrame pipeline.
+    """
+    print("\n--- Part 0: Basics Warm-Up (Polars Expressions from Scratch) ---")
+    sample_df = pl.DataFrame({
+        "trans_id": [1, 2, 3, 4],
+        "driver_id": [101, 101, 102, 102],
+        "gallons_pumped": [120.0, -10.0, 150.0, 360.0],
+        "transaction_amount": [456.0, -38.0, 570.0, 1368.0],
+    })
+    cleaned = (
+        sample_df
+        .filter(pl.col("gallons_pumped") > 0)
+        .with_columns([
+            (pl.col("transaction_amount") / pl.col("gallons_pumped")).round(2).alias("price_per_gal"),
+            (pl.col("gallons_pumped") > 300.0).alias("flag_tank_overflow"),
+        ])
+    )
+    print(cleaned)
+    return cleaned
+
+
 def build_anomaly_pipeline(parquet_path="data/fuel_transactions.parquet"):
     """
     Constructs a Polars LazyFrame transformation graph that ingests 1,000,000 records,
@@ -133,6 +158,7 @@ def run_isolation_forest(pipeline):
 
 def main():
     print("Apex Logistics Unsupervised Anomaly Engine (Unit 2)")
+    part0_basics_warmup()
     pipeline = build_anomaly_pipeline()
     run_isolation_forest(pipeline)
 

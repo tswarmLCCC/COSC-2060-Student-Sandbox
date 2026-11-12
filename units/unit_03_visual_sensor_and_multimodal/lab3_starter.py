@@ -21,6 +21,22 @@ CLASS_MAPPING = {
     "Rim_Damage": 2
 }
 
+def part0_basics_warmup():
+    """
+    PART 0: Basics Warm-Up (3D NumPy Image Arrays & BGR/RGB Conversion)
+    Inspects a simple (Height, Width, Channels) NumPy image array and converts
+    OpenCV BGR channels to RGB before running letterboxing and YOLO coordinate math.
+    """
+    print("\n--- Part 0: Basics Warm-Up (Image Tensor Shapes & BGR/RGB) ---")
+    sample_img = np.zeros((120, 240, 3), dtype=np.uint8)
+    sample_img[:] = (255, 0, 0)  # Blue in BGR
+    h, w, c = sample_img.shape
+    rgb_img = cv2.cvtColor(sample_img, cv2.COLOR_BGR2RGB)
+    print(f"Sample image shape -> Height: {h}, Width: {w}, Channels: {c}")
+    print(f"Top-left BGR pixel: {sample_img[0, 0].tolist()} | Top-left RGB pixel: {rgb_img[0, 0].tolist()}")
+    return sample_img
+
+
 def letterbox_image(image, target_size=(640, 640), pad_color=(114, 114, 114)):
     """
     Resizes image with uniform aspect ratio, centering on a neutral gray canvas.
@@ -102,6 +118,7 @@ def main():
     print("Apex Logistics Fleet Vision Pipeline (Unit 3)")
     print("=" * 60)
     
+    part0_basics_warmup()
     annotations = setup_mock_data()
     
     os.makedirs("output/images", exist_ok=True)

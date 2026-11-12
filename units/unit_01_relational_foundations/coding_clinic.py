@@ -12,12 +12,37 @@ demonstrations:
 
 
 # ====================================================================
-# PART 1: 'I DO' — INSTRUCTOR DEMONSTRATION
+# PART 0: BASICS WARM-UP — BUILDING BASIC SQL FEATURES FROM SCRATCH
 # ====================================================================
-print("\n>>> Executing PART 1: 'I DO' — INSTRUCTOR DEMONSTRATION...")
+print("\n>>> Executing PART 0: BASICS WARM-UP (Ground-Up SQL Features)...")
 import duckdb
 
 con = duckdb.connect()
+
+# Before touching ASOF JOIN or window lags, let's build basic features in SQL:
+# 1. Extract hour from a timestamp
+# 2. Compute an arithmetic ratio (estimated driving hours at 55 mph)
+# 3. Create a 0/1 indicator flag using CASE WHEN
+warmup_df = con.sql("""
+SELECT
+    101 AS route_id,
+    TIMESTAMP '2026-10-15 07:30:00' AS dep_time,
+    EXTRACT(HOUR FROM TIMESTAMP '2026-10-15 07:30:00') AS dep_hour,
+    165.0 AS distance_miles,
+    ROUND(165.0 / 55.0, 2) AS est_drive_hours,
+    CASE
+        WHEN EXTRACT(HOUR FROM TIMESTAMP '2026-10-15 07:30:00') BETWEEN 7 AND 9 THEN 1
+        ELSE 0
+    END AS is_morning_rush
+""").df()
+print("Part 0 Warm-Up — Basic SQL Features:")
+print(warmup_df)
+
+
+# ====================================================================
+# PART 1: 'I DO' — INSTRUCTOR DEMONSTRATION
+# ====================================================================
+print("\n>>> Executing PART 1: 'I DO' — INSTRUCTOR DEMONSTRATION...")
 
 # Departures
 con.sql("""

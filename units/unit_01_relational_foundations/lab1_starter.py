@@ -78,6 +78,35 @@ def initialize_database():
     return con
 
 
+def part0_basics_warmup(con):
+    """
+    PART 0: Basics Warm-Up (Ground-Up SQL Feature Building)
+    Verifies basic DuckDB row counts, arithmetic feature ratios, CASE WHEN flags,
+    and a simple LEFT JOIN before moving into ASOF JOIN and window functions.
+    """
+    print("\n--- Part 0: Basics Warm-Up (SQL Feature Building Blocks) ---")
+    driver_count = con.sql("SELECT COUNT(*) FROM drivers").fetchone()[0]
+    route_count = con.sql("SELECT COUNT(*) FROM routes").fetchone()[0]
+    print(f"Loaded {driver_count} drivers and {route_count} routes.")
+
+    basic_features = con.sql("""
+    SELECT
+        r.route_id,
+        r.origin_city,
+        EXTRACT(HOUR FROM r.dep_time) AS dep_hour,
+        ROUND(r.distance_miles / 55.0, 2) AS est_drive_hours,
+        CASE WHEN r.distance_miles >= 200.0 THEN 1 ELSE 0 END AS is_long_haul,
+        COALESCE(d.safety_score, 0.85) AS safety_score
+    FROM routes r
+    LEFT JOIN drivers d ON r.driver_id = d.driver_id
+    ORDER BY r.route_id
+    LIMIT 3;
+    """).df()
+    print("Basic SQL Features Preview (First 3 Routes):")
+    print(basic_features)
+    return basic_features
+
+
 def build_feature_matrix(con):
     """
     Constructs the leak-free feature matrix query and returns the DuckDB relation.
@@ -126,6 +155,9 @@ def main():
     print("=" * 60)
     
     con = initialize_database()
+    
+    # Run Part 0 Basics Warm-Up first
+    part0_basics_warmup(con)
     
     # Run defensive verification
     verify_no_leakage(con)

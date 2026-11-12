@@ -12,6 +12,21 @@ demonstrations:
 
 
 # ====================================================================
+# PART 0: BASICS WARM-UP — JSON-RPC 2.0 ENVELOPE BASICS
+# ====================================================================
+print("\n>>> Executing PART 0: BASICS WARM-UP (JSON-RPC 2.0 Request/Response)...")
+import json
+
+sample_rpc_request = {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "tools/call",
+    "params": {"name": "ping_truck", "arguments": {"truck_id": "TRUCK-101"}}
+}
+print("Part 0 Warm-Up — JSON-RPC Request Envelope:", json.dumps(sample_rpc_request))
+
+
+# ====================================================================
 # PART 1: 'I DO' — INSTRUCTOR DEMONSTRATION
 # ====================================================================
 print("\n>>> Executing PART 1: 'I DO' — INSTRUCTOR DEMONSTRATION...")

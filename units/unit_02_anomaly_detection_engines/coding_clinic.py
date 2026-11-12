@@ -12,10 +12,33 @@ demonstrations:
 
 
 # ====================================================================
+# PART 0: BASICS WARM-UP — POLARS SELECT, FILTER & WITH_COLUMNS
+# ====================================================================
+print("\n>>> Executing PART 0: BASICS WARM-UP (Polars Expressions from Scratch)...")
+import polars as pl
+
+warmup_df = pl.DataFrame({
+    "trans_id": [1, 2, 3],
+    "gallons": [100.0, -5.0, 200.0],
+    "amount_usd": [380.0, -19.0, 760.0]
+})
+# 1. Filter out negative sensor glitches with .filter(pl.col(...) > 0)
+# 2. Add a basic calculated column with .with_columns()
+warmup_clean = (
+    warmup_df
+    .filter(pl.col("gallons") > 0)
+    .with_columns([
+        (pl.col("amount_usd") / pl.col("gallons")).round(2).alias("price_per_gallon")
+    ])
+)
+print("Part 0 Warm-Up — Basic Polars Filter & Calculated Column:")
+print(warmup_clean)
+
+
+# ====================================================================
 # PART 1: 'I DO' — INSTRUCTOR DEMONSTRATION
 # ====================================================================
 print("\n>>> Executing PART 1: 'I DO' — INSTRUCTOR DEMONSTRATION...")
-import polars as pl
 
 # In-memory telemetry LazyFrame
 clinic_data = pl.LazyFrame({

@@ -48,6 +48,25 @@ NOTES: Routine pre-trip tire tread depth measurement. Steer tires at 8/32nds, dr
 """
 
 # =========================================================================
+# PART 0: BASICS WARM-UP — REGEX CLEANING & DOT PRODUCT SIMILARITY
+# =========================================================================
+def part0_basics_warmup() -> dict:
+    """
+    PART 0: Basics Warm-Up (Ground-Up Text Scrubbing & Vector Dot Product)
+    Demonstrates stripping HTML/extra spaces with regex and computing cosine similarity
+    on two simple 2D unit vectors before running full 384-D SentenceTransformer RAG.
+    """
+    print("=== Part 0: Basics Warm-Up (Regex Scrubbing & Vector Dot Product) ===")
+    raw_snippet = "<p>Turbo   oil  line\n\ninspected;   no leaks found.</p>"
+    scrubbed = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", raw_snippet)).strip()
+    vec_1 = np.array([0.6, 0.8])
+    vec_2 = np.array([0.6, 0.8])
+    sim = float(np.dot(vec_1, vec_2) / (np.linalg.norm(vec_1) * np.linalg.norm(vec_2)))
+    print(f"Scrubbed text: '{scrubbed}' | 2D Unit Vector Cosine Similarity: {sim:.4f}")
+    return {"scrubbed": scrubbed, "similarity": sim}
+
+
+# =========================================================================
 # CHALLENGE 1: Raw Log Ingestion & Header Metadata Extraction (25 pts)
 # =========================================================================
 def parse_maintenance_logs(raw_text: str) -> list[dict]:
@@ -188,7 +207,8 @@ class LocalVectorIndex:
 # VERIFICATION SUITE (Do not modify)
 # =========================================================================
 if __name__ == "__main__":
-    print("=== Step 1: Parsing Raw Logs ===")
+    part0_basics_warmup()
+    print("\n=== Step 1: Parsing Raw Logs ===")
     parsed = parse_maintenance_logs(RAW_MAINTENANCE_DUMP)
     print(f"Extracted {len(parsed)} structured work orders.")
     assert len(parsed) == 4, f"Expected 4 records, got {len(parsed)}"

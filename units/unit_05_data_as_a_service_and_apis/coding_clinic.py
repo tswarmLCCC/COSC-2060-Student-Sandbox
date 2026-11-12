@@ -12,10 +12,27 @@ demonstrations:
 
 
 # ====================================================================
+# PART 0: BASICS WARM-UP — MINIMAL PYDANTIC MODEL & VALIDATION CHECK
+# ====================================================================
+print("\n>>> Executing PART 0: BASICS WARM-UP (Minimal Pydantic BaseModel)...")
+from pydantic import BaseModel, Field, ValidationError, field_validator
+
+class BasicTruckCheck(BaseModel):
+    truck_num: int = Field(gt=0)
+    city: str = Field(min_length=2)
+
+warm_truck = BasicTruckCheck(truck_num=101, city="Cheyenne")
+print("Part 0 Warm-Up — Validated dict:", warm_truck.model_dump())
+try:
+    BasicTruckCheck(truck_num=-5, city="Cheyenne")
+except ValidationError as err:
+    print("Part 0 Warm-Up — Caught negative truck_num:", err.errors()[0]["msg"])
+
+
+# ====================================================================
 # PART 1: 'I DO' — INSTRUCTOR DEMONSTRATION
 # ====================================================================
 print("\n>>> Executing PART 1: 'I DO' — INSTRUCTOR DEMONSTRATION...")
-from pydantic import BaseModel, Field, field_validator
 
 class DeliveryWindow(BaseModel):
     shipment_id: str = Field(..., pattern=r"^SHP-\d{5}$")
