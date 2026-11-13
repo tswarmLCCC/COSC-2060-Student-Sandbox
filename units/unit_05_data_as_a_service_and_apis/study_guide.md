@@ -440,7 +440,7 @@ Try these three exercises in your GitHub Codespaces sandbox (`units/unit_05_data
 ### Common Traps & Formative Self-Check FAQ
 
 * **Question 1: What is the difference between synchronous (`def`) and asynchronous (`async def`) endpoints?**  
-  *Answer:* An `async def` endpoint allows Python's event loop to pause execution during I/O operations (like querying a remote database or waiting on a network socket) and process other incoming HTTP requests concurrently.
+  *Answer:* An `async def` endpoint allows Python's event loop (think of a restaurant server taking Table 2's order while Table 1's food is cooking in the kitchen) to pause while waiting on slow I/O (like querying a database or waiting on a network socket) and process other incoming HTTP requests concurrently.
 
 * **Question 2: What happens when a client sends invalid JSON to a FastAPI endpoint?**  
   *Answer:* FastAPI intercepts the malformed payload, prevents it from touching your database or model code, and automatically responds with an HTTP `422 Unprocessable Entity` containing exact details on which field failed validation.
