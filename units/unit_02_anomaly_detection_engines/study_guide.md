@@ -70,19 +70,21 @@ When our Unit 2 Polars pipeline finishes scrubbing, enriching, and standardizing
 
 ## 2b. Building Columnar Features & Velocity Lags in Polars from the Ground Up
 
-Before we examine real-world fraud cases or distance math, let's start at the beginning: **How do we write columnar transformations in Polars, and how do we calculate physical features like `implied_speed_mph` from raw transaction logs?**
+Before we examine real-world fraud cases or distance math, let's start at the beginning: **How does Polars think about data differently from SQL and plain Python, what tools does it give us, and how do we use them to build features like `implied_speed_mph`?**
 
-In Unit 1, you wrote SQL statements using `SELECT`, `WHERE`, and `OVER (PARTITION BY driver_id ORDER BY dep_time)`. **Polars** brings that exact same declarative, columnar mindset directly into Python—without the memory overhead or single-threaded slowdowns of Pandas.
+In Unit 1, you wrote SQL statements (`SELECT`, `WHERE`, and `OVER (PARTITION BY ... ORDER BY ...)`). In standard Python, you usually loop over one item at a time (`for row in rows:`). **Polars** bridges those two worlds: you write Python code, but instead of looping row by row, you build **column expressions** using `pl.col("column_name")` that Polars compiles and runs across all rows in parallel.
 
-In Polars, almost every operation revolves around **`pl.col("column_name")`** placed inside one of three methods:
-* **`.select([...])`**: Choose and return only specific columns (like a SQL `SELECT`).
-* **`.filter(...)`**: Keep only rows that satisfy a boolean condition (like a SQL `WHERE`).
-* **`.with_columns([...])`**: Keep all existing columns and attach one or more newly engineered feature columns to the right side of the table.
+Think of `pl.col("gallons")` not as a single number, but as a *recipe* that says *"grab the entire `gallons` column."* Almost every Polars transformation places those `pl.col(...)` recipes inside one of three core DataFrame methods:
+* **`.select([...])`**: Returns **only** the columns you list (just like SQL `SELECT`), dropping everything else.
+* **`.filter(...)`**: Keeps **only** the rows that pass a true/false test (just like SQL `WHERE`), leaving all columns intact.
+* **`.with_columns([...])`**: Keeps **all existing columns** and attaches newly calculated columns on the right (or replaces an existing column if you reuse its name).
 
-Let's walk through the four foundational ways data engineers build anomaly features in Polars from the ground up.
+Let's walk through the four foundational ways data engineers use these tools, starting with how each feature works in general before applying it to our fuel-card dataset.
 
-### 1. Scrubbing Sensor Glitches with `.filter()`
-Real Point-of-Sale (POS) fuel pump logs frequently contain hardware reset glitches: a faulty fuel meter might log `-999.0` gallons, `0.0` gallons, or a negative dollar charge when a clerk voids a receipt. Before we compute any averages or train any model, we filter to strictly valid physical transactions:
+### 1. Removing Bad or Irrelevant Rows with `.filter()`
+* **How it differs from standard Python:** In normal Python `if` statements, you combine two conditions with the word `and` or `or`. In Polars, you are comparing entire columns of millions of values at once, so you must wrap each condition in parentheses and use the bitwise operators **`&`** (AND), **`|`** (OR), and **`~`** (NOT).
+* **What `.filter()` is used for overall:** Whenever you need to narrow a dataset down—such as keeping only active customers, selecting last month's orders, or removing corrupted rows before math runs—`.filter()` acts as your gatekeeper. Because Polars is declarative, it can even push `.filter()` down to the file reader so bad rows are skipped before they ever fill up RAM.
+* **How it applies to our fleet logs:** Real Point-of-Sale (POS) fuel pump logs frequently contain hardware reset glitches: a faulty meter might log `-999.0` gallons, `0.0` gallons, or a negative dollar charge when a clerk voids a receipt. Before we compute any averages or train any model, we filter to strictly valid physical transactions:
 
 ```python
 import polars as pl
@@ -93,23 +95,25 @@ clean_tx = raw_tx.filter(
 )
 ```
 
-### 2. Creating Domain Ratios and Boolean Threshold Flags with `.with_columns()`
-Just as we used arithmetic and `CASE WHEN` in Unit 1 SQL, we can create new columns in Polars by combining `pl.col(...)` expressions and naming each new column with `.alias("column_name")`:
+### 2. Adding New Columns Without Losing Old Ones: `.with_columns()` & `.alias()`
+* **How it differs from `.select()` and SQL:** In SQL `SELECT`, if you want to add one calculated column to a 20-column table, you either have to list all 20 columns or write `SELECT *, amount / gallons AS price_per_gallon`. In Polars, `.select()` drops any column you don't mention, whereas **`.with_columns([...])`** automatically keeps every existing column (`SELECT *`) and appends your new calculations. Notice also that Polars names any new expression after the *first* column used inside it unless you explicitly name it with **`.alias("new_name")`**—without `.alias("price_per_gallon")`, `pl.col("amount_usd") / pl.col("gallons")` would accidentally overwrite `amount_usd`!
+* **What `.with_columns()` is used for overall:** Feature engineering is mostly `.with_columns()`—converting units (kilometers to miles), extracting dates (`timestamp.dt.hour()`), combining columns into ratios (debt-to-income, click-through rate), or creating `True`/`False` threshold flags for downstream models.
+* **How it applies to our fleet logs:** We can compute the unit price paid at the pump and flag physically impossible single fill-ups (exceeding a Class 8 semi-truck's 300-gallon dual-tank capacity) in one pass:
 
 ```python
 flagged_tx = clean_tx.with_columns([
-    # 1. Compute price paid per gallon
+    # 1. Compute price paid per gallon (named explicitly with .alias)
     (pl.col("amount_usd") / pl.col("gallons")).round(2).alias("price_per_gallon"),
 
-    # 2. Flag any single fill-up exceeding a Class 8 semi-truck's 300-gallon dual-tank capacity
+    # 2. Flag any single fill-up exceeding a 300-gallon dual-tank capacity
     (pl.col("gallons") > 300.0).alias("flag_tank_overflow")
 ])
 ```
 
-### 3. Calculating Time & Distance Lags Across Consecutive Swipes (`.shift(1).over()`)
-How do we know how fast a truck traveled between two fuel stops (`implied_speed_mph`) when a single transaction row only lists one station and one timestamp?
-
-We sort the transactions chronologically and use **`.shift(1).over("driver_id")`** (the exact Polars equivalent of SQL's `LAG(col, 1) OVER (PARTITION BY driver_id ORDER BY timestamp)`!) to pull the **previous** swipe's timestamp and mile-marker onto the current row:
+### 3. Comparing Rows Across Time Without Collapsing the Table: `.shift(1).over()`
+* **How `.over()` differs from `.group_by()`:** When you use `.group_by("driver_id").agg(...)`, Polars collapses 1,000 rows for a driver down into **1 summary row**. When you instead attach **`.over("driver_id")`** to a column expression inside `.with_columns()`, Polars keeps **all 1,000 rows intact** and runs the calculation independently inside each driver's slice of the table (exact same concept as SQL's `OVER (PARTITION BY driver_id)`).
+* **What `.shift(1)` is used for overall:** **`.shift(1)`** slides a column's values down by 1 row so that Row 2 can "see" Row 1's value right next to it (and Row 1 receives `null`, since there is no row before it). Across data engineering, `.shift(1).over(entity)` is how you calculate time between user clicks, day-over-day stock price changes, or distance between consecutive GPS pings.
+* **How it applies to our fleet logs:** A single fuel receipt only tells us *one* station and *one* timestamp. To catch a cloned fuel card used in two distant cities minutes apart, we sort by `["driver_id", "timestamp"]`, pull each driver's previous mile-marker and timestamp onto the current row, and divide distance by elapsed hours to get `implied_speed_mph`:
 
 ```python
 velocity_tx = (
@@ -133,8 +137,10 @@ Look at what happens on each row for Driver 42 *(you can run this exact cell-by-
 * On Driver 42's **first swipe**, there is no previous swipe, so `.shift(1)` returns `null` and `.fill_null(0.0)` safely sets `implied_speed_mph` to `0.0`.
 * On Driver 42's **second swipe** (45 minutes later, 950 miles away), Polars divides `950.0 miles / 0.75 hours` and populates `implied_speed_mph = 1266.67`—instantly exposing a cloned fuel card!
 
-### 4. Standardizing Features with Vectorized Column Aggregations
-Finally, inside `.with_columns()`, Polars allows you to mix row values (`pl.col("gallons")`) and whole-column aggregations (`pl.col("gallons").mean()` and `pl.col("gallons").std()`) in a single expression to convert any raw column into a standardized Z-score:
+### 4. Scaling Columns Using Whole-Column Broadcasting (Z-Scores)
+* **How broadcasting works in Polars:** Normally, subtracting two columns requires them to have the same number of rows. Inside `.with_columns()`, however, Polars lets you mix a full column (`pl.col("gallons")`, 1,000,000 values) with a single summary number (`pl.col("gallons").mean()`, 1 value). Polars automatically **broadcasts** (applies) that single average across every row in the column without needing a separate SQL subquery or join.
+* **What Z-score standardization is used for overall:** A **Z-score** measures how many standard deviations a value sits above or below the column average (`0.0` = exact average, `+2.0` = unusually high, `-2.0` = unusually low). Data engineers use this everywhere before distance-based machine learning so columns measured in large units (like dollars or miles) don't overpower columns measured in small units (like gallons).
+* **How it applies to our fleet logs:** We convert `gallons` into `z_gallons` in one readable expression:
 
 ```python
 scaled_tx = velocity_tx.with_columns([

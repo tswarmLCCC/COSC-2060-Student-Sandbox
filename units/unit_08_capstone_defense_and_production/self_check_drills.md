@@ -2,8 +2,8 @@
 ## Capstone Defense, Docker Packaging & CI/CD Quality Gates
 
 > **Time Commitment**: ~60 Minutes (Asynchronous Self-Study)  
-> **Prerequisites**: Review of [Unit 8 Required Readings & Concepts](study_guide.md)  
-> **Target Mastery**: Multi-stage Docker builds, Hermetic dependency pinning, Pytest defensive quality gates, Dead Letter Queue (DLQ) routing.
+> **Prerequisites**: Review of **Unit 8 Required Readings & Concepts**  
+> **Target Mastery**: Multi-stage Docker builds, Hermetic (sealed, exact-version) dependency pinning, Pytest defensive quality gates, Dead Letter Queue (DLQ) routing.
 
 ---
 
@@ -24,7 +24,7 @@ Test your conceptual grasp of production deployment engineering and defensive CI
 **Architectural Rationale:**
 Compiling Python scientific libraries (like DuckDB, OpenCV, Polars, or NumPy) often requires heavy build utilities: GCC, CMake, Linux kernel headers, and build wheels. 
 
-A multi-stage build uses a temporary **Builder Stage** containing compilers to build wheel artifacts. The final **Runtime Stage** copies **only** the pre-compiled binary wheels into a pristine, minimal slim OS image (like `python:3.11-slim`). This shrinks image size from 1.8 GB to under 180 MB, reduces attack surface vulnerabilities, and speeds up deployment spin-up times.
+A multi-stage build uses a temporary **Builder Stage** containing compilers to build wheel artifacts (pre-compiled Python package files). The final **Runtime Stage** copies **only** those pre-compiled binary wheels into a pristine, minimal slim OS image (like `python:3.11-slim`). This shrinks image size from 1.8 GB to under 180 MB, reduces attack surface vulnerabilities, and speeds up deployment spin-up times.
 </details>
 
 <details>

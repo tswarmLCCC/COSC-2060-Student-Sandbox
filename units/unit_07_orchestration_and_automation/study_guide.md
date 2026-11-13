@@ -114,12 +114,14 @@ Instead of guessing clock times (*"Run script 1 at 3:00 AM, guess that it finish
 Because dependencies only flow forward with zero circular loops, this structure is called a **Directed Acyclic Graph (DAG)**.
 
 ### 2. Separating Transient Network Glitches from Bad Data Rows
-When a pipeline fails at 3:00 AM, there are two completely different causes:
-* **Transient Infrastructure Error** (e.g., `TimeoutError`, `ConnectionError`, HTTP `503`): The remote server blinked. Waiting 1 second, then 2 seconds, then 4 seconds (**exponential backoff**) almost always succeeds.
-* **Permanent Data Error / "Poison Pill"** (e.g., a row with `gallons: -45.0` or `route_id: null`): Retrying 100 times will never turn `-45.0` into a valid number. We catch the error per row, append it to a **Dead-Letter Queue (`dlq_quarantine.jsonl`)**, and let the remaining valid rows finish.
+* **How engineers classify failures overall:** Not every error should be handled the same way. Across all distributed systems (web APIs, payment processors, and data pipelines), engineers separate failures into two buckets:
+  * **Transient Infrastructure Errors** (e.g., `TimeoutError`, `ConnectionError`, HTTP `503`): The remote server blinked or was briefly overloaded. Waiting 1 second, then 2 seconds, then 4 seconds (**exponential backoff**) gives the server breathing room and almost always succeeds.
+  * **Permanent Data Errors / "Poison Pills"** (e.g., a row with `gallons: -45.0` or `route_id: null`): Retrying 100 times will never turn `-45.0` into a valid number. Instead of letting one bad row crash the entire night's job, engineers park that record in a **Dead-Letter Queue (DLQ)** for human inspection and let the valid rows finish.
+* **How it applies to our fleet pipeline:** We catch per-row validation errors, append them to `dlq_quarantine.jsonl`, and let the remaining valid fuel records proceed downstream.
 
-### 3. Making Database Writes Repeatable (`INSERT OR REPLACE INTO`)
-If a pipeline crashes halfway through and you restart it, a naive `INSERT INTO` will duplicate the first half of the batch. Using `PRIMARY KEY` constraints with `INSERT OR REPLACE INTO` (or `DELETE` + `INSERT` on a date partition) guarantees that running the pipeline 1 time or 10 times produces the exact same table.
+### 3. Making Database Writes Repeatable (Idempotency & `INSERT OR REPLACE INTO`)
+* **What idempotency means overall:** Think of an elevator call button: pressing it once or ten times produces the exact same result—one elevator arrives. In data engineering, an **idempotent** operation produces the exact same table whether you run it once or ten times.
+* **How it differs from `INSERT INTO`:** A naive `INSERT INTO` appends rows blindly; if a job crashes halfway through and you restart it, the first half of the batch gets duplicated. Using `PRIMARY KEY` constraints with `INSERT OR REPLACE INTO` (or `DELETE` + `INSERT` on a date partition) guarantees zero duplicates when re-running a failed batch.
 
 ### 4. Emitting a Structured Heartbeat (`pipeline_heartbeat.json`)
 At the end of every automated run, the orchestrator writes a small JSON summary file recording `run_id`, `pipeline_status`, `execution_order`, `valid_records_written`, and `dlq_records_quarantined` so monitoring dashboards know immediately if a batch dropped to zero rows or quarantined an unusual spike of bad data.

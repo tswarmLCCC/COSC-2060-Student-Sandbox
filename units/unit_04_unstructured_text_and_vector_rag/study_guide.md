@@ -89,8 +89,10 @@ When mechanics type notes into a shop-floor terminal or customers submit support
 ### 1. Ingesting JSON Lines (`.jsonl`) Records
 Unlike tabular data where every row has identical numeric columns, unstructured text logs often have nested metadata lists or variable-length paragraphs. Data engineers store and stream these logs as **JSON Lines (`.jsonl`)**—a text file where every individual line is a standalone JSON object that can be parsed one line at a time with `json.loads(line)` without loading the entire file into RAM at once.
 
-### 2. Scrubbing HTML Markup and Whitespace Noise
-Legacy web portals frequently wrap mechanic comments in HTML tags (`<p>`, `<br>`, `<b>`, `<div class="note">`) and erratic tab/newline spacing. If you feed `"<p>Pulled   dipstick,<br>found glitter</p>"` into an embedding model, the model wastes capacity encoding `"<p>"` and `"<br>"`. We strip tags and normalize whitespace in two lines using Python's regular expression (`re`) module:
+### 2. Scrubbing HTML Markup and Whitespace Noise with Regular Expressions (`re.sub`)
+* **How `re.sub` differs from `.replace()`:** Standard Python `text.replace("<p>", "")` only removes one exact literal string at a time—you would have to write dozens of `.replace()` calls for `<p>`, `<br>`, `<div class="note">`, and every HTML variation. Python's regular expression function **`re.sub(pattern, replacement, text)`** lets you describe a *pattern* once (such as `<[^>]+>` meaning *"an opening `<`, followed by one or more characters that aren't `>`, followed by `>`"*, or `\s+` meaning *"one or more spaces, tabs, or newlines"*).
+* **What `re.sub` is used for overall:** Data engineers use `re.sub` as a general text-scrubbing tool across logs, web scrapes, and customer tickets to strip markup, mask PII (like phone numbers or SSNs), and normalize erratic spacing.
+* **How it applies to our mechanic logs:** Legacy shop portals frequently wrap notes in `<p>`, `<br>`, and `<b>` tags. If you feed raw HTML into an embedding model, it wastes capacity encoding formatting noise. Two `re.sub` calls scrub all tags and collapse extra whitespace cleanly:
 
 ```python
 import re

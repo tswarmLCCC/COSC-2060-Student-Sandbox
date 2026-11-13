@@ -2,7 +2,7 @@
 ## Agentic Interfaces & Model Context Protocol (MCP)
 
 > **Time Commitment**: ~60 Minutes (Asynchronous Self-Study)  
-> **Prerequisites**: Review of [Unit 6 Required Readings & Concepts](study_guide.md)  
+> **Prerequisites**: Review of **Unit 6 Required Readings & Concepts**  
 > **Target Mastery**: Model Context Protocol specifications, JSON-RPC 2.0 protocols, Tool schema contracts, Prompt injection sandboxing.
 
 ---

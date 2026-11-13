@@ -107,7 +107,9 @@ IMAGE PIXEL COORDINATE GRID (1920 Wide x 1080 Tall):
 ```
 
 ### 3. Pasting an Image onto a Padded Canvas Using NumPy Slice Assignment
-Because an image is just a NumPy array indexed as `image[y_row, x_col]`, we can place a resized image (`new_h` tall by `new_w` wide) dead-center onto a square `640 x 640` gray canvas in a single line of NumPy slice assignment:
+* **How NumPy slicing differs from Python loops:** In plain Python, copying a 360×640 patch of pixels onto a blank background would require nested `for` loops over every `y` and `x` coordinate. In **NumPy**, `array[y_start:y_end, x_start:x_end]` selects an entire rectangular block of memory at once, and assigning `=` copies the pixels in compiled C at memory speed.
+* **What slice assignment is used for overall:** Engineers use array slicing everywhere in computer vision—cropping regions of interest (like a license plate), masking out privacy zones, or centering photos onto uniform canvases.
+* **How it applies to our inspection frames:** Because our image is indexed as `image[y_row, x_col]`, we can place a resized image (`new_h` tall by `new_w` wide) dead-center onto a square `640 × 640` gray canvas in a single line:
 
 ```python
 # Create a 640x640 neutral gray canvas

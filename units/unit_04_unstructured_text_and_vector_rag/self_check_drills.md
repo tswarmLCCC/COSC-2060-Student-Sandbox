@@ -2,7 +2,7 @@
 ## Unstructured Text Ingestion & Dense Vector RAG
 
 > **Time Commitment**: ~60 Minutes (Asynchronous Self-Study)  
-> **Prerequisites**: Review of [Unit 4 Required Readings & Concepts](study_guide.md)  
+> **Prerequisites**: Review of **Unit 4 Required Readings & Concepts**  
 > **Target Mastery**: Lexical vs. dense vector search, Cosine similarity math, ChromaDB HNSW indexing, Metadata filtering.
 
 ---
@@ -33,18 +33,18 @@ If a mechanic's ticket describes `"whistling noise near turbine"` and the user s
 **Architectural Rationale:**
 Cosine similarity measures the angle between two vectors `u` and `v`:
 `Cosine Similarity = dot(u, v) / (norm(u) * norm(v))`
-When embedding vectors are L2-normalized such that their Euclidean norm `norm(u) = 1.0`, the denominator becomes $1.0$, and cosine similarity reduces to a fast hardware dot product:
+When embedding vectors are L2-normalized such that their Euclidean norm `norm(u) = 1.0`, the denominator becomes `1.0`, and cosine similarity reduces to a fast hardware dot product:
 `Cosine Similarity = dot(u, v) = sum(u_i * v_i)`
-This enables sub-millisecond similarity scans using CPU SIMD instructions.
+This enables sub-millisecond similarity scans using CPU vector instructions (SIMD).
 </details>
 
 <details>
 <summary>Question 3: How does ChromaDB's HNSW graph index prevent linear brute-force scan times?</summary>
 
 **Architectural Rationale:**
-Hierarchical Navigable Small World (HNSW) organizes high-dimensional vectors into multi-layer proximity graphs (analogous to a Skip List in data structures). 
+Hierarchical Navigable Small World (HNSW) organizes high-dimensional vectors into multi-layer proximity graphs (analogous to a Skip List in data structures). Think of it like an expressway map: top layers take big jumps across the dataset to get close to the neighborhood, and bottom layers walk street-by-street to find the exact nearest match.
 
-The top layers have long-range sparse edges for rapid cross-cluster navigation, while the bottom layers have dense short-range edges for fine-grained nearest neighbor discovery. This reduces search complexity from linear `mathcal{O(N)` brute-force comparison to logarithmic `mathcal{O(log N)`, retrieving nearest vectors in under 2 milliseconds across millions of entries.
+The top layers have long-range sparse edges for rapid cross-cluster navigation, while the bottom layers have dense short-range edges for fine-grained nearest neighbor discovery. This reduces search complexity from linear `O(N)` brute-force comparison to logarithmic `O(log N)`, retrieving nearest vectors in under 2 milliseconds across millions of entries.
 </details>
 
 <details>

@@ -2,7 +2,7 @@
 ## The Anomaly Engine & Polars Lazy Window Expressions
 
 > **Time Commitment**: ~60 Minutes (Asynchronous Self-Study)  
-> **Prerequisites**: Review of [Unit 2 Required Readings & Concepts](study_guide.md)  
+> **Prerequisites**: Review of **Unit 2 Required Readings & Concepts**  
 > **Target Mastery**: Eager vs. Lazy execution, SIMD multi-threading, Polars `.over()` window expressions, Isolation Forest bounds.
 
 ---
@@ -32,7 +32,7 @@ For a fleet of 10,000 delivery vehicles, this triggers 10,000 function dispatche
 
 **Architectural Rationale:**
 - **Eager Execution (`pl.DataFrame`):** Executes every transformation immediately in RAM line-by-line, allocating intermediate arrays for every step regardless of whether downstream operations discard those columns.
-- **Lazy Execution (`pl.LazyFrame`):** Builds a symbolic Directed Acyclic Graph (DAG) of transformations called a Logical Plan. Polars optimizes this plan using predicate pushdown (filtering early) and projection pushdown (loading only necessary columns) before compiling to hardware SIMD instructions when `.collect()` is called.
+- **Lazy Execution (`pl.LazyFrame`):** Builds a symbolic Directed Acyclic Graph (DAG) of transformations called a Logical Plan. Polars optimizes this plan using predicate pushdown (filtering early) and projection pushdown (loading only necessary columns) before compiling to hardware SIMD instructions (Single Instruction, Multiple Data—CPU instructions that apply one math operation to many numbers at once) when `.collect()` is called.
 </details>
 
 <details>
@@ -41,7 +41,7 @@ For a fleet of 10,000 delivery vehicles, this triggers 10,000 function dispatche
 **Architectural Rationale:**
 In Polars, `.over()` calculates window functions in place across partitioned contiguous columnar memory without physically splitting the table into separate sub-tables. 
 
-It keeps the entire dataset in Apache Arrow contiguous arrays and computes rolling statistics across partitions in parallel using Rayon work-stealing threads, avoiding intermediate object allocation entirely.
+It keeps the entire dataset in Apache Arrow contiguous arrays and computes rolling statistics across partitions in parallel using a Rust work-stealing thread pool (Rayon) that balances work across all CPU cores, avoiding intermediate object allocation entirely.
 </details>
 
 <details>

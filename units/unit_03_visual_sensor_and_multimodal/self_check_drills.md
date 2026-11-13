@@ -2,14 +2,14 @@
 ## The Visual Sensor Layer & High-Throughput Tensor Pipelines
 
 > **Time Commitment**: ~60 Minutes (Asynchronous Self-Study)  
-> **Prerequisites**: Review of [Unit 3 Required Readings & Concepts](study_guide.md)  
+> **Prerequisites**: Review of **Unit 3 Required Readings & Concepts**  
 > **Target Mastery**: Letterbox padding math, BGR/RGB color spaces, C-contiguous tensors, YOLO normalization.
 
 ---
 
 ## 1. Readiness Self-Check Checklist
 Before attempting the diagnostic drills below, verify you have completed the foundational preparation:
-- [ ] Grasped why naive image resizing ($1920 \times 1080 \to 640 \times 640$) causes severe geometric aspect distortion.
+- [ ] Grasped why naive image resizing (`1920 × 1080 → 640 × 640`) causes severe geometric aspect distortion.
 - [ ] Studied OpenCV's native BGR memory ordering vs. standard RGB format.
 - [ ] Verified local installation of `opencv-python-headless` and `numpy`.
 
@@ -22,7 +22,7 @@ Test your conceptual grasp of multimodal vision data engineering. Formulate your
 <summary>Question 1: Why does direct non-aspect resizing sabotage object detection models?</summary>
 
 **Architectural Rationale:**
-Squishing a 16:9 widescreen frame ($1920 \times 1080$) directly into a square $640 \times 640$ canvas compresses pixels along the horizontal axis by $3.0\times$ while compressing the vertical axis by only $1.68\times$. 
+Squishing a 16:9 widescreen frame (`1920 × 1080`) directly into a square `640 × 640` canvas compresses pixels along the horizontal axis by `3.0×` while compressing the vertical axis by only `1.68×`. 
 
 Circular tires become tall, thin ovals, and horizontal tread fractures become distorted. A convolutional model trained on natural camera angles will fail to recognize distorted defect features. **Letterboxing** preserves natural aspect ratios by scaling uniformly and padding the remaining borders with neutral gray pixels.
 </details>
@@ -32,16 +32,16 @@ Circular tires become tall, thin ovals, and horizontal tread fractures become di
 
 **Architectural Rationale:**
 - **PIL (Pillow):** Decodes images into proprietary Python object wrappers. Transferring frames into ML tensor runtimes requires intermediate type conversions (`np.array(pil_img)`), which duplicates the entire image buffer in RAM.
-- **OpenCV:** Decodes image bytes directly into contiguous C-ordered NumPy arrays (`dtype=uint8`) in native memory registers. Operations like cropping, channel flipping, and resizing run in compiled C++ using SIMD vector instructions with zero intermediate object churn.
+- **OpenCV:** Decodes image bytes directly into contiguous C-ordered NumPy arrays (`dtype=uint8`) in native memory registers. Operations like cropping, channel flipping, and resizing run in compiled C++ using CPU vector instructions (SIMD—applying one math operation to multiple pixels at once) without creating extra Python objects in RAM.
 </details>
 
 <details>
 <summary>Question 3: Why does PyTorch/ONNX require tensor memory to be C-contiguous?</summary>
 
 **Architectural Rationale:**
-When an array is transposed from Height-Width-Channel (HWC: $640 \times 640 \times 3$) to Channel-Height-Width (CHW: $3 \times 640 \times 640$), NumPy modifies the memory **strides** without rearranging the underlying byte buffer. 
+When an array is transposed from Height-Width-Channel (HWC: `640 × 640 × 3`) to Channel-Height-Width (CHW: `3 × 640 × 640`), NumPy modifies the memory **strides** without rearranging the underlying byte buffer. 
 
-Direct Memory Access (DMA) hardware controllers on GPUs expect sequential byte memory blocks. Passing a non-contiguous array causes CUDA memory transfer crashes or forces an unhandled copy. Calling `np.ascontiguousarray()` guarantees a linear, sequential byte layout.
+GPUs copy image arrays directly from RAM using Direct Memory Access (DMA) hardware controllers, which expect all pixel bytes to sit in one unbroken, sequential block. Passing a non-contiguous array causes CUDA memory transfer crashes or forces an unhandled copy. Calling `np.ascontiguousarray()` guarantees a linear, sequential byte layout.
 </details>
 
 <details>
@@ -58,7 +58,7 @@ All four spatial coordinates are normalized relative to the image dimensions by 
 ## 3. Part 2: Code Execution Order & Syntax Traces
 
 ### Trace Drill 1: Letterbox Scaling Math
-Calculate the uniform scale factor and padding required to fit a $1280 \times 720$ gate inspection frame into a $640 \times 640$ YOLO canvas without geometric distortion:
+Calculate the uniform scale factor and padding required to fit a $12801280 × 720 gate inspection frame into a $640640 × 640 YOLO canvas without geometric distortion:
 
 ```python
 orig_w, orig_h = 1280, 720
@@ -77,7 +77,7 @@ target_w, target_h = 640, 640
 3. **Vertical Padding Needed**:
    `pad_total = 640 - 360 = 280 pixels`
    `pad_top = 280 / 2 = 140 pixels, pad_bottom = 140 pixels`
-4. The scaled image is placed in the vertical center of the $640 \times 640$ canvas with 140 pixels of neutral gray (114) border on the top and bottom.
+4. The scaled image is placed in the vertical center of the $640640 × 640 canvas with 140 pixels of neutral gray (114) border on the top and bottom.
 </details>
 
 ### Trace Drill 2: Color Space Inversion Bug

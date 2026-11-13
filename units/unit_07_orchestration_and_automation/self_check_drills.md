@@ -2,7 +2,7 @@
 ## Pipeline Orchestration & Software-Defined Asset DAGs
 
 > **Time Commitment**: ~60 Minutes (Asynchronous Self-Study)  
-> **Prerequisites**: Review of [Unit 7 Required Readings & Concepts](study_guide.md)  
+> **Prerequisites**: Review of **Unit 7 Required Readings & Concepts**  
 > **Target Mastery**: Directed Acyclic Graphs (DAGs), Kahn's algorithm, In-degree tracking, Asset caching, Cycle detection.
 
 ---
@@ -10,7 +10,7 @@
 ## 1. Readiness Self-Check Checklist
 Before attempting the diagnostic drills below, verify you have completed the foundational preparation:
 - [ ] Grasped why monolithic linear ETL scripts collapse when a late-stage downstream task fails.
-- [ ] Studied Kahn's algorithm for topological sorting of dependency graphs.
+- [ ] Studied Kahn's algorithm for topological sorting of dependency graphs (tracking each task's `in_degree`—how many upstream steps it is still waiting on—and running tasks as soon as their `in_degree` reaches `0`).
 - [ ] Understood why data pipelines should track immutable assets rather than arbitrary task schedules.
 
 ---
@@ -81,10 +81,10 @@ Calculate the initial in-degree counts and determine a valid topological executi
    - `trained_model`: 1 (from `joined_features`)
 2. **Initial Queue (`in_degree == 0`)**: `["raw_trips", "raw_weather"]`
 3. **Execution Steps**:
-   - Dequeue `raw_trips`: Add to order. Decrement `joined_features` in-degree ($2 \to 1$).
-   - Dequeue `raw_weather`: Add to order. Decrement `clean_weather` in-degree ($1 \to 0$). Queue `clean_weather`.
-   - Dequeue `clean_weather`: Add to order. Decrement `joined_features` in-degree ($1 \to 0$). Queue `joined_features`.
-   - Dequeue `joined_features`: Add to order. Decrement `trained_model` in-degree ($1 \to 0$). Queue `trained_model`.
+   - Dequeue `raw_trips`: Add to order. Decrement `joined_features` in-degree (`2 → 1`).
+   - Dequeue `raw_weather`: Add to order. Decrement `clean_weather` in-degree (`1 → 0`). Queue `clean_weather`.
+   - Dequeue `clean_weather`: Add to order. Decrement `joined_features` in-degree (`1 → 0`). Queue `joined_features`.
+   - Dequeue `joined_features`: Add to order. Decrement `trained_model` in-degree (`1 → 0`). Queue `trained_model`.
    - Dequeue `trained_model`: Add to order.
 4. **Valid Topological Order**:
    `raw_trips` -> `raw_weather` -> `clean_weather` -> `joined_features` -> `trained_model`

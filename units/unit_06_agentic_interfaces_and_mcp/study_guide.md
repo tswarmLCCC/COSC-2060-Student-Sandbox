@@ -127,7 +127,8 @@ def validate_truck_id(truck_id: int) -> int:
 ```
 
 ### 3. Describing the Tool with JSON Schema (`name`, `description`, `inputSchema`)
-An AI model never reads the Python code inside your function body. Instead, it reads a JSON metadata card (`tools/list`) containing three fields:
+* **What JSON Schema is used for overall:** Before an external system—whether a web form, an API client, or an AI agent—can send data to your code, it needs to know what fields are allowed and what types they must be. **JSON Schema** is the industry-standard JSON format for describing the exact shape, types, and rules of a JSON object.
+* **How it applies to MCP tools:** An AI model never reads the Python code inside your function body. Instead, it reads a JSON metadata card (`tools/list`) containing three fields:
 * **`name`:** Exact function identifier (e.g., `"get_truck_telemetry"`).
 * **`description`:** Plain-English instruction telling the model *when* to use this tool and *what* it returns.
 * **`inputSchema`:** A JSON Schema dictionary declaring `"type": "object"`, `"properties"` (each parameter's type, bounds, and description), and `"required"` parameter names.

@@ -2,7 +2,7 @@
 ## The Relational Foundation & Look-Ahead Bias Prevention
 
 > **Time Commitment**: ~60 Minutes (Asynchronous Self-Study)  
-> **Prerequisites**: Review of [Unit 1 Required Readings & Concepts](study_guide.md)  
+> **Prerequisites**: Review of **Unit 1 Required Readings & Concepts**  
 > **Target Mastery**: Temporal event ordering, OLTP vs. OLAP memory layouts, DuckDB `ASOF JOIN` mechanics.
 
 ---

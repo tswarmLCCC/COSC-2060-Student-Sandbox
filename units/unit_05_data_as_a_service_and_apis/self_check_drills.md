@@ -2,7 +2,7 @@
 ## Data-as-a-Service (DaaS) & Production REST Serving
 
 > **Time Commitment**: ~60 Minutes (Asynchronous Self-Study)  
-> **Prerequisites**: Review of [Unit 5 Required Readings & Concepts](study_guide.md)  
+> **Prerequisites**: Review of **Unit 5 Required Readings & Concepts**  
 > **Target Mastery**: REST API contracts, FastAPI async architecture, Pydantic v2 validation, HTTP 422 defenses.
 
 ---

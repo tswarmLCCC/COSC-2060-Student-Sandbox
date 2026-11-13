@@ -108,7 +108,9 @@ Before we examine real-world API outages or microservice architectures, let's st
 In standard Python, type annotations like `gallons: float` are merely polite suggestions—Python will happily allow a caller to pass `"N/A"` or `-999.0` into a function until a math operation crashes halfway through your pipeline. Let's walk through the four foundational building blocks that turn fragile Python dictionaries into contract-guaranteed web services.
 
 ### 1. Turning Python Classes into Runtime Validators with `BaseModel`
-When a Python class inherits from `pydantic.BaseModel`, Pydantic inspects every field's type annotation (`int`, `float`, `str`, `bool`) and validates incoming values the instant an object is created:
+* **How `BaseModel` differs from plain Python dictionaries and type hints:** In plain Python, a `dict` accepts any key or type without complaint, and standard type hints (`driver_id: int`) are ignored at runtime. When a class inherits from `pydantic.BaseModel`, Pydantic acts like a strict bouncer at the door: the instant an object is created, it inspects every field, rejects bad types (like `"abc"` for an `int`), and converts valid inputs into a guaranteed Python object.
+* **What `BaseModel` is used for overall:** Engineers use Pydantic `BaseModel` classes across web APIs, config files, and LLM structured outputs whenever data crosses a boundary between two systems.
+* **How it applies to our fleet API:** We define a `DriverSummary` contract so every downstream dashboard receives the exact fields and types it expects:
 
 ```python
 from pydantic import BaseModel
@@ -130,7 +132,9 @@ Knowing that `gallons` is a `float` is not enough—a negative number like `-50.
 * **`min_length=2, max_length=50`** (minimum and maximum character length for strings)
 
 ### 3. Understanding HTTP Verbs (`GET` vs. `POST`) and Route Decorators
-In **FastAPI**, you create an application with `app = FastAPI()` and attach route decorators above regular Python functions:
+* **How web routes differ from local Python functions:** A normal Python function can only be called from another Python script on the same computer. A **FastAPI route decorator** (`@app.get(...)` or `@app.post(...)`) attaches a web URL path to a Python function so any browser, mobile app, or remote service on the network can call it over HTTP and get JSON back.
+* **What `GET` and `POST` are used for overall:** Across the entire web, `GET` requests **read/fetch** existing data using parameters in the URL, while `POST` requests **send** a JSON payload in the request body (like submitting a form or sending a record to be scored).
+* **How it applies to our fleet service:** You create an application with `app = FastAPI()` and attach route decorators above your Python functions:
 * **`@app.get("/v1/routes/{route_id}")`**: Used when a client wants to **read or look up** an existing record without sending a complex body. The `{route_id}` part of the URL is a **path parameter** passed directly into your Python function (`async def get_route(route_id: int):`).
 * **`@app.post("/v1/evaluate-anomaly")`**: Used when a client wants to **send a JSON payload** in the request body (such as a new fuel card swipe) for your server to validate, score, or process.
 
