@@ -1,7 +1,7 @@
 # Unit 5 Lab Grading Rubric: Data as a Service (FastAPI & Pydantic v2 Contracts)
 
 > **Course**: COSC 2060 — Modern Data Engineering & AI Infrastructure  
-> **Assessment**: Unit 5 Applied Engineering Lab (`lab5_yourlastname.py`)  
+> **Assessment**: Unit 5 Applied Engineering Lab (`lab5_starter.py`)  
 > **Total Points**: 100 Points (Canvas SpeedGrader)
 
 ---

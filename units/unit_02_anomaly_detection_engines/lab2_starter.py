@@ -163,5 +163,6 @@ def main():
     run_isolation_forest(pipeline)
 
 
+# %%
 if __name__ == "__main__":
     main()

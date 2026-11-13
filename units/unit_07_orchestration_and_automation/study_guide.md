@@ -429,7 +429,7 @@ Notice that `publish_daas_service` was prevented from running until *both* upstr
 Try these three exercises in your GitHub Codespaces sandbox (`units/unit_07_orchestration_and_automation/`) before starting the graded lab:
 
 1. **Exercise 1 (Circular Dependency Detection):** Add two tasks that depend on each other (`pipeline.add_task("a", ["b"])` and `pipeline.add_task("b", ["a"])`) and confirm that `pipeline.run()` immediately raises a `RuntimeError` instead of hanging forever.
-2. **Exercise 2 (Idempotency Proof):** Run `coding_clinic.py` twice in a row and check the output Parquet row count to verify that running the pipeline multiple times produces the exact same number of rows.
+2. **Exercise 2 (Idempotency Proof):** Run `coding_clinic.ipynb` twice in a row and check the output Parquet row count to verify that running the pipeline multiple times produces the exact same number of rows.
 3. **Exercise 3 (Cron Expression Practice):** Verify what time a GitHub Actions workflow with `schedule: - cron: '0 3 * * *'` triggers (3:00 AM UTC daily).
 
 ### Common Traps & Formative Self-Check FAQ

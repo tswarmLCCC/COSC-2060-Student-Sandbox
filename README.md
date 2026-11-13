@@ -43,10 +43,10 @@ Each unit folder includes a guided Jupyter Notebook showing how fragile Data Sci
 2. Click **`ds_to_engine.ipynb`**.
 3. Click **Run All** (or press `Shift + Enter` on each cell) using the pre-configured `/usr/local/bin/python` kernel.
 
-### 2. Synchronous Coding Clinics (`coding_clinic.py`)
+### 2. Synchronous Coding Clinics (`coding_clinic.ipynb`)
 Follow along during class walkthroughs ("I Do, We Do, You Do") directly in the terminal:
 ```bash
-python units/unit_01_relational_foundations/coding_clinic.py
+Open units/unit_01_relational_foundations/coding_clinic.ipynb in VS Code and run each cell
 ```
 
 ### 3. Weekly Applied Lab Starters (`lab{N}_starter.py`)
@@ -92,7 +92,7 @@ If an experimental pipeline overwrites your DuckDB tables, corrupts a Parquet fi
 
 Inside **each unit folder**, you will find:
 * `ds_to_engine.ipynb`: Interactive Jupyter Notebook bridging Data Science prototypes to production Data Engineering pipelines.
-* `coding_clinic.py`: Runnable synchronous class walkthrough script ("I Do, We Do, You Do").
+* `coding_clinic.ipynb`: Runnable synchronous class walkthrough script ("I Do, We Do, You Do").
 * `lab{N}_starter.py`: Starter template with mock data initialization and automated defensive tests.
 * `lab_guide.md`: Detailed business scenario, architecture specifications, and step-by-step instructions.
 * `lab_rubric.md`: The 100-point grading rubric used in Canvas SpeedGrader.

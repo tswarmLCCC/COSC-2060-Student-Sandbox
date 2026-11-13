@@ -1,7 +1,7 @@
 # Unit 6 Lab Grading Rubric: The Agentic Interface & Model Context Protocol (MCP)
 
 > **Course**: COSC 2060 — Modern Data Engineering & AI Infrastructure  
-> **Assessment**: Unit 6 Applied Engineering Lab (`lab6_yourlastname.py`)  
+> **Assessment**: Unit 6 Applied Engineering Lab (`lab6_starter.py`)  
 > **Total Points**: 100 Points (Canvas SpeedGrader)
 
 ---

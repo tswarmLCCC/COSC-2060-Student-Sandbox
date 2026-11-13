@@ -27,6 +27,7 @@ MAINTENANCE_RAG = {
 }
 
 
+# %%
 # =========================================================================
 # PART 0: BASICS WARM-UP — JSON-RPC 2.0 MESSAGE FORMAT
 # =========================================================================
@@ -46,6 +47,7 @@ def part0_basics_warmup() -> Dict[str, Any]:
     return rpc_response
 
 
+# %%
 # =========================================================================
 # CHALLENGE 1: MCP Tool Registry & Schema Introspection (25 pts)
 # =========================================================================
@@ -80,6 +82,7 @@ class MCPLogisticsServer:
 
 server = MCPLogisticsServer()
 
+# %%
 # =========================================================================
 # CHALLENGE 2: Defensive Input Validation & Least-Privilege Sandboxing (25 pts)
 # =========================================================================
@@ -93,6 +96,7 @@ def sanitize_truck_id(truck_id: str) -> str:
     return clean
 
 
+# %%
 # =========================================================================
 # CHALLENGE 3: Multimodal Fleet Safety Diagnostic Tool (25 pts)
 # =========================================================================
@@ -156,6 +160,7 @@ def evaluate_fleet_safety_clearance(truck_id: str) -> Dict[str, Any]:
         }
 
 
+# %%
 # =========================================================================
 # CHALLENGE 4: Agentic JSON-RPC Tool Execution Simulation (25 pts)
 # =========================================================================
@@ -197,6 +202,7 @@ def execute_agent_call(rpc_request: Dict[str, Any]) -> Dict[str, Any]:
 # =========================================================================
 # VERIFICATION SUITE (Do not modify)
 # =========================================================================
+# %%
 if __name__ == "__main__":
     part0_basics_warmup()
     print("\n=== Step 1: Verifying Tool Manifest Registration ===")

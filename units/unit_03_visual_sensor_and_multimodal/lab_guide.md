@@ -2,7 +2,7 @@
 
 > **Course**: COSC 2060 — Modern Data Engineering & AI Infrastructure  
 > **Unit**: Unit 3 — The Visual Sensor Layer (Computer Vision Targets)  
-> **Deliverable**: `lab3_yourlastname.py` & `manifests/yolo_train.txt`  
+> **Deliverable**: `lab3_starter.py` & `manifests/yolo_train.txt`  
 > **Total Points**: 100 Points  
 > **Toolchain**: Python 3.10+, OpenCV (`opencv-python`), NumPy, Pillow (for EXIF)
 
@@ -80,28 +80,34 @@ Now apply these transformations across hundreds of gate camera inspection images
 ### Scenario & Business Context
 You are a computer vision data engineer at **Apex Logistics Inc.** To prevent steer tire blowouts and catastrophic jackknife accidents, the fleet maintenance department has installed automated multi-angle inspection cameras at all regional gate terminals.
 
-Every day, trucks trigger high-speed camera sensors as they pull through the inspection lane. The photos arrive in an unorganized, nested folder structure with mixed dimensions ($3840 \times 2160$ 4K terminal cameras, 1920 &times; 1080 lane cameras, and $1280 \times 720$ mobile tablet photos).
+Every day, trucks trigger high-speed camera sensors as they pull through the inspection lane. The photos arrive in an unorganized, nested folder structure with mixed dimensions ($38403840 × 2160 4K terminal cameras, 1920 &times; 1080 lane cameras, and $12801280 × 720 mobile tablet photos).
 
 The machine learning team is training a **YOLOv8 defect detector** to identify three critical failure modes:
 - **Class 0**: `Sidewall_Crack` (structural tire fractures).
 - **Class 1**: `Tread_Separation` (peeling or delaminating rubber).
 - **Class 2**: `Rim_Damage` (cracked or bent aluminum wheel rims).
 
-Your mission is to write an automated preprocessing pipeline (`lab3_yourlastname.py`) that walks the raw image directory, extracts EXIF metadata, resizes all photos to 640 &times; 640 using **letterbox padding (zero distortion)**, transforms raw bounding box coordinates, and generates a master `yolo_train.txt` manifest.
+Your mission is to write an automated preprocessing pipeline (`lab3_starter.py`) that walks the raw image directory, extracts EXIF metadata, resizes all photos to 640 &times; 640 using **letterbox padding (zero distortion)**, transforms raw bounding box coordinates, and generates a master `yolo_train.txt` manifest.
 
 ---
 
-### Submission Instructions
-1. Save your Python pipeline script as `lab3_yourlastname.py`.
+### Submission Instructions (GitHub-Only Workflow)
+1. Edit and test `units/unit_03_visual_sensor_and_multimodal/lab3_starter.py` inside your personal `COSC-2060-Student-Sandbox-yourname` repository.
 2. Ensure your script generates:
    - `output/images/`: 640x640 letterboxed `.jpg` images.
    - `output/labels/`: YOLO `.txt` coordinate files matching each image name.
    - `output/yolo_train.txt`: Master training manifest.
 3. Test your pipeline from the terminal:
    ```bash
-   python lab3_yourlastname.py
+   python units/unit_03_visual_sensor_and_multimodal/lab3_starter.py
    ```
-4. Upload `lab3_yourlastname.py` to Canvas.
+4. Commit and push your changes to your personal GitHub repository:
+   ```bash
+   git add -A
+   git commit -m "Complete Unit 3 Lab"
+   git push
+   ```
+5. In Canvas, submit your **GitHub repository URL** along with a **list of the files you changed** (e.g., `units/unit_03_visual_sensor_and_multimodal/lab3_starter.py`). Do not upload `.py` files to Canvas.
 
 ---
 
@@ -118,7 +124,7 @@ Before running letterbox padding and YOLO coordinate conversions, run `part0_bas
 #### Part 2: Letterbox Padding & Aspect Ratio Preservation (40 Points)
 1. **Uniform Scaling**: Calculate the exact scale factor: `scale = min(640 / W, 640 / H)`.
 2. **Aspect-Preserving Resize**: Resize the image using `cv2.resize()` with `cv2.INTER_AREA` interpolation.
-3. **Neutral Canvas Assembly**: Create a $640 \times 640 \times 3$ NumPy array filled with neutral gray (RGB: `(114, 114, 114)`).
+3. **Neutral Canvas Assembly**: Create a $640640 × 640 × 3 NumPy array filled with neutral gray (RGB: `(114, 114, 114)`).
 4. **Centering & Offset Math**: Paste the resized image into the exact center of the canvas, calculating integer pixel offsets:
    `dx = (640 - new_w) // 2` and `dy = (640 - new_h) // 2`
 
@@ -149,7 +155,7 @@ Unit 3 Applied Lab: The Fleet Vision Manifest
 Starter Template File (100 Points Total)
 ====================================================================
 Student Name : [YOUR NAME HERE]
-Submission   : lab3_yourlastname.py
+Submission   : lab3_starter.py
 Due Date     : Friday at 11:59 PM (Midnight MT)
 ====================================================================
 """

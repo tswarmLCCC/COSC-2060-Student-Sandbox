@@ -507,7 +507,7 @@ Notice that Route 101 (departed 07:15) was matched with the 06:00 observation (D
 Try these three quick exercises in your GitHub Codespaces sandbox (`units/unit_01_relational_foundations/`) before starting the graded lab:
 
 1. **Exercise 1 (Direct Parquet Querying):** Open a terminal in your sandbox and run `python -c "import duckdb; duckdb.sql('SELECT * FROM \"datasets/unit_01_routes.parquet\" LIMIT 5').show()"`. Observe how DuckDB reads a Parquet file directly inside a SQL `FROM` clause without needing `CREATE TABLE` first.
-2. **Exercise 2 (Window Frame Experiment):** In `coding_clinic.py`, temporarily change `ROWS BETWEEN 5 PRECEDING AND 1 PRECEDING` to `ROWS BETWEEN 5 PRECEDING AND CURRENT ROW` and re-run the script. Compare the numbers in `prior_5trip_avg_delay` and notice how `CURRENT ROW` leaks the current trip's outcome into the feature column. Change it back to `1 PRECEDING`.
+2. **Exercise 2 (Window Frame Experiment):** In `coding_clinic.ipynb`, temporarily change `ROWS BETWEEN 5 PRECEDING AND 1 PRECEDING` to `ROWS BETWEEN 5 PRECEDING AND CURRENT ROW` and re-run the script. Compare the numbers in `prior_5trip_avg_delay` and notice how `CURRENT ROW` leaks the current trip's outcome into the feature column. Change it back to `1 PRECEDING`.
 3. **Exercise 3 (Early Morning Departure Test):** Add a route that departs at `04:00:00` (before the earliest `06:00:00` weather observation) and compare `ASOF JOIN` vs. `ASOF LEFT JOIN`. Verify that `ASOF LEFT JOIN` preserves the route row while `COALESCE` fills in the default weather values.
 
 ### Common Traps & Formative Self-Check FAQ

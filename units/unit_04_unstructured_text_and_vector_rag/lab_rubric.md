@@ -1,7 +1,7 @@
 # Unit 4 Lab Grading Rubric: Unstructured Text, Semantic Chunking, & Vector RAG
 
 > **Course**: COSC 2060 — Modern Data Engineering & AI Infrastructure  
-> **Assessment**: Unit 4 Applied Engineering Lab (`lab4_yourlastname.py`)  
+> **Assessment**: Unit 4 Applied Engineering Lab (`lab4_starter.py`)  
 > **Total Points**: 100 Points (Canvas SpeedGrader)
 
 ---

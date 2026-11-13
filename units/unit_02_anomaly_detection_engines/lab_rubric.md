@@ -1,7 +1,7 @@
 # Unit 2 Lab Grading Rubric: The Anomaly Engine & Vectorized LazyFrames
 
 > **Course**: COSC 2060 — Modern Data Engineering & AI Infrastructure  
-> **Assessment**: Unit 2 Applied Engineering Lab (`lab2_yourlastname.py`)  
+> **Assessment**: Unit 2 Applied Engineering Lab (`lab2_starter.py`)  
 > **Total Points**: 100 Points (Canvas SpeedGrader)
 
 ---

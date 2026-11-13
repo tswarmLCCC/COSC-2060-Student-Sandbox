@@ -95,7 +95,7 @@ COSC 2060 - UNIT 6 LAB: MODEL CONTEXT PROTOCOL (MCP) INTERFACE
 
 ### Complete Copy-and-Paste Starter Script (`lab6_starter.py`)
 
-Save the following code as `courses/cosc-2060-data-engineering/content/labs/lab6_starter.py`:
+Open `units/unit_06_agentic_interfaces_and_mcp/lab6_starter.py` in your sandbox repository (reference starter code shown below):
 
 ```python
 """
@@ -360,3 +360,16 @@ if __name__ == "__main__":
 | **Challenge 2: Defensive Sandboxing** | 25 pts | Regex checks prevent malformed IDs, SQL commands, and prompt injection strings with explicit `ValueError`. | Checks for length only without regex boundary matching. | Accepts raw strings without validation. |
 | **Challenge 3: Multimodal Diagnostic** | 25 pts | Unifies vision defects and maintenance RAG notes into an actionable clearance decision (`GROUNDED` vs `CLEARED`). | Checks vision only, missing RAG turbo recall note. | Incorrect logic produces false safety clearances. |
 | **Challenge 4: JSON-RPC Simulation** | 25 pts | Dispatches requests using standard JSON-RPC 2.0 envelopes; handles errors cleanly with standard codes. | Dispatches function directly without JSON-RPC response formatting. | Execution errors unhandled or crashes script. |
+
+---
+
+### Submission Instructions (GitHub-Only Workflow)
+1. Edit and test `units/unit_06_agentic_interfaces_and_mcp/lab6_starter.py` inside your personal `COSC-2060-Student-Sandbox-yourname` repository.
+2. Confirm your code and tests run cleanly in the terminal with zero errors.
+3. Commit and push your changes to your personal GitHub repository:
+   ```bash
+   git add -A
+   git commit -m "Complete Unit 6 Lab"
+   git push
+   ```
+4. In Canvas, submit your **GitHub repository URL** along with a **list of the files you changed** (e.g., `units/unit_06_agentic_interfaces_and_mcp/lab6_starter.py`). Do not upload `.py` files to Canvas.

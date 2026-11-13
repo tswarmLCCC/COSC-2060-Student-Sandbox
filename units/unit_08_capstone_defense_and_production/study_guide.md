@@ -373,7 +373,7 @@ Finally, a production pipeline verifies its own outputs before reporting success
 Try these three exercises in your GitHub Codespaces sandbox (`units/unit_08_capstone_defense_and_production/`) before starting the capstone lab:
 
 1. **Exercise 1 (Inspecting Our Own Sandbox Container):** Open `.devcontainer/devcontainer.json` in your workspace and examine how the container `image`, `postCreateCommand`, and VS Code `extensions` are configured. You have been developing inside a reproducible Linux container all semester!
-2. **Exercise 2 (Testing Multi-Modal DLQ Quarantine):** Run `coding_clinic.py` in `units/unit_08_capstone_defense_and_production/` and inspect how corrupted records from different modalities are logged with their subsystem name and error reason.
+2. **Exercise 2 (Testing Multi-Modal DLQ Quarantine):** Run `coding_clinic.ipynb` in `units/unit_08_capstone_defense_and_production/` and inspect how corrupted records from different modalities are logged with their subsystem name and error reason.
 3. **Exercise 3 (Running `pytest`):** Run `pytest` in your terminal to observe how automated test functions (`def test_...(): assert ...`) verify pipeline invariants in milliseconds.
 
 ### Common Traps & Formative Self-Check FAQ

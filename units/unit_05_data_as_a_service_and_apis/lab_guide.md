@@ -82,7 +82,7 @@ COSC 2060 - UNIT 5 LAB: DATA AS A SERVICE (FASTAPI & PYDANTIC V2)
 
 ### Complete Copy-and-Paste Starter Script (`lab5_starter.py`)
 
-Save the following code as `courses/cosc-2060-data-engineering/content/labs/lab5_starter.py`:
+Open `units/unit_05_data_as_a_service_and_apis/lab5_starter.py` in your sandbox repository (reference starter code shown below):
 
 ```python
 """
@@ -348,3 +348,16 @@ if __name__ == "__main__":
 | **Challenge 2: Core Endpoints** | 25 pts | Implements `/v1/health`, `/v1/features/{truck_id}`, and `/v1/anomalies/fuel-check` with exact HTTP status codes. | Endpoints work but return 200 with error string instead of proper 404/422. | Endpoints fail or crash on execution. |
 | **Challenge 3: Multimodal Integration** | 25 pts | Integrates vision manifest and vector RAG search with structured query models and response guarantees. | Endpoints lack response models or query filtering is hardcoded. | Endpoints omitted or uncallable. |
 | **Challenge 4: Automated Verification** | 25 pts | Test suite exercises 200, 404, and 422 responses cleanly with 100% assertions passing. | Test suite tests happy path only, skipping 422 validation. | No automated test script provided. |
+
+---
+
+### Submission Instructions (GitHub-Only Workflow)
+1. Edit and test `units/unit_05_data_as_a_service_and_apis/lab5_starter.py` inside your personal `COSC-2060-Student-Sandbox-yourname` repository.
+2. Confirm your code and tests run cleanly in the terminal with zero errors.
+3. Commit and push your changes to your personal GitHub repository:
+   ```bash
+   git add -A
+   git commit -m "Complete Unit 5 Lab"
+   git push
+   ```
+4. In Canvas, submit your **GitHub repository URL** along with a **list of the files you changed** (e.g., `units/unit_05_data_as_a_service_and_apis/lab5_starter.py`). Do not upload `.py` files to Canvas.

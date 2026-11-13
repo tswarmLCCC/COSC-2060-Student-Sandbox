@@ -1,7 +1,7 @@
 # Unit 3 Lab Grading Rubric: The Visual Sensor Layer & YOLO Coordinate Math
 
 > **Course**: COSC 2060 — Modern Data Engineering & AI Infrastructure  
-> **Assessment**: Unit 3 Applied Engineering Lab (`lab3_yourlastname.py`)  
+> **Assessment**: Unit 3 Applied Engineering Lab (`lab3_starter.py`)  
 > **Total Points**: 100 Points (Canvas SpeedGrader)
 
 ---

@@ -83,7 +83,7 @@ COSC 2060 - UNIT 4 LAB: UNSTRUCTURED TEXT & RAG INGESTION PIPELINE
 
 ### Complete Copy-and-Paste Starter Script (`lab4_starter.py`)
 
-Save the following code as `courses/cosc-2060-data-engineering/content/labs/lab4_starter.py`:
+Open `units/unit_04_unstructured_text_and_vector_rag/lab4_starter.py` in your sandbox repository (reference starter code shown below):
 
 ```python
 """
@@ -341,3 +341,16 @@ if __name__ == "__main__":
 | **Challenge 2: Semantic Chunking** | 25 pts | Correct sliding window word algorithm preserving overlap; tags each chunk with parent ID. | Chunks split words in half or overlap is negative. | Returns single monolithic chunk per document. |
 | **Challenge 3: Dense Vector Embeddings** | 25 pts | Computes 384-d embeddings using `all-MiniLM-L6-v2`; enforces unit L2 normalization. | Embeddings not normalized, distorting cosine metric. | Uses random vectors or crash during model initialization. |
 | **Challenge 4: Hybrid Retrieval Engine** | 25 pts | Successfully retrieves Truck #219 log with similarity score > 0.55; supports exact metadata filtering. | Retrieves correct record but metadata filter is broken. | Top hit is wrong truck or score < 0.30. |
+
+---
+
+### Submission Instructions (GitHub-Only Workflow)
+1. Edit and test `units/unit_04_unstructured_text_and_vector_rag/lab4_starter.py` inside your personal `COSC-2060-Student-Sandbox-yourname` repository.
+2. Confirm your code and tests run cleanly in the terminal with zero errors.
+3. Commit and push your changes to your personal GitHub repository:
+   ```bash
+   git add -A
+   git commit -m "Complete Unit 4 Lab"
+   git push
+   ```
+4. In Canvas, submit your **GitHub repository URL** along with a **list of the files you changed** (e.g., `units/unit_04_unstructured_text_and_vector_rag/lab4_starter.py`). Do not upload `.py` files to Canvas.

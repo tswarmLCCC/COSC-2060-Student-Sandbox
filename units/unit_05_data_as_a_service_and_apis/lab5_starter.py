@@ -18,6 +18,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# %%
 # =========================================================================
 # PART 0: BASICS WARM-UP — PYDANTIC MODEL DUMP & VALIDATION ERROR
 # =========================================================================
@@ -37,6 +38,7 @@ def part0_basics_warmup() -> dict:
     return valid_ping.model_dump()
 
 
+# %%
 # =========================================================================
 # CHALLENGE 1: Defensive Pydantic v2 Data Contracts (25 pts)
 # =========================================================================
@@ -102,6 +104,7 @@ MAINTENANCE_LOGS = [
 ]
 
 
+# %%
 # =========================================================================
 # CHALLENGE 2: Core Feature & Anomaly REST Endpoints (25 pts)
 # =========================================================================
@@ -156,6 +159,7 @@ def evaluate_fuel_transaction(payload: FuelEvaluationRequest):
         )
 
 
+# %%
 # =========================================================================
 # CHALLENGE 3: Multimodal Vision & Vector RAG Endpoint Integration (25 pts)
 # =========================================================================
@@ -189,9 +193,11 @@ def search_maintenance_logs(request: RAGSearchRequest):
     return results[:request.top_k]
 
 
+# %%
 # =========================================================================
 # CHALLENGE 4: Automated Verification Suite with TestClient (25 pts)
 # =========================================================================
+# %%
 if __name__ == "__main__":
     part0_basics_warmup()
     print("\nRunning Automated API Test Suite...")

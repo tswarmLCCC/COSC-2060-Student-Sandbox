@@ -47,6 +47,7 @@ NOTES: Routine pre-trip tire tread depth measurement. Steer tires at 8/32nds, dr
 --- LOG_END ---
 """
 
+# %%
 # =========================================================================
 # PART 0: BASICS WARM-UP — REGEX CLEANING & DOT PRODUCT SIMILARITY
 # =========================================================================
@@ -66,6 +67,7 @@ def part0_basics_warmup() -> dict:
     return {"scrubbed": scrubbed, "similarity": sim}
 
 
+# %%
 # =========================================================================
 # CHALLENGE 1: Raw Log Ingestion & Header Metadata Extraction (25 pts)
 # =========================================================================
@@ -105,6 +107,7 @@ def parse_maintenance_logs(raw_text: str) -> list[dict]:
     return records
 
 
+# %%
 # =========================================================================
 # CHALLENGE 2: Overlapping Semantic Chunking Algorithm (25 pts)
 # =========================================================================
@@ -143,6 +146,7 @@ def create_overlapping_chunks(records: list[dict], chunk_words: int = 25, overla
     return chunks
 
 
+# %%
 # =========================================================================
 # CHALLENGE 3: Dense Vector Embeddings (384-d L2 Normalized) (25 pts)
 # =========================================================================
@@ -165,6 +169,7 @@ class LocalVectorIndex:
         print(f"Indexed {len(chunks)} chunks into vector space shape: {self.embeddings.shape}")
 
 
+# %%
 # =========================================================================
 # CHALLENGE 4: Hybrid Retrieval Engine with Exact Citations (25 pts)
 # =========================================================================
@@ -206,6 +211,7 @@ class LocalVectorIndex:
 # =========================================================================
 # VERIFICATION SUITE (Do not modify)
 # =========================================================================
+# %%
 if __name__ == "__main__":
     part0_basics_warmup()
     print("\n=== Step 1: Parsing Raw Logs ===")

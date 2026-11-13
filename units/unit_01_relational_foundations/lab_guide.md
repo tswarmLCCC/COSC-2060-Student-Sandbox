@@ -2,7 +2,7 @@
 
 > **Course**: COSC 2060 — Modern Data Engineering & AI Infrastructure  
 > **Unit**: Unit 1 — Relational Foundations & Feature Tables  
-> **Deliverable**: `lab1_yourlastname.py`  
+> **Deliverable**: `lab1_starter.py`  
 > **Total Points**: 100 Points  
 > **Toolchain**: Python 3.10+, DuckDB  
 > **New to the Sandbox?** If you haven't created your personal GitHub Codespaces workspace from the template repository yet, open **Getting Started with the Lab Environment** (`getting-started-lab-sandbox.html`) in the *Getting Started - Course Orientation* module first.
@@ -150,11 +150,16 @@ Your pipeline will create and populate three tables:
 
 ---
 
-### Submission Instructions
-1. Save your Python script as `lab1_yourlastname.py`.
-2. Ensure your script runs standalone from the command line (`python lab1_yourlastname.py`) without errors.
-3. Your script must generate `output/feature_matrix.parquet` and print summary diagnostics.
-4. Upload `lab1_yourlastname.py` to the Canvas assignment portal.
+### Submission Instructions (GitHub-Only Workflow)
+1. Edit and test `units/unit_01_relational_foundations/lab1_starter.py` inside your personal `COSC-2060-Student-Sandbox-yourname` repository.
+2. Ensure your script runs standalone from the command line (`python units/unit_01_relational_foundations/lab1_starter.py`) without errors and generates `output/feature_matrix.parquet`.
+3. Commit and push your changes to your personal GitHub repository:
+   ```bash
+   git add -A
+   git commit -m "Complete Unit 1 Lab"
+   git push
+   ```
+4. In Canvas, submit your **GitHub repository URL** along with a **list of the files you changed** (e.g., `units/unit_01_relational_foundations/lab1_starter.py`). Do not upload `.py` files to Canvas.
 
 ---
 
@@ -200,7 +205,7 @@ Unit 1 Applied Lab: The Feature Matrix Builder
 Starter Template File (100 Points Total)
 ====================================================================
 Student Name : [YOUR NAME HERE]
-Submission   : lab1_yourlastname.py
+Submission   : lab1_starter.py
 Due Date     : Friday at 11:59 PM (Midnight MT)
 ====================================================================
 """

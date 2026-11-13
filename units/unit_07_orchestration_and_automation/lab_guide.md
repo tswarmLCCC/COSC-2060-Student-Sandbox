@@ -93,7 +93,7 @@ COSC 2060 - UNIT 7 LAB: ORCHESTRATION, DAGS, & DEAD-LETTER QUEUES
 
 ### Complete Copy-and-Paste Starter Script (`lab7_starter.py`)
 
-Save the following code as `courses/cosc-2060-data-engineering/content/labs/lab7_starter.py`:
+Open `units/unit_07_orchestration_and_automation/lab7_starter.py` in your sandbox repository (reference starter code shown below):
 
 ```python
 """
@@ -344,3 +344,16 @@ if __name__ == "__main__":
 | **Challenge 2: Exponential Backoff** | 25 pts | Retries transient errors with exponential delay ($2^{\text{attempt}-1}$); caps at `max_retries` before declaring node failed. | Retries without delay or retries forever in an infinite loop. | Fails immediately on first transient error without retrying. |
 | **Challenge 3: Dead-Letter Queue** | 25 pts | Quarantines poison pills into DLQ with error reasons and timestamps; clean records continue processing. | Drops poison pills silently without logging to DLQ. | Crashes entire batch on first corrupted record. |
 | **Challenge 4: Idempotent Execution** | 25 pts | Partition overwrites prevent duplication; re-running pipeline outputs identical deterministic values. | Duplicate records generated on re-run (e.g. 840 gallons instead of 420). | Execution fails on subsequent runs. |
+
+---
+
+### Submission Instructions (GitHub-Only Workflow)
+1. Edit and test `units/unit_07_orchestration_and_automation/lab7_starter.py` inside your personal `COSC-2060-Student-Sandbox-yourname` repository.
+2. Confirm your code and tests run cleanly in the terminal with zero errors.
+3. Commit and push your changes to your personal GitHub repository:
+   ```bash
+   git add -A
+   git commit -m "Complete Unit 7 Lab"
+   git push
+   ```
+4. In Canvas, submit your **GitHub repository URL** along with a **list of the files you changed** (e.g., `units/unit_07_orchestration_and_automation/lab7_starter.py`). Do not upload `.py` files to Canvas.

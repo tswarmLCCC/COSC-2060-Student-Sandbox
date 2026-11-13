@@ -1,7 +1,7 @@
 # Unit 1 Lab Grading Rubric: The Relational Foundation & Look-Ahead Bias Prevention
 
 > **Course**: COSC 2060 — Modern Data Engineering & AI Infrastructure  
-> **Assessment**: Unit 1 Applied Engineering Lab (`lab1_yourlastname.py`)  
+> **Assessment**: Unit 1 Applied Engineering Lab (`lab1_starter.py`)  
 > **Total Points**: 100 Points (Canvas SpeedGrader)
 
 ---

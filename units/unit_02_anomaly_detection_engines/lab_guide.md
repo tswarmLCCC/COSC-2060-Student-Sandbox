@@ -2,7 +2,7 @@
 
 > **Course**: COSC 2060 — Modern Data Engineering & AI Infrastructure  
 > **Unit**: Unit 2 — The Anomaly Engine (Unsupervised Learning Targets)  
-> **Deliverable**: `lab2_yourlastname.py`  
+> **Deliverable**: `lab2_starter.py`  
 > **Total Points**: 100 Points  
 > **Toolchain**: Python 3.10+, Polars 0.20+, Scikit-Learn 1.3+
 
@@ -69,22 +69,23 @@ You are a senior data engineer at **Apex Logistics Inc.** Following the resoluti
 
 Every month, the company processes **1,000,000 fuel transaction records**. You have been provided with `generate_fuel_data.py`, which synthesizes one month of raw telemetry logs into `data/fuel_transactions.parquet`.
 
-Your mission is to construct a production-ready, multithreaded data pipeline (`lab2_yourlastname.py`) using **Polars LazyFrames** that ingests all 1,000,000 records, programmatically cleans and standardizes the features, and exports a standardized matrix evaluated by an unsupervised **Isolation Forest** model to detect fraudulent swipes.
+Your mission is to construct a production-ready, multithreaded data pipeline (`lab2_starter.py`) using **Polars LazyFrames** that ingests all 1,000,000 records, programmatically cleans and standardizes the features, and exports a standardized matrix evaluated by an unsupervised **Isolation Forest** model to detect fraudulent swipes.
 
 ---
 
-### Submission Instructions
-1. First, generate your dataset by running:
+### Submission Instructions (GitHub-Only Workflow)
+1. Confirm your sandbox dataset `datasets/fuel_transactions_1m.parquet` (1,000,000 rows) is present (if missing, run `python datasets/seed_all_datasets.py`).
+2. Edit and test `units/unit_02_anomaly_detection_engines/lab2_starter.py` inside your personal `COSC-2060-Student-Sandbox-yourname` repository:
    ```bash
-   python courses/cosc-2060-data-engineering/content/labs/generate_fuel_data.py
+   python units/unit_02_anomaly_detection_engines/lab2_starter.py
    ```
-   *(Verify `data/fuel_transactions.parquet` is created with 1,000,000 rows).*
-2. Save your solution as `lab2_yourlastname.py`.
-3. Your script must run standalone from the command line without running out of memory:
+3. Commit and push your changes to your personal GitHub repository:
    ```bash
-   python lab2_yourlastname.py
+   git add -A
+   git commit -m "Complete Unit 2 Lab"
+   git push
    ```
-4. Upload `lab2_yourlastname.py` to Canvas.
+4. In Canvas, submit your **GitHub repository URL** along with a **list of the files you changed** (e.g., `units/unit_02_anomaly_detection_engines/lab2_starter.py`). Do not upload `.py` files to Canvas.
 
 ---
 
@@ -141,7 +142,7 @@ Unit 2 Applied Lab: The Outlier Detection Pipeline
 Starter Template File (100 Points Total)
 ====================================================================
 Student Name : [YOUR NAME HERE]
-Submission   : lab2_yourlastname.py
+Submission   : lab2_starter.py
 Due Date     : Friday at 11:59 PM (Midnight MT)
 ====================================================================
 """

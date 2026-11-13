@@ -129,7 +129,7 @@ velocity_tx = (
 )
 ```
 
-Look at what happens on each row for Driver 42:
+Look at what happens on each row for Driver 42 *(you can run this exact cell-by-cell example in `units/unit_02_anomaly_detection_engines/coding_clinic.ipynb` under Part 3)*:
 * On Driver 42's **first swipe**, there is no previous swipe, so `.shift(1)` returns `null` and `.fill_null(0.0)` safely sets `implied_speed_mph` to `0.0`.
 * On Driver 42's **second swipe** (45 minutes later, 950 miles away), Polars divides `950.0 miles / 0.75 hours` and populates `implied_speed_mph = 1266.67`—instantly exposing a cloned fuel card!
 
@@ -469,7 +469,7 @@ final_df.write_parquet("output/anomaly_features.parquet")
 Try these three short exercises in your GitHub Codespaces sandbox (`units/unit_02_anomaly_detection_engines/`) before starting the graded lab:
 
 1. **Exercise 1 (Inspecting the Query Plan):** In Python, create a `LazyFrame` with `.lazy()`, add a `.filter()` and `.with_columns()`, and print `lazy_pipeline.explain()`. Observe how Polars shows you the optimized query plan before reading the data.
-2. **Exercise 2 (Seeing the Effect of Sensor Glitches on Z-Scores):** In `coding_clinic.py`, check what happens to `z_gallons` if you compute the Z-score *before* filtering out negative or `99999.0` sensor error rows versus *after* filtering them out.
+2. **Exercise 2 (Seeing the Effect of Sensor Glitches on Z-Scores):** In `coding_clinic.ipynb`, check what happens to `z_gallons` if you compute the Z-score *before* filtering out negative or `99999.0` sensor error rows versus *after* filtering them out.
 3. **Exercise 3 (Group Window Practice):** Using `.over("driver_id")`, add a column that calculates the maximum `gallons` each driver has ever pumped (`pl.col("gallons").max().over("driver_id")`).
 
 ### Common Traps & Formative Self-Check FAQ

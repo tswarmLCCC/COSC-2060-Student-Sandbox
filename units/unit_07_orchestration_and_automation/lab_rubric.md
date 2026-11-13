@@ -1,7 +1,7 @@
 # Unit 7 Lab Grading Rubric: Orchestration, Asset DAGs, & Dead-Letter Queues
 
 > **Course**: COSC 2060 — Modern Data Engineering & AI Infrastructure  
-> **Assessment**: Unit 7 Applied Engineering Lab (`lab7_yourlastname.py`)  
+> **Assessment**: Unit 7 Applied Engineering Lab (`lab7_starter.py`)  
 > **Total Points**: 100 Points (Canvas SpeedGrader)
 
 ---

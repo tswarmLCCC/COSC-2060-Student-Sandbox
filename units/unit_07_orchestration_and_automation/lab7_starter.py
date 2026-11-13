@@ -7,6 +7,7 @@ Date: [Current Date]
 import time
 from typing import Dict, List, Any, Callable
 
+# %%
 # =========================================================================
 # PART 0: BASICS WARM-UP — IDEMPOTENCY & DLQ FILTERING FROM SCRATCH
 # =========================================================================
@@ -25,6 +26,7 @@ def part0_basics_warmup() -> Dict[str, Any]:
     return store
 
 
+# %%
 # =========================================================================
 # CHALLENGE 1: Directed Acyclic Graph (DAG) Dependency Resolver (25 pts)
 # =========================================================================
@@ -80,6 +82,7 @@ class DAGOrchestrator:
         return order
 
 
+# %%
 # =========================================================================
 # CHALLENGE 2: Automated Retry Policy with Exponential Backoff (25 pts)
 # =========================================================================
@@ -106,6 +109,7 @@ class DAGOrchestrator:
                     return False
 
 
+# %%
 # =========================================================================
 # CHALLENGE 3: Poison Pill Quarantine & Dead-Letter Queue (DLQ) (25 pts)
 # =========================================================================
@@ -133,6 +137,7 @@ class DAGOrchestrator:
             self.execute_node_with_retry(node)
 
 
+# %%
 # =========================================================================
 # CHALLENGE 4: Idempotent Daily Pipeline Execution (25 pts)
 # =========================================================================
@@ -187,6 +192,7 @@ def task_write_features(ctx):
 # =========================================================================
 # VERIFICATION SUITE (Do not modify)
 # =========================================================================
+# %%
 if __name__ == "__main__":
     part0_basics_warmup()
     print("\n=== Step 1: Building DAG & Checking Topological Order ===")

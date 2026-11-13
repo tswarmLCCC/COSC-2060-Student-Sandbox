@@ -156,5 +156,6 @@ def main():
     print("Verification passed: Output tensors are strictly 640x640 with zero aspect distortion.")
 
 
+# %%
 if __name__ == "__main__":
     main()

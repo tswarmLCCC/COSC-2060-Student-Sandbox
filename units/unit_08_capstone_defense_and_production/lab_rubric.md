@@ -1,7 +1,7 @@
 # Unit 8 Lab Grading Rubric: Capstone Defense, Multi-Stage Docker, & Blind Batch Audit
 
 > **Course**: COSC 2060 — Modern Data Engineering & AI Infrastructure  
-> **Assessment**: Unit 8 Applied Engineering Lab (`lab8_yourlastname.py`)  
+> **Assessment**: Unit 8 Applied Engineering Lab (`lab8_starter.py`)  
 > **Total Points**: 100 Points (Canvas SpeedGrader)
 
 ---

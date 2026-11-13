@@ -81,7 +81,7 @@ COSC 2060 - UNIT 8 LAB: CAPSTONE DEFENSE & BLIND BATCH VERIFICATION
 
 ### Complete Copy-and-Paste Starter Script (`lab8_starter.py`)
 
-Save the following code as `courses/cosc-2060-data-engineering/content/labs/lab8_starter.py`:
+Open `units/unit_08_capstone_defense_and_production/lab8_starter.py` in your sandbox repository (reference starter code shown below):
 
 ```python
 """
@@ -288,3 +288,16 @@ if __name__ == "__main__":
 | **Challenge 2: Blind Batch Ingestion** | 25 pts | Quarantines poison pills into DLQ without crash; flags fuel fraud; aggregates valid transactions. | Ingestion crashes on negative values or ignores fraud alert. | Fails to parse transactions. |
 | **Challenge 3: Multimodal Diagnostics** | 25 pts | Correctly joins vision defects and RAG notes; grounds TRUCK-219 with 2 verified citations. | Grounds truck but misses one of the two modalities. | Gives false clearance to unsafe vehicle. |
 | **Challenge 4: Live Defense Verification** | 25 pts | 100% assertions pass across all 4 phases of blind test batch; outputs clear executive audit trail. | Passes with warnings or manual intervention required. | Script crashes during verification suite. |
+
+---
+
+### Submission Instructions (GitHub-Only Workflow)
+1. Edit and test `units/unit_08_capstone_defense_and_production/lab8_starter.py` inside your personal `COSC-2060-Student-Sandbox-yourname` repository.
+2. Confirm your code and tests run cleanly in the terminal with zero errors.
+3. Commit and push your changes to your personal GitHub repository:
+   ```bash
+   git add -A
+   git commit -m "Complete Unit 8 Lab"
+   git push
+   ```
+4. In Canvas, submit your **GitHub repository URL** along with a **list of the files you changed** (e.g., `units/unit_08_capstone_defense_and_production/lab8_starter.py`). Do not upload `.py` files to Canvas.

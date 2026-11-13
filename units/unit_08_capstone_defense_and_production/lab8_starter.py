@@ -29,6 +29,7 @@ BLIND_TEST_BATCH = {
 }
 
 
+# %%
 # =========================================================================
 # PART 0: BASICS WARM-UP — CAPSTONE PRE-FLIGHT SANITY CHECK
 # =========================================================================
@@ -44,6 +45,7 @@ def part0_basics_warmup() -> Dict[str, int]:
     return counts
 
 
+# %%
 # =========================================================================
 # CHALLENGE 1: Multi-Modal System Architecture & Config (25 pts)
 # =========================================================================
@@ -57,6 +59,7 @@ class CapstoneDefenseSystem:
         print(f"[{self.system_name}] Initializing Capstone Defense Ecosystem...")
 
 
+# %%
 # =========================================================================
 # CHALLENGE 2: Blind Test Batch Ingestion & DLQ Isolation (25 pts)
 # =========================================================================
@@ -93,6 +96,7 @@ class CapstoneDefenseSystem:
             self.feature_store[tid]["transaction_count"] += 1
 
 
+# %%
 # =========================================================================
 # CHALLENGE 3: Automated Cross-Engine Diagnostic Synthesis (25 pts)
 # =========================================================================
@@ -134,9 +138,11 @@ class CapstoneDefenseSystem:
             }
 
 
+# %%
 # =========================================================================
 # CHALLENGE 4: Full Stack Capstone Defense Verification Suite (25 pts)
 # =========================================================================
+# %%
 if __name__ == "__main__":
     print("================================================================================")
     print("COSC 2060 CAPSTONE TECHNICAL DEFENSE: LIVE SIMULATION")
